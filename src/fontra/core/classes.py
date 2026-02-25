@@ -81,6 +81,7 @@ class Font:
     kerning: dict[str, Kerning] = field(default_factory=dict)
     features: OpenTypeFeatures = field(default_factory=OpenTypeFeatures)
     customData: CustomData = field(default_factory=dict)
+    colorPalettes: list[list[RGBAColor]] = field(default_factory=list)
 
     def _trackAssignedAttributeNames(self):
         # see fonthandler.py
@@ -196,6 +197,7 @@ class GlyphSource:
 @dataclass(kw_only=True)
 class Layer:
     glyph: StaticGlyph
+    colorIndex: Optional[int] = None
     customData: CustomData = field(default_factory=dict)
 
 
@@ -205,6 +207,8 @@ class RGBAColor:
     green: float
     blue: float
     alpha: float = 0
+    def as_tuple(self):
+        return (self.red, self.green, self.blue, getattr(self, "alpha", 1.0))
 
 
 @dataclass(kw_only=True)

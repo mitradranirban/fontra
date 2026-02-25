@@ -795,6 +795,7 @@ class DesignspaceBackend(WatchableBackend, ReadableBaseBackend):
             drawPointsFunc = populateUFOLayerGlyph(
                 layerGlyph,
                 layer.glyph,
+                glyph,
                 hasVariableComponents,
                 imageFileName=imageFileName,
             )
@@ -1780,6 +1781,21 @@ class UFOBackend(DesignspaceBackend):
         self.fileWatcherIgnoreNextChange(
             os.path.join(self.defaultUFOLayer.path, LIB_FILENAME)
         )
+        # Read the UFO lib, update color palette data, then write it back.
+        # self.defaultReader is a UFOReaderWriter; use readLib/writeLib directly.
+        ufo_lib = self.defaultReader.readLib()
+        if hasattr(self.font, "colorPalettes") and self.font.colorPalettes:
+            ufo_palettes = [
+                [
+                    [c.red, c.green, c.blue, getattr(c, "alpha", 1.0)]
+                    for c in palette
+                ]
+                for palette in self.font.colorPalettes
+            ]
+            ufo_lib["com.github.googlei18n.ufo2ft.colorPalettes"] = ufo_palettes
+        else:
+            ufo_lib.pop("com.github.googlei18n.ufo2ft.colorPalettes", None)
+        self.defaultReader.writeLib(ufo_lib)
 
     async def putAxes(self, axes):
         if axes.axes or axes.mappings:
@@ -2197,6 +2213,7 @@ def readGlyphOrCreate(
 def populateUFOLayerGlyph(
     layerGlyph: UFOGlyph,
     staticGlyph: StaticGlyph,
+    fontra_glyph: VariableGlyph,
     forceVariableComponents: bool = False,
     imageFileName: str | None = None,
 ) -> Callable[[AbstractPointPen], None]:
@@ -2210,6 +2227,15 @@ def populateUFOLayerGlyph(
 
     staticGlyph.path.drawPoints(pen)
     variableComponents = []
+    # Build the color mapping for ufo2ft
+    color_mapping = []
+    for layer_name, layer in fontra_glyph.layers.items():
+        if getattr(layer, "colorIndex", None) is not None:
+            color_mapping.append([layer_name, layer.colorIndex])
+            
+    # Use storeInLib to handle activation/deactivation
+    storeInLib(layerGlyph, "com.github.googlei18n.ufo2ft.colorLayerMapping", color_mapping)
+    
     layerGlyph.anchors = [
         {"name": a.name, "x": a.x, "y": a.y} for a in staticGlyph.anchors
     ]
@@ -2302,17 +2328,33 @@ def packLocalAxes(axes):
         for axis in axes
     ]
 
-
-def reverseSparseDict(d):
-    return {v: k for k, v in d.items() if k != v}
-
-
 def storeInLib(layerGlyph, key, value):
     if value:
         layerGlyph.lib[key] = value
     else:
         layerGlyph.lib.pop(key, None)
 
+def reverseSparseDict(d):
+    return {v: k for k, v in d.items() if k != v}
+
+
+def storeColorMappingInLib(layerGlyph, layers):
+    """
+    Specifically handles the ufo2ft colorLayerMapping activation.
+    Divides by 255 if values are stored as 0-255 floats.
+    """
+    mapping = []
+    for layer in layers:
+        # Check if colorIndex is set (0 is a valid index, so check against None)
+        if getattr(layer, "colorIndex", None) is not None:
+            mapping.append([layer.name, layer.colorIndex])
+    
+    # Use the same logic as storeInLib: only add if the mapping exists
+    key = "com.github.googlei18n.ufo2ft.colorLayerMapping"  
+    if mapping:
+        layerGlyph.lib[key] = mapping
+    else:
+        layerGlyph.lib.pop(key, None)
 
 def glyphHasVariableComponents(glyph):
     return any(
