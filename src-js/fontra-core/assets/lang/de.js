@@ -107,6 +107,7 @@ export const strings = {
   "background-image.labels.colorize": "Färbung",
   "background-image.labels.opacity": "Transparenz",
   "canvas.clean-view-and-hand-tool": "Ungehinderte Sicht und Hand Werkzeug",
+  "color-palettes.title": "Color Palettes",
   "cross-axis-mapping.axis-participates":
     "Wenn markiert, dann ist diese Achse teil des Mappings",
   "cross-axis-mapping.delete": "Achsübergreifendes Mapping entfernen",
@@ -371,6 +372,7 @@ export const strings = {
   "sidebar.selection-info": "Auswahl-Info",
   "sidebar.selection-info.advance-width": "Breite",
   "sidebar.selection-info.base-unicode": "Basis Unicode",
+  "sidebar.selection-info.color-index": "Color Index",
   "sidebar.selection-info.component": "Komponente #%0",
   "sidebar.selection-info.component.base-glyph": "Basis-Glyph",
   "sidebar.selection-info.component.center": "Zentrum",

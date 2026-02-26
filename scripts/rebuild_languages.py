@@ -73,7 +73,12 @@ def main():
     )
 
     rows = downloadSheet(languageSpreadsheetURL + "export?format=csv")
-
+    LOCAL_OVERRIDES_PATH = repoDir / "scripts" / "local-language-overrides.csv"
+    if LOCAL_OVERRIDES_PATH.exists():
+        print(f"Merging local overrides from {LOCAL_OVERRIDES_PATH}")
+        with open(LOCAL_OVERRIDES_PATH, encoding="utf-8") as f:
+            local_rows = list(csv.reader(f))
+        rows = rows + local_rows
     numHeaders = 5
     headers = rows[:numHeaders]
     assert headers[0][0] == "Go to Documentation", headers[0][0]
