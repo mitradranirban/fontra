@@ -227,9 +227,38 @@ export default class SelectionInfoPanel extends Panel {
               varGlyphController,
               "xAdvance"
             ),
-          minValue: 0,
-        });
-        formContents.push({
+            minValue: 0,
+          });
+  
+          // COLOR INDEX — assigns this layer to a CPAL palette entry for ufo2ft COLR export
+          const _fontCustomData = this.fontController.customData;
+          const _colorPalettes =
+            _fontCustomData?.["com.github.googlei18n.ufo2ft.colorPalettes"] ?? [[]];
+          const _paletteSize = _colorPalettes[0]?.length ?? 0;
+          const _editLayerName = this.sceneController.sceneSettings.editLayerName;
+          const _currentColorIndex =
+            varGlyphController?.glyph?.layers?.[_editLayerName]?.colorIndex ?? null;
+  
+          if (_paletteSize > 0) {
+            formContents.push({
+              type: "edit-number",
+              key: JSON.stringify(["layers", _editLayerName, "colorIndex"]),
+              label: translate("sidebar.selection-info.color-index"),
+              value: _currentColorIndex,
+              numDigits: 0,
+              minValue: 0,
+              maxValue: _paletteSize - 1,
+              getValue: (layerGlyph, layerGlyphController, fieldItem) => {
+                return layerGlyph.colorIndex ?? null;
+              },
+              setValue: (layerGlyph, layerGlyphController, fieldItem, value) => {
+                layerGlyph.colorIndex =
+                  value == null || value === "" ? null : Math.round(value);
+              },
+            });
+          }
+  
+         formContents.push({
           type: "edit-number-x-y",
           key: '["sidebearings"]',
           label: translate("sidebar.selection-info.sidebearings"),

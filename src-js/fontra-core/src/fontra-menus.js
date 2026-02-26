@@ -164,6 +164,7 @@ function getFontMenuItems() {
     ["opentype-feature-code.title", "#opentype-feature-code-panel"],
     ["cross-axis-mapping.title", "#cross-axis-mapping-panel"],
     ["development-status-definitions.title", "#development-status-definitions-panel"],
+    ["color-palettes.title", "#color-palettes-panel"],
     [undefined, undefined], // divider
     ["font-overview.title", "fontoverview"],
   ];

@@ -107,6 +107,7 @@ export const strings = {
   "background-image.labels.colorize": "Colorize",
   "background-image.labels.opacity": "Opacity",
   "canvas.clean-view-and-hand-tool": "Clean View and Hand Tool",
+  "color-palettes.title": "Color Palettes",
   "cross-axis-mapping.axis-participates":
     "When checked, this axis participates in the mapping",
   "cross-axis-mapping.delete": "Delete cross-axis mapping",
@@ -361,6 +362,7 @@ export const strings = {
   "sidebar.selection-info": "Selection Info",
   "sidebar.selection-info.advance-width": "Advance width",
   "sidebar.selection-info.base-unicode": "Base unicode",
+  "sidebar.selection-info.color-index": "Color Index",
   "sidebar.selection-info.component": "Component #%0",
   "sidebar.selection-info.component.base-glyph": "Base glyph",
   "sidebar.selection-info.component.center": "Center",
