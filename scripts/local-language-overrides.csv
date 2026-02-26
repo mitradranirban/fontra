@@ -1,2 +1,9 @@
 ,color-palettes.title,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes
-,sidebar.selection-info.color-index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index
+,panel-color-layers.title,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers
+,sidebar.color-layers.color-index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index
+,color-layers.title,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers
+,color-layers.no-glyph-selected,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers
+,color-layers.no-layers-yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet
+,color-layers.add-layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer
+,color-layers.remove-layer,Remove,Remove,Remove,Remove,Remove,Remove,Remove,Remove,Remove,Remove
+,color-layers.edit-description,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping
