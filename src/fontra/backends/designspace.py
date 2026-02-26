@@ -1777,26 +1777,17 @@ class UFOBackend(DesignspaceBackend):
         return self.defaultReader.readLib()
 
     async def putCustomData(self, lib):
-        self.defaultReader.writeLib(lib)
+        COLOR_PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes"
+        ufolib = self.defaultReader.readLib()
+        color_palettes = lib.get(COLOR_PALETTES_KEY)
+        if color_palettes:
+            ufolib[COLOR_PALETTES_KEY] = color_palettes
+        else:
+            ufolib.pop(COLOR_PALETTES_KEY, None)
+        self.defaultReader.writeLib(ufolib)
         self.fileWatcherIgnoreNextChange(
             os.path.join(self.defaultUFOLayer.path, LIB_FILENAME)
         )
-        # Read the UFO lib, update color palette data, then write it back.
-        # self.defaultReader is a UFOReaderWriter; use readLib/writeLib directly.
-        ufo_lib = self.defaultReader.readLib()
-        if hasattr(self.font, "colorPalettes") and self.font.colorPalettes:
-            ufo_palettes = [
-                [
-                    [c.red, c.green, c.blue, getattr(c, "alpha", 1.0)]
-                    for c in palette
-                ]
-                for palette in self.font.colorPalettes
-            ]
-            ufo_lib["com.github.googlei18n.ufo2ft.colorPalettes"] = ufo_palettes
-        else:
-            ufo_lib.pop("com.github.googlei18n.ufo2ft.colorPalettes", None)
-        self.defaultReader.writeLib(ufo_lib)
-
     async def putAxes(self, axes):
         if axes.axes or axes.mappings:
             raise ValueError("The single-UFO backend does not support variation axes")
