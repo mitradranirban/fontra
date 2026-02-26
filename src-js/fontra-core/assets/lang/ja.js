@@ -107,6 +107,7 @@ export const strings = {
   "background-image.labels.colorize": "彩色",
   "background-image.labels.opacity": "透明度",
   "canvas.clean-view-and-hand-tool": "塗りのプレビューと手のひらツール",
+  "color-palettes.title": "Color Palettes",
   "cross-axis-mapping.axis-participates":
     "チェックすると、この補完軸がマッピング内で有効になります",
   "cross-axis-mapping.delete": "交差補完軸マッピングを削除",
@@ -364,6 +365,7 @@ export const strings = {
   "sidebar.selection-info": "グリフの情報",
   "sidebar.selection-info.advance-width": "グリフ幅",
   "sidebar.selection-info.base-unicode": "Unicode",
+  "sidebar.selection-info.color-index": "Color Index",
   "sidebar.selection-info.component": "コンポーネント #%0",
   "sidebar.selection-info.component.base-glyph": "グリフ名",
   "sidebar.selection-info.component.center": "中心座標",

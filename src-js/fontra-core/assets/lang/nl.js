@@ -107,6 +107,7 @@ export const strings = {
   "background-image.labels.colorize": "Colorize",
   "background-image.labels.opacity": "Opacity",
   "canvas.clean-view-and-hand-tool": "Schone weergave en Hand gereedschap",
+  "color-palettes.title": "Color Palettes",
   "cross-axis-mapping.axis-participates":
     "When checked, this axis participates in the mapping",
   "cross-axis-mapping.delete": "Delete cross-axis mapping",
@@ -365,6 +366,7 @@ export const strings = {
   "sidebar.selection-info": "Selecie informatie",
   "sidebar.selection-info.advance-width": "Zetbreedte",
   "sidebar.selection-info.base-unicode": "Base unicode",
+  "sidebar.selection-info.color-index": "Color Index",
   "sidebar.selection-info.component": "Component #%0",
   "sidebar.selection-info.component.base-glyph": "Basisglyph",
   "sidebar.selection-info.component.center": "Middelpunt",

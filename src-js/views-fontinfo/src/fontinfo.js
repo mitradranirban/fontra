@@ -10,11 +10,13 @@ import { DevelopmentStatusDefinitionsPanel } from "./panel-development-status-de
 import { FontInfoPanel } from "./panel-font-info.js";
 import { OpenTypeFeatureCodePanel } from "./panel-opentype-feature-code.js";
 import { SourcesPanel } from "./panel-sources.js";
+import { ColorPalettesPanel } from "./panel-color-palette.js";
 
 const panelClasses = [
   FontInfoPanel,
   AxesPanel,
   SourcesPanel,
+  ColorPalettesPanel,
   OpenTypeFeatureCodePanel,
   CrossAxisMappingPanel,
   DevelopmentStatusDefinitionsPanel,
