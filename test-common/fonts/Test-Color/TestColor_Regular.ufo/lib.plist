@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>com.github.googlei18n.ufo2ft.colorPalettes</key>
+    <array>
+      <array>
+        <array>
+          <real>0.9647058823529412</real>
+          <real>0.07450980392156863</real>
+          <real>0.07450980392156863</real>
+          <integer>1</integer>
+        </array>
+        <array>
+          <real>0.058823529411764705</real>
+          <real>0.9411764705882353</real>
+          <real>0.23529411764705882</real>
+          <integer>1</integer>
+        </array>
+        <array>
+          <real>0.09019607843137255</real>
+          <real>0.22745098039215686</real>
+          <real>0.9098039215686274</real>
+          <integer>1</integer>
+        </array>
+      </array>
+    </array>
+    <key>fontra.projectGlyphSets</key>
+    <array>
+      <dict>
+        <key>commentChars</key>
+        <string>#</string>
+        <key>dataFormat</key>
+        <string>glyph-names</string>
+        <key>name</key>
+        <string>GF Latin Kernel</string>
+        <key>url</key>
+        <string>https://cdn.jsdelivr.net/gh/googlefonts/glyphsets/data/results/txt/nice-names/GF_Latin_Kernel.txt</string>
+      </dict>
+    </array>
+  </dict>
+</plist>
