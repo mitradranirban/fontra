@@ -6,12 +6,17 @@ import { Form } from "@fontra/web-components/ui-form.js";
 import Panel from "./panel.js";
 
 const PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes";
-const MAPPING_KEY  = "com.github.googlei18n.ufo2ft.colorLayerMapping";
+
+// MAPPING_KEY is the canonical UFO lib key used by ufo2ft.
+// The backend reads/writes it at the top level of the .glif lib.
+// Internally, Fontra transfers it through glyph.customData under the
+// short key below so the backend's pop("colorLayerMapping") finds it.
+const MAPPING_KEY = "com.github.googlei18n.ufo2ft.colorLayerMapping"; // kept for reference
+const CUSTOM_DATA_KEY = "colorLayerMapping"; // short key used in glyph.customData
 
 export default class ColorLayersPanel extends Panel {
-
   identifier = "color-layers";
-  iconPath   = "/images/color.svg";
+  iconPath = "/images/color.svg";
 
   constructor(editorController) {
     super(editorController);
@@ -27,15 +32,12 @@ export default class ColorLayersPanel extends Panel {
 
   getContentElement() {
     this.colorLayersForm = new Form();
-    return html.div(
-      { class: "panel" },
-      [
-        html.div(
-          { class: "panel-section panel-section--flex panel-section--scrollable" },
-          [this.colorLayersForm]
-        ),
-      ]
-    );
+    return html.div({ class: "panel" }, [
+      html.div(
+        { class: "panel-section panel-section--flex panel-section--scrollable" },
+        [this.colorLayersForm]
+      ),
+    ]);
   }
 
   async toggle(on, focus) {
@@ -48,7 +50,7 @@ export default class ColorLayersPanel extends Panel {
     await this.fontController.ensureInitialized;
 
     const customData = this.fontController.customData ?? {};
-    const palettes   = customData[PALETTES_KEY];
+    const palettes = customData[PALETTES_KEY];
 
     if (!palettes?.length || !palettes[0]?.length) {
       this.colorLayersForm.setFieldDescriptions([
@@ -69,7 +71,10 @@ export default class ColorLayersPanel extends Panel {
 
     const varGlyphController =
       await this.sceneController.sceneModel.getSelectedVariableGlyphController();
-    const mapping = varGlyphController?.glyph?.customData?.[MAPPING_KEY] ?? [];
+
+    // Backend promotes "com.github.googlei18n.ufo2ft.colorLayerMapping" from
+    // the top-level .glif lib into customData[CUSTOM_DATA_KEY] on read.
+    const mapping = varGlyphController?.glyph?.customData?.[CUSTOM_DATA_KEY] ?? [];
 
     const formContents = [];
 
@@ -102,7 +107,8 @@ export default class ColorLayersPanel extends Panel {
           label: layerName,
           auxiliaryElement: html.div(
             {
-              style: "cursor: pointer; font-size: 1.2em; line-height: 1; padding: 0 0.3em;",
+              style:
+                "cursor: pointer; font-size: 1.2em; line-height: 1; padding: 0 0.3em;",
               onclick: () => this._removeLayer(glyphName, i, mapping),
               title: translate("color-layers.remove-layer"),
             },
@@ -141,16 +147,18 @@ export default class ColorLayersPanel extends Panel {
   async _writeMapping(glyphName, newMapping) {
     await this.sceneController.editGlyphAndRecordChanges((glyph) => {
       if (newMapping.length > 0) {
-        glyph.customData[MAPPING_KEY] = newMapping;
+        // Use the short key — backend pops "colorLayerMapping" and writes it
+        // to the top-level .glif lib as "com.github.googlei18n.ufo2ft.colorLayerMapping"
+        glyph.customData[CUSTOM_DATA_KEY] = newMapping;
       } else {
-        delete glyph.customData[MAPPING_KEY];
+        delete glyph.customData[CUSTOM_DATA_KEY];
       }
       return translate("color-layers.edit-description");
     });
   }
 
   async _addLayer(glyphName, paletteSize, mapping) {
-    const layerName  = this._nextLayerName(mapping);
+    const layerName = this._nextLayerName(mapping);
     const colorIndex = mapping.length < paletteSize ? mapping.length : 0;
     const newMapping = [...mapping, [layerName, colorIndex]];
 
@@ -160,7 +168,8 @@ export default class ColorLayersPanel extends Panel {
           glyph: { path: { contours: [] }, components: [] },
         };
       }
-      glyph.customData[MAPPING_KEY] = newMapping;
+      // Use the short key — same contract as _writeMapping
+      glyph.customData[CUSTOM_DATA_KEY] = newMapping;
       return translate("color-layers.add-layer");
     });
   }
@@ -174,9 +183,20 @@ export default class ColorLayersPanel extends Panel {
   async _setColorIndex(glyphName, index, value) {
     const varGlyphController =
       await this.sceneController.sceneModel.getSelectedVariableGlyphController();
-    const mapping = [
-      ...(varGlyphController?.glyph?.customData?.[MAPPING_KEY] ?? []),
-    ];
+
+    // Read from CUSTOM_DATA_KEY — matches what the backend and update() use.
+    const currentMapping = varGlyphController?.glyph?.customData?.[CUSTOM_DATA_KEY];
+
+    // Guard: if the mapping is absent or the index is stale, bail out silently.
+    // This prevents _writeMapping being called with an empty/broken array,
+    // which would delete the entire mapping from the glyph.
+    if (!currentMapping?.length || index >= currentMapping.length) {
+      return;
+    }
+
+    // Deep-clone each [layerName, colorIndex] pair so we never mutate
+    // the live glyph object before the write completes.
+    const mapping = currentMapping.map((entry) => [...entry]);
     mapping[index] = [mapping[index][0], value];
     await this._writeMapping(glyphName, mapping);
   }

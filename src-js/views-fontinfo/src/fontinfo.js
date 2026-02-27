@@ -5,12 +5,12 @@ import { translate } from "@fontra/core/localization.js";
 import { MultiPanelController } from "@fontra/core/multi-panel.js";
 import { ViewController } from "@fontra/core/view-controller.js";
 import { AxesPanel } from "./panel-axes.js";
+import { ColorPalettesPanel } from "./panel-color-palette.js";
 import { CrossAxisMappingPanel } from "./panel-cross-axis-mapping.js";
 import { DevelopmentStatusDefinitionsPanel } from "./panel-development-status-definitions.js";
 import { FontInfoPanel } from "./panel-font-info.js";
 import { OpenTypeFeatureCodePanel } from "./panel-opentype-feature-code.js";
 import { SourcesPanel } from "./panel-sources.js";
-import { ColorPalettesPanel } from "./panel-color-palette.js";
 
 const panelClasses = [
   FontInfoPanel,
