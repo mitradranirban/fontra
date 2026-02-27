@@ -207,6 +207,7 @@ class RGBAColor:
     green: float
     blue: float
     alpha: float = 0
+
     def as_tuple(self):
         return (self.red, self.green, self.blue, getattr(self, "alpha", 1.0))
 

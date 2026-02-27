@@ -11,52 +11,48 @@ export class ColorPalettesPanel extends BaseInfoPanel {
 
   async setupUI() {
     const palettes = structuredClone(
-        this.fontController.customData?.[PALETTES_KEY] ?? [[[0, 0, 0, 1.0]]]
+      this.fontController.customData?.[PALETTES_KEY] ?? [[[0, 0, 0, 1.0]]]
     );
 
     this.panelElement.innerHTML = "";
 
     palettes.forEach((palette, pi) => {
-        const swatches = palette.map((color, ci) => {
-            const inp = html.input({
-                type: "color",
-                title: `Color index ${ci}`,
-                value: this.toHex(color[0], color[1], color[2]),
-            });
-            inp.addEventListener("change", async (e) => {
-                await this.onColorChange(pi, ci, e.target.value, palettes);
-            });
-            return html.label(
-                { class: "swatch-label" },
-                [inp, html.span({}, [String(ci)])]  // ← children in array
-            );
+      const swatches = palette.map((color, ci) => {
+        const inp = html.input({
+          type: "color",
+          title: `Color index ${ci}`,
+          value: this.toHex(color[0], color[1], color[2]),
         });
-
-        const addColorBtn = html.button({ class: "add-color-btn" }, ["+"]);
-        addColorBtn.addEventListener("click", async () => {
-            palettes[pi].push([0, 0, 0, 1.0]);
-            await this.savePalettes(palettes);
+        inp.addEventListener("change", async (e) => {
+          await this.onColorChange(pi, ci, e.target.value, palettes);
         });
-
-        const section = html.div(
-            { class: "color-palette-section" },
-            [
-                html.div({ class: "palette-label" }, [`Palette ${pi}`]),
-                html.div({ class: "color-swatches" }, [...swatches, addColorBtn]),
-            ]
+        return html.label(
+          { class: "swatch-label" },
+          [inp, html.span({}, [String(ci)])] // ← children in array
         );
+      });
 
-        this.panelElement.appendChild(section);
+      const addColorBtn = html.button({ class: "add-color-btn" }, ["+"]);
+      addColorBtn.addEventListener("click", async () => {
+        palettes[pi].push([0, 0, 0, 1.0]);
+        await this.savePalettes(palettes);
+      });
+
+      const section = html.div({ class: "color-palette-section" }, [
+        html.div({ class: "palette-label" }, [`Palette ${pi}`]),
+        html.div({ class: "color-swatches" }, [...swatches, addColorBtn]),
+      ]);
+
+      this.panelElement.appendChild(section);
     });
 
     const addPaletteBtn = html.button({ class: "add-palette-btn" }, ["Add Palette"]);
     addPaletteBtn.addEventListener("click", async () => {
-        palettes.push([[0, 0, 0, 1.0]]);
-        await this.savePalettes(palettes);
+      palettes.push([[0, 0, 0, 1.0]]);
+      await this.savePalettes(palettes);
     });
     this.panelElement.appendChild(addPaletteBtn);
-}
-
+  }
 
   async onColorChange(pi, ci, hex, palettes) {
     const r = parseInt(hex.slice(1, 3), 16) / 255;
@@ -86,7 +82,11 @@ export class ColorPalettesPanel extends BaseInfoPanel {
     return (
       "#" +
       [r, g, b]
-        .map((v) => Math.round(v * 255).toString(16).padStart(2, "0"))
+        .map((v) =>
+          Math.round(v * 255)
+            .toString(16)
+            .padStart(2, "0")
+        )
         .join("")
     );
   }

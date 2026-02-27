@@ -1,12 +1,18 @@
-import pytest
 import pathlib
 import tempfile
+
+import pytest
 import ufoLib2
 
-from fontra.core.classes import (
-    Font, VariableGlyph, Layer, GlyphSource, RGBAColor, StaticGlyph,
-)
 from fontra.backends.designspace import UFOBackend
+from fontra.core.classes import (
+    Font,
+    GlyphSource,
+    Layer,
+    RGBAColor,
+    StaticGlyph,
+    VariableGlyph,
+)
 
 
 @pytest.mark.asyncio
@@ -44,9 +50,9 @@ async def test_color_font_ufo_export():
         # 5. Verify CPAL (Palettes)
         ufo = ufoLib2.Font.open(ufo_path)
         palettes_key = "com.github.googlei18n.ufo2ft.colorPalettes"
-        assert palettes_key in ufo.lib, (
-            f"Missing {palettes_key}. Lib keys: {list(ufo.lib.keys())}"
-        )
+        assert (
+            palettes_key in ufo.lib
+        ), f"Missing {palettes_key}. Lib keys: {list(ufo.lib.keys())}"
         assert ufo.lib[palettes_key][0][0] == [1.0, 0.0, 0.0, 1.0]
 
         # 6. Discover the actual source identifier that fromPath() assigned,
@@ -65,7 +71,7 @@ async def test_color_font_ufo_export():
         ufo = ufoLib2.Font.open(ufo_path)
         mapping_key = "com.github.googlei18n.ufo2ft.colorLayerMapping"
         glyph_a = ufo["A"]
-        assert mapping_key in glyph_a.lib, (
-            f"Missing {mapping_key} in 'A'. Lib: {list(glyph_a.lib.keys())}"
-        )
+        assert (
+            mapping_key in glyph_a.lib
+        ), f"Missing {mapping_key} in 'A'. Lib: {list(glyph_a.lib.keys())}"
         assert glyph_a.lib[mapping_key] == [["foreground", 0]]
