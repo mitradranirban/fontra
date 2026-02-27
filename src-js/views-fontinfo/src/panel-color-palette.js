@@ -1,5 +1,6 @@
 import { recordChanges } from "@fontra/core/change-recorder.js";
 import * as html from "@fontra/core/html-utils.js";
+import { translate } from "@fontra/core/localization.js";
 import { BaseInfoPanel } from "./panel-base.js";
 
 const PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes";
@@ -20,16 +21,16 @@ export class ColorPalettesPanel extends BaseInfoPanel {
       const swatches = palette.map((color, ci) => {
         const inp = html.input({
           type: "color",
-          title: `Color index ${ci}`,
+          title: translate("color-palettes.color-index-tooltip", ci),
           value: this.toHex(color[0], color[1], color[2]),
         });
         inp.addEventListener("change", async (e) => {
           await this.onColorChange(pi, ci, e.target.value, palettes);
         });
-        return html.label(
-          { class: "swatch-label" },
-          [inp, html.span({}, [String(ci)])] // ← children in array
-        );
+        return html.label({ class: "swatch-label" }, [
+          inp,
+          html.span({}, [String(ci)]),
+        ]);
       });
 
       const addColorBtn = html.button({ class: "add-color-btn" }, ["+"]);
@@ -39,14 +40,18 @@ export class ColorPalettesPanel extends BaseInfoPanel {
       });
 
       const section = html.div({ class: "color-palette-section" }, [
-        html.div({ class: "palette-label" }, [`Palette ${pi}`]),
+        html.div({ class: "palette-label" }, [
+          translate("color-palettes.palette-label", pi),
+        ]),
         html.div({ class: "color-swatches" }, [...swatches, addColorBtn]),
       ]);
 
       this.panelElement.appendChild(section);
     });
 
-    const addPaletteBtn = html.button({ class: "add-palette-btn" }, ["Add Palette"]);
+    const addPaletteBtn = html.button({ class: "add-palette-btn" }, [
+      translate("color-palettes.add-palette"),
+    ]);
     addPaletteBtn.addEventListener("click", async () => {
       palettes.push([[0, 0, 0, 1.0]]);
       await this.savePalettes(palettes);
@@ -71,7 +76,7 @@ export class ColorPalettesPanel extends BaseInfoPanel {
       await this.postChange(
         changes.change,
         changes.rollbackChange,
-        "Edit color palettes"
+        translate("color-palettes.edit-description")
       );
       this.fontController.customData[PALETTES_KEY] = palettes;
     }

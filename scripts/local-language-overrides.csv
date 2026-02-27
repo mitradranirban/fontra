@@ -7,3 +7,9 @@
 ,color-layers.add-layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer
 ,color-layers.remove-layer,Remove,Remove,Remove,Remove,Remove,Remove,Remove,Remove,Remove,Remove
 ,color-layers.edit-description,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping
+,color-layers.no-palette,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font
+,color-palettes.add-palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette
+,color-palettes.color-index-tooltip,"Color index {0}","Color index {0}","Color index {0}","Color index {0}","Color index {0}","Color index {0}","Color index {0}","Color index {0}","Color index {0}","Color index {0}"
+,color-palettes.edit-description,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes
+,color-palettes.palette-label,"Palette {0}","Palette {0}","Palette {0}","Palette {0}","Palette {0}","Palette {0}","Palette {0}","Palette {0}","Palette {0}","Palette {0}"
+,sidebar.selection-info.color-index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index
