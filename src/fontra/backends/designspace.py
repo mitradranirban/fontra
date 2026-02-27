@@ -553,6 +553,15 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         # global per glyph custom data, eg. glyph locking
         customData = defaultUFOGlyph.lib.get(GLYPH_CUSTOM_DATA_LIB_KEY, {})
 
+        # Promote top-level colorLayerMapping into customData so the frontend
+        # always receives it, regardless of which tool originally wrote the UFO.
+        _topLevelColorMapping = defaultUFOGlyph.lib.get(
+            "com.github.googlei18n.ufo2ft.colorLayerMapping"
+        )
+        if _topLevelColorMapping and "colorLayerMapping" not in customData:
+            customData = dict(customData)  # shallow copy — do not mutate cached lib
+            customData["colorLayerMapping"] = _topLevelColorMapping
+
         if defaultUFOGlyph.note:
             customData[GLYPH_NOTE_LIB_KEY] = defaultUFOGlyph.note
 
@@ -692,6 +701,11 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         defaultLayerGlyph = readGlyphOrCreate(
             self.defaultUFOLayer.glyphSet, glyphName, codePoints
         )
+        colorLayerMapping = glyph.customData.get(
+            "colorLayerMapping"
+        ) or defaultLayerGlyph.lib.get(
+            "com.github.googlei18n.ufo2ft.colorLayerMapping", []
+        )
         revLayerNameMapping = reverseSparseDict(
             defaultLayerGlyph.lib.get(LAYER_NAME_MAPPING_LIB_KEY, {})
         )
@@ -769,7 +783,24 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
                 storeInLib(layerGlyph, SOURCE_NAME_MAPPING_LIB_KEY, sourceNameMapping)
                 storeInLib(layerGlyph, LAYER_NAME_MAPPING_LIB_KEY, layerNameMapping)
                 layerGlyph.note = glyph.customData.pop(GLYPH_NOTE_LIB_KEY, None)
+                # Strip colorLayerMapping from customData in both possible key forms
+                # so it never leaks into xyz.fontra.customData.
+                # Fall back to the value already resolved above (from top-level lib)
+                # so pre-existing color data is never lost.
+                colorLayerMapping = (
+                    glyph.customData.pop("colorLayerMapping", None)
+                    or glyph.customData.pop(
+                        "com.github.googlei18n.ufo2ft.colorLayerMapping", None
+                    )
+                    or colorLayerMapping
+                )
                 storeInLib(layerGlyph, GLYPH_CUSTOM_DATA_LIB_KEY, glyph.customData)
+                # Always write at top level — required by ufo2ft for color font compilation.
+                storeInLib(
+                    layerGlyph,
+                    "com.github.googlei18n.ufo2ft.colorLayerMapping",
+                    colorLayerMapping,
+                )
             else:
                 layerGlyph = readGlyphOrCreate(glyphSet, glyphName, codePoints)
 
@@ -811,6 +842,31 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
                 self.ensureGlyphInGlyphOrder(ufoLayer, glyphName)
 
             modTimes.add(glyphSet.getGLIFModificationTime(glyphName))
+        # Bootstrap color UFO layers from colorLayerMapping
+        for colorLayerName, _paletteIndex in colorLayerMapping or []:
+            # Ensure the UFO layer exists
+            ufoColorLayer = self.ufoLayers.findItem(fontraLayerName=colorLayerName)
+            if ufoColorLayer is None:
+                ufoColorLayer = self._createUFOLayer(
+                    glyphName,
+                    self.defaultUFOLayer.path,
+                    colorLayerName,
+                    colorLayerName,
+                )
+            colorGlyphSet = ufoColorLayer.glyphSet
+            # Write the .glif using default layer geometry if not yet present
+            if glyphName not in colorGlyphSet:
+                colorLayerGlyph = readGlyphOrCreate(
+                    colorGlyphSet, glyphName, codePoints
+                )
+                colorGlyphSet.writeGlyph(
+                    glyphName, colorLayerGlyph, drawPointsFunc=lambda pen: None
+                )
+                self.updateGlyphSetContents(colorGlyphSet)
+                logger.debug(
+                    f"Bootstrapped color layer {colorLayerName!r} "
+                    f"for glyph {glyphName!r}"
+                )
 
         # Prune unused UFO layers
         relevantLayerNames = set(
@@ -1852,6 +1908,7 @@ class UFOBackend(DesignspaceBackend):
         self.fileWatcherIgnoreNextChange(
             os.path.join(self.defaultUFOLayer.path, LIB_FILENAME)
         )
+
     async def putAxes(self, axes):
         if axes.axes or axes.mappings:
             raise ValueError("The single-UFO backend does not support variation axes")
@@ -2282,17 +2339,12 @@ def populateUFOLayerGlyph(
     if staticGlyph.verticalOrigin is not None:
         layerGlyph.lib["public.verticalOrigin"] = staticGlyph.verticalOrigin
 
-    staticGlyph.path.drawPoints(pen)
+    if staticGlyph.path is not None:
+        try:
+            staticGlyph.path.drawPoints(pen)
+        except NotImplementedError:
+            pass  # stub/empty path with no contours
     variableComponents = []
-    # Build the color mapping for ufo2ft
-    color_mapping = []
-    for layer_name, layer in fontra_glyph.layers.items():
-        if getattr(layer, "colorIndex", None) is not None:
-            color_mapping.append([layer_name, layer.colorIndex])
-            
-    # Use storeInLib to handle activation/deactivation
-    storeInLib(layerGlyph, "com.github.googlei18n.ufo2ft.colorLayerMapping", color_mapping)
-    
     layerGlyph.anchors = [
         {"name": a.name, "x": a.x, "y": a.y} for a in staticGlyph.anchors
     ]
@@ -2385,6 +2437,7 @@ def packLocalAxes(axes):
         for axis in axes
     ]
 
+
 def storeInLib(layerGlyph, key, value):
     storeInDict(layerGlyph.lib, key, value)
 
@@ -2394,6 +2447,7 @@ def storeInDict(dictionary, key, value):
         dictionary[key] = value
     else:
         dictionary.pop(key, None)
+
 
 def reverseSparseDict(d):
     return {v: k for k, v in d.items() if k != v}
@@ -2409,13 +2463,14 @@ def storeColorMappingInLib(layerGlyph, layers):
         # Check if colorIndex is set (0 is a valid index, so check against None)
         if getattr(layer, "colorIndex", None) is not None:
             mapping.append([layer.name, layer.colorIndex])
-    
+
     # Use the same logic as storeInLib: only add if the mapping exists
-    key = "com.github.googlei18n.ufo2ft.colorLayerMapping"  
+    key = "com.github.googlei18n.ufo2ft.colorLayerMapping"
     if mapping:
         layerGlyph.lib[key] = mapping
     else:
         layerGlyph.lib.pop(key, None)
+
 
 def glyphHasVariableComponents(glyph):
     return any(

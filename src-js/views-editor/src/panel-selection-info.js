@@ -227,10 +227,10 @@ export default class SelectionInfoPanel extends Panel {
               varGlyphController,
               "xAdvance"
             ),
-            minValue: 0,
-          });
-  
-         formContents.push({
+          minValue: 0,
+        });
+
+        formContents.push({
           type: "edit-number-x-y",
           key: '["sidebearings"]',
           label: translate("sidebar.selection-info.sidebearings"),
