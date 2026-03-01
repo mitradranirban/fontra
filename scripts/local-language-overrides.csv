@@ -9,7 +9,10 @@
 ,color-layers.edit-description,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping
 ,color-layers.no-palette,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font
 ,color-palettes.add-palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette
-,color-palettes.color-index-tooltip,"Color index {0}","Color index {0}","Color index {0}","Color index {0}","Color index {0}","Color index {0}","Color index {0}","Color index {0}","Color index {0}","Color index {0}"
+,color-palettes.color-index-tooltip,"Color index %0","Color index %0","Color index %0","Color index %0","Color index %0","Color index %0","Color index %0","Color index %0","Color index %0","Color index %0"
 ,color-palettes.edit-description,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes
-,color-palettes.palette-label,"Palette {0}","Palette {0}","Palette {0}","Palette {0}","Palette {0}","Palette {0}","Palette {0}","Palette {0}","Palette {0}","Palette {0}"
+,color-palettes.palette-label,"Palette %0","Palette %0","Palette %0","Palette %0","Palette %0","Palette %0","Palette %0","Palette %0","Palette %0","Palette %0"
 ,sidebar.selection-info.color-index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index
+,color-palettes.add-color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color
+,color-palettes.remove-palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette
+,color-palettes.palette-entry-count,"%0 entries","%0 entries","%0 entries","%0 entries","%0 entries","%0 entries","%0 entries","%0 entries","%0 entries","%0 entries"
