@@ -1,6 +1,13 @@
+// src-js/views-editor/src/visualization-layers.js
+
 import { withSavedState } from "@fontra/core/utils.js";
 import { mulScalar } from "@fontra/core/var-funcs.js";
+import { COLRV1_KEY, renderCOLRv1 } from "./colrv1-canvas-renderer.js";
 import { equalGlyphSelection } from "./scene-controller.js";
+
+// ---------------------------------------------------------------------------
+// VisualizationLayers
+// ---------------------------------------------------------------------------
 
 export class VisualizationLayers {
   constructor(definitions, darkTheme) {
@@ -95,6 +102,10 @@ export class VisualizationLayers {
   }
 }
 
+// ---------------------------------------------------------------------------
+// VisualizationContext
+// ---------------------------------------------------------------------------
+
 export class VisualizationContext {
   constructor(model, controller) {
     this.model = model;
@@ -102,6 +113,60 @@ export class VisualizationContext {
     this.glyphsBySelectionMode = getGlyphsBySelectionMode(model);
   }
 }
+
+// ---------------------------------------------------------------------------
+// COLRv1 inline layer definition
+//
+// This is injected at runtime into any VisualizationLayers instance that
+// uses the standard visualizationLayerDefinitions array (see
+// visualization-layer-definitions.js where this entry is also registered).
+//
+// Having it here as well means it is available to unit tests and to any
+// custom VisualizationLayers instances built outside the editor.
+// ---------------------------------------------------------------------------
+
+export const colrv1PaintOverlayDefinition = {
+  identifier: "fontra.colrv1-paint-overlay",
+  name: "color-layers.colrv1-title",
+  userSwitchable: true,
+  defaultOn: true,
+
+  // Draw for every glyph in the text string (all modes: selected, editing,
+  // unselected) so the colour preview is always visible.
+  selectionFunc(visContext) {
+    return visContext.glyphsBySelectionMode.all;
+  },
+
+  draw(context, positionedGlyph, parameters, model, controller) {
+    const fontController = model.fontController;
+    if (!fontController) return;
+
+    // Only render if this glyph actually carries a COLRv1 paint graph.
+    const paint = positionedGlyph?.glyph?.instance?.customData?.[COLRV1_KEY];
+    if (!paint) return;
+
+    // Axis values at the current designspace location.
+    // model.fontLocation is the normalised location dict { axisTag: value }.
+    const axisValues = model.fontLocation ?? {};
+
+    // Which CPAL palette row to render (persisted in localStorage so the
+    // palette panel and the canvas stay in sync).
+    const activePaletteIndex =
+      parseInt(localStorage.getItem("fontra-colrv1-active-palette") ?? "0", 10) || 0;
+
+    renderCOLRv1(
+      context,
+      positionedGlyph,
+      fontController,
+      axisValues,
+      activePaletteIndex
+    );
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Private helpers
+// ---------------------------------------------------------------------------
 
 function getGlyphsBySelectionMode(model) {
   const selectedPositionedGlyph = model.getSelectedPositionedGlyph();

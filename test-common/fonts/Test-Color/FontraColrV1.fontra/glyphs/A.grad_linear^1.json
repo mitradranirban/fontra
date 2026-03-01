@@ -1,0 +1,87 @@
+{
+  "name": "A.grad_linear",
+  "sources": [
+    {
+      "name": "",
+      "layerName": "28e6e158",
+      "locationBase": "28e6e158"
+    }
+  ],
+  "layers": {
+    "28e6e158": {
+      "glyph": {
+        "xAdvance": 660,
+        "path": {
+          "contours": [
+            {
+              "points": [
+                {
+                  "x": 30,
+                  "y": 0
+                },
+                {
+                  "x": 630,
+                  "y": 0
+                },
+                {
+                  "x": 630,
+                  "y": 700
+                },
+                {
+                  "x": 30,
+                  "y": 700
+                }
+              ],
+              "isClosed": true
+            }
+          ]
+        },
+        "customData": {
+          "colorv1": {
+            "type": "PaintLinearGradient",
+            "colorLine": {
+              "extend": "pad",
+              "colorStops": [
+                {
+                  "stopOffset": 0.0,
+                  "paletteIndex": 2,
+                  "alpha": 1.0
+                },
+                {
+                  "stopOffset": 0.5,
+                  "paletteIndex": 4,
+                  "alpha": 1.0
+                },
+                {
+                  "stopOffset": 1.0,
+                  "paletteIndex": 1,
+                  "alpha": 1.0
+                }
+              ]
+            },
+            "x0": 30,
+            "y0": 350,
+            "x1": {
+              "default": 630,
+              "keyframes": [
+                {
+                  "axis": "SHDW",
+                  "loc": 0.0,
+                  "value": 630
+                },
+                {
+                  "axis": "SHDW",
+                  "loc": 1.0,
+                  "value": 230
+                }
+              ]
+            },
+            "y1": 350,
+            "x2": 30,
+            "y2": 700
+          }
+        }
+      }
+    }
+  }
+}

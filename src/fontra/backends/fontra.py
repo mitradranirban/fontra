@@ -473,7 +473,9 @@ def deserializeGlyph(jsonSource: str, glyphName: str | None = None) -> VariableG
     jsonGlyph = json.loads(jsonSource)
     if glyphName is not None:
         jsonGlyph["name"] = glyphName
+
     glyph = structure(jsonGlyph, VariableGlyph)
+
     return glyph.convertToPackedPaths()
 
 
