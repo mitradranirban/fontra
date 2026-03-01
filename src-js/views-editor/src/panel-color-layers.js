@@ -13,6 +13,37 @@ const PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes";
 // short key below so the backend's pop("colorLayerMapping") finds it.
 const MAPPING_KEY = "com.github.googlei18n.ufo2ft.colorLayerMapping"; // kept for reference
 const CUSTOM_DATA_KEY = "colorLayerMapping"; // short key used in glyph.customData
+const COLRV1_KEY = "colorv1"; // key used in glyph.customData for COLRv1 paint graph
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function makePlusButton(onclick, title) {
+  return html.div(
+    {
+      style: "cursor: pointer; font-size: 1.2em; line-height: 1; padding: 0 0.3em;",
+      onclick,
+      title,
+    },
+    ["+"]
+  );
+}
+
+function makeMinusButton(onclick, title) {
+  return html.div(
+    {
+      style: "cursor: pointer; font-size: 1.2em; line-height: 1; padding: 0 0.3em;",
+      onclick,
+      title,
+    },
+    ["−"]
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Panel
+// ---------------------------------------------------------------------------
 
 export default class ColorLayersPanel extends Panel {
   identifier = "color-layers";
@@ -46,10 +77,17 @@ export default class ColorLayersPanel extends Panel {
     }
   }
 
-  async update() {
-    await this.fontController.ensureInitialized;
+  // ── Entry point ────────────────────────────────────────────────────────────
 
-    const customData = this.fontController.customData ?? {};
+  async update() {
+    // Guard: catch font-not-ready errors during startup
+    let customData;
+    try {
+      customData = this.fontController.customData ?? {};
+    } catch {
+      return; // Font not ready yet, will be called again when ready
+    }
+
     const palettes = customData[PALETTES_KEY];
 
     if (!palettes?.length || !palettes[0]?.length) {
@@ -69,26 +107,69 @@ export default class ColorLayersPanel extends Panel {
       return;
     }
 
+    const pg = this.sceneController.sceneModel.getSelectedPositionedGlyph();
+    const layerGlyph = pg?.glyph?.instance;
+
     const varGlyphController =
       await this.sceneController.sceneModel.getSelectedVariableGlyphController();
+    const varGlyph = varGlyphController?.glyph;
 
-    // Backend promotes "com.github.googlei18n.ufo2ft.colorLayerMapping" from
-    // the top-level .glif lib into customData[CUSTOM_DATA_KEY] on read.
-    const mapping = varGlyphController?.glyph?.customData?.[CUSTOM_DATA_KEY] ?? [];
+    const hasV1 = !!layerGlyph?.customData?.[COLRV1_KEY];
+    const hasV0 = !!varGlyph?.customData?.[CUSTOM_DATA_KEY]?.length;
 
-    const formContents = [];
+    if (hasV1) {
+      this._renderV1UI(layerGlyph, glyphName, palette);
+    } else if (hasV0) {
+      this._renderV0UI(varGlyph, glyphName, palette);
+    } else {
+      this._renderEmptyUI(glyphName, palette);
+    }
+  }
 
-    // Main header with plain text "+" button
+  // ── Empty state ────────────────────────────────────────────────────────────
+
+  _renderEmptyUI(glyphName, palette) {
+    const formContents = [
+      { type: "text", value: translate("color-layers.no-layers-yet") },
+    ];
+
+    // Offer both V0 and V1 as starting points
     formContents.push({
       type: "header",
       label: translate("color-layers.title"),
-      auxiliaryElement: html.div(
-        {
-          style: "cursor: pointer; font-size: 1.2em; line-height: 1; padding: 0 0.3em;",
-          onclick: () => this._addLayer(glyphName, palette.length, mapping),
-          title: translate("color-layers.add-layer"),
-        },
-        ["+"]
+      auxiliaryElement: html.div({ style: "display:flex; gap:4px;" }, [
+        html.button(
+          {
+            title: "Start COLRv0 (layer mapping)",
+            onclick: () => this._addLayer(glyphName, palette.length, []),
+          },
+          ["v0 +"]
+        ),
+        html.button(
+          {
+            title: "Start COLRv1 (paint graph)",
+            onclick: () => this._initV1(glyphName),
+          },
+          ["v1 +"]
+        ),
+      ]),
+    });
+
+    this.colorLayersForm.setFieldDescriptions(formContents);
+  }
+
+  // ── COLRv0 UI (original logic, unchanged) ─────────────────────────────────
+
+  _renderV0UI(glyph, glyphName, palette) {
+    const mapping = glyph?.customData?.[CUSTOM_DATA_KEY] ?? [];
+    const formContents = [];
+
+    formContents.push({
+      type: "header",
+      label: translate("color-layers.title"),
+      auxiliaryElement: makePlusButton(
+        () => this._addLayer(glyphName, palette.length, mapping),
+        translate("color-layers.add-layer")
       ),
     });
 
@@ -101,18 +182,12 @@ export default class ColorLayersPanel extends Panel {
       for (let i = 0; i < mapping.length; i++) {
         const [layerName, colorIndex] = mapping[i];
 
-        // Per-layer sub-header with plain text "−" button
         formContents.push({
           type: "header",
           label: layerName,
-          auxiliaryElement: html.div(
-            {
-              style:
-                "cursor: pointer; font-size: 1.2em; line-height: 1; padding: 0 0.3em;",
-              onclick: () => this._removeLayer(glyphName, i, mapping),
-              title: translate("color-layers.remove-layer"),
-            },
-            ["\u2212"]
+          auxiliaryElement: makeMinusButton(
+            () => this._removeLayer(glyphName, i, mapping),
+            translate("color-layers.remove-layer")
           ),
         });
 
@@ -132,10 +207,141 @@ export default class ColorLayersPanel extends Panel {
       }
     }
 
+    // Allow converting to COLRv1
+    formContents.push({
+      type: "header",
+      label: "",
+      auxiliaryElement: html.button(
+        {
+          title: "Convert this glyph to COLRv1 paint graph",
+          onclick: () => this._convertV0toV1(glyphName, mapping, palette),
+          style: "font-size:0.75em; opacity:0.6;",
+        },
+        ["→ COLRv1"]
+      ),
+    });
+
     this.colorLayersForm.setFieldDescriptions(formContents);
   }
 
-  // ── Mutations ─────────────────────────────────────────────────────────────
+  // ── COLRv1 UI ─────────────────────────────────────────────────────────────
+
+  _renderV1UI(glyph, glyphName, palette) {
+    const paint = glyph.customData[COLRV1_KEY] ?? {
+      type: "PaintColrLayers",
+      layers: [],
+    };
+    const layers = paint.layers ?? [];
+    const formContents = [];
+
+    // Header with version badge and add-layer button
+    formContents.push({
+      type: "header",
+      label: "COLRv1",
+      auxiliaryElement: html.div(
+        { style: "display:flex; gap:6px; align-items:center;" },
+        [
+          makePlusButton(
+            () => this._addV1Layer(glyphName, paint, palette.length),
+            translate("color-layers.add-layer")
+          ),
+        ]
+      ),
+    });
+
+    if (layers.length === 0) {
+      formContents.push({
+        type: "text",
+        value: translate("color-layers.no-layers-yet"),
+      });
+    } else {
+      for (let i = 0; i < layers.length; i++) {
+        const layer = layers[i];
+
+        // Determine label: use referenced glyph name or layer index
+        const layerLabel =
+          layer.type === "PaintGlyph"
+            ? `${i}: PaintGlyph "${layer.glyph ?? "?"}"`
+            : `${i}: ${layer.type ?? "Paint"}`;
+
+        formContents.push({
+          type: "header",
+          label: layerLabel,
+          auxiliaryElement: makeMinusButton(
+            () => this._removeV1Layer(glyphName, paint, i),
+            translate("color-layers.remove-layer")
+          ),
+        });
+
+        // Paint type selector
+        formContents.push({
+          type: "edit-text",
+          key: JSON.stringify(["v1PaintType", i]),
+          label: "Paint type",
+          value: layer.type ?? "",
+          getValue: () => layers[i]?.type ?? "",
+          setValue: async (g, lg, fi, value) => {
+            await this._setV1LayerField(glyphName, paint, i, "type", value);
+          },
+        });
+
+        // If PaintGlyph: show referenced glyph name
+        if (layer.type === "PaintGlyph") {
+          formContents.push({
+            type: "edit-text",
+            key: JSON.stringify(["v1GlyphRef", i]),
+            label: "Glyph",
+            value: layer.glyph ?? "",
+            getValue: () => layers[i]?.glyph ?? "",
+            setValue: async (g, lg, fi, value) => {
+              await this._setV1LayerField(glyphName, paint, i, "glyph", value);
+            },
+          });
+        }
+
+        // Fill paint: paletteIndex + alpha if present
+        const fillPaint = layer.paint ?? layer;
+        if (fillPaint?.paletteIndex != null) {
+          formContents.push({
+            type: "edit-number",
+            key: JSON.stringify(["v1ColorIndex", i]),
+            label: translate("sidebar.selection-info.color-index"),
+            value: fillPaint.paletteIndex,
+            integer: true,
+            minValue: 0,
+            maxValue: palette.length - 1,
+            getValue: () => {
+              const l = layers[i];
+              return (l?.paint ?? l)?.paletteIndex ?? 0;
+            },
+            setValue: async (g, lg, fi, value) => {
+              await this._setV1ColorIndex(glyphName, paint, i, value);
+            },
+          });
+
+          formContents.push({
+            type: "edit-number",
+            key: JSON.stringify(["v1Alpha", i]),
+            label: "Alpha",
+            value: fillPaint.alpha ?? 1.0,
+            minValue: 0,
+            maxValue: 1,
+            getValue: () => {
+              const l = layers[i];
+              return (l?.paint ?? l)?.alpha ?? 1.0;
+            },
+            setValue: async (g, lg, fi, value) => {
+              await this._setV1Alpha(glyphName, paint, i, value);
+            },
+          });
+        }
+      }
+    }
+
+    this.colorLayersForm.setFieldDescriptions(formContents);
+  }
+
+  // ── COLRv0 mutations (original, unchanged) ────────────────────────────────
 
   _nextLayerName(mapping) {
     const existing = new Set(mapping.map(([n]) => n));
@@ -188,8 +394,6 @@ export default class ColorLayersPanel extends Panel {
     const currentMapping = varGlyphController?.glyph?.customData?.[CUSTOM_DATA_KEY];
 
     // Guard: if the mapping is absent or the index is stale, bail out silently.
-    // This prevents _writeMapping being called with an empty/broken array,
-    // which would delete the entire mapping from the glyph.
     if (!currentMapping?.length || index >= currentMapping.length) {
       return;
     }
@@ -199,6 +403,113 @@ export default class ColorLayersPanel extends Panel {
     const mapping = currentMapping.map((entry) => [...entry]);
     mapping[index] = [mapping[index][0], value];
     await this._writeMapping(glyphName, mapping);
+  }
+
+  // ── COLRv1 mutations ──────────────────────────────────────────────────────
+
+  async _initV1(glyphName) {
+    const paint = {
+      type: "PaintColrLayers",
+      layers: [],
+    };
+    await this._writeV1Paint(paint);
+  }
+
+  async _addV1Layer(glyphName, paint, paletteSize) {
+    const layers = paint.layers ?? [];
+    const newLayer = {
+      type: "PaintGlyph",
+      glyph: glyphName,
+      paint: {
+        type: "PaintSolid",
+        paletteIndex: Math.min(layers.length, paletteSize - 1),
+        alpha: 1.0,
+      },
+    };
+    await this._writeV1Paint({
+      ...paint,
+      layers: [...layers, newLayer],
+    });
+  }
+
+  async _removeV1Layer(glyphName, paint, index) {
+    const layers = [...(paint.layers ?? [])];
+    layers.splice(index, 1);
+    await this._writeV1Paint({ ...paint, layers });
+  }
+
+  async _setV1ColorIndex(glyphName, paint, layerIndex, value) {
+    const layers = (paint.layers ?? []).map((layer, i) => {
+      if (i !== layerIndex) return layer;
+      const fillPaint = layer.paint
+        ? { ...layer.paint, paletteIndex: value }
+        : { ...layer, paletteIndex: value };
+      return layer.paint ? { ...layer, paint: fillPaint } : fillPaint;
+    });
+    await this._writeV1Paint({ ...paint, layers });
+  }
+
+  async _setV1Alpha(glyphName, paint, layerIndex, value) {
+    const layers = (paint.layers ?? []).map((layer, i) => {
+      if (i !== layerIndex) return layer;
+      const fillPaint = layer.paint
+        ? { ...layer.paint, alpha: value }
+        : { ...layer, alpha: value };
+      return layer.paint ? { ...layer, paint: fillPaint } : fillPaint;
+    });
+    await this._writeV1Paint({ ...paint, layers });
+  }
+
+  async _setV1LayerField(glyphName, paint, layerIndex, field, value) {
+    const layers = (paint.layers ?? []).map((layer, i) =>
+      i === layerIndex ? { ...layer, [field]: value } : layer
+    );
+    await this._writeV1Paint({ ...paint, layers });
+  }
+
+  // ✅ Fix — writes to StaticGlyph.customData in the default layer
+  async _writeV1Paint(newPaint) {
+    await this.sceneController.editGlyphAndRecordChanges((varGlyph) => {
+      const defaultSource =
+        varGlyph.sources?.find((s) => !s.inactive && !s.locationBase) ??
+        varGlyph.sources?.[0];
+      const layerGlyph = varGlyph.layers?.[defaultSource?.layerName]?.glyph;
+      if (layerGlyph) {
+        if (!layerGlyph.customData) layerGlyph.customData = {};
+        layerGlyph.customData[COLRV1_KEY] = newPaint;
+      }
+      return "Edit COLRv1 paint";
+    });
+  }
+
+  // ── COLRv0 → COLRv1 converter ─────────────────────────────────────────────
+
+  async _convertV0toV1(glyphName, mapping, palette) {
+    // Each V0 [layerName, colorIndex] becomes a PaintGlyph + PaintSolid
+    const layers = mapping.map(([layerName, colorIndex]) => ({
+      type: "PaintGlyph",
+      glyph: layerName,
+      paint: {
+        type: "PaintSolid",
+        paletteIndex: colorIndex,
+        alpha: 1.0,
+      },
+    }));
+
+    const newPaint = { type: "PaintColrLayers", layers };
+
+    await this.sceneController.editGlyphAndRecordChanges((varGlyph) => {
+      const defaultSource =
+        varGlyph.sources?.find((s) => !s.inactive && !s.locationBase) ??
+        varGlyph.sources?.[0];
+      const layerGlyph = varGlyph.layers?.[defaultSource?.layerName]?.glyph;
+      if (layerGlyph) {
+        if (!layerGlyph.customData) layerGlyph.customData = {};
+        layerGlyph.customData[COLRV1_KEY] = newPaint;
+      }
+      delete varGlyph.customData[CUSTOM_DATA_KEY]; // V0 mapping IS on VariableGlyph
+      return "Convert COLRv0 → COLRv1";
+    });
   }
 }
 

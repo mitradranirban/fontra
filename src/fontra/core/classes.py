@@ -260,6 +260,7 @@ class StaticGlyph:
     anchors: list[Anchor] = field(default_factory=list)
     guidelines: list[Guideline] = field(default_factory=list)
     backgroundImage: Optional[BackgroundImage] = None
+    customData: CustomData = field(default_factory=dict)
 
     def convertToPackedPaths(self):
         return replace(self, path=self.path.asPackedPath())
