@@ -1,0 +1,81 @@
+{
+  "name": "A.solid",
+  "sources": [
+    {
+      "name": "",
+      "layerName": "28e6e158",
+      "locationBase": "28e6e158"
+    }
+  ],
+  "layers": {
+    "28e6e158": {
+      "glyph": {
+        "xAdvance": 660,
+        "path": {
+          "contours": [
+            {
+              "points": [
+                {
+                  "x": 30,
+                  "y": 0
+                },
+                {
+                  "x": 630,
+                  "y": 0
+                },
+                {
+                  "x": 630,
+                  "y": 700
+                },
+                {
+                  "x": 30,
+                  "y": 700
+                }
+              ],
+              "isClosed": true
+            }
+          ]
+        },
+        "customData": {
+          "colorv1": {
+            "type": "PaintColrLayers",
+            "layers": [
+              {
+                "type": "PaintGlyph",
+                "glyph": "A.solid",
+                "paint": {
+                  "type": "PaintSolid",
+                  "paletteIndex": 2,
+                  "alpha": 1.0
+                }
+              },
+              {
+                "type": "PaintGlyph",
+                "glyph": "A.solid",
+                "paint": {
+                  "type": "PaintSolid",
+                  "paletteIndex": 1,
+                  "alpha": {
+                    "default": 0.0,
+                    "keyframes": [
+                      {
+                        "axis": "SHDW",
+                        "loc": 0.0,
+                        "value": 0.0
+                      },
+                      {
+                        "axis": "SHDW",
+                        "loc": 1.0,
+                        "value": 0.85
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
