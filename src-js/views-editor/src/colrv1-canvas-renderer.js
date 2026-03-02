@@ -40,15 +40,21 @@ export function renderCOLRv1(
   const palettes = fontController.customData?.[PALETTES_KEY];
   if (!palettes?.length) return;
 
-  // Clamp palette index
   const pi = Math.max(0, Math.min(activePaletteIndex, palettes.length - 1));
   const palette = palettes[pi];
 
-  // Build outline cache: glyphName → Path2D  (lazy, populated on demand)
   const outlineCache = new Map();
 
   ctx.save();
-  _renderPaint(ctx, paint, palette, axisValues, fontController, outlineCache);
+  _renderPaint(
+    ctx,
+    paint,
+    palette,
+    axisValues,
+    fontController,
+    outlineCache,
+    positionedGlyph
+  );
   ctx.restore();
 }
 
@@ -109,156 +115,191 @@ export function resolveVal(val, axisValues) {
 // Paint graph walker
 // ---------------------------------------------------------------------------
 
-function _renderPaint(ctx, paint, palette, axisValues, fontController, outlineCache) {
-  if (!paint || typeof paint !== "object") return;
+function _renderPaint(
+  ctx,
+  paint,
+  palette,
+  axisValues,
+  fontController,
+  outlineCache,
+  positionedGlyph,
+  _depth = 0
+) {
+  if (!paint) return;
+  if (_depth > 32) {
+    console.warn("COLRv1: max depth");
+    return;
+  }
 
   switch (paint.type) {
-    // ── Layer stack ────────────────────────────────────────────────────────
     case "PaintColrLayers": {
       for (const layer of paint.layers ?? []) {
-        _renderPaint(ctx, layer, palette, axisValues, fontController, outlineCache);
+        _renderPaint(
+          ctx,
+          layer,
+          palette,
+          axisValues,
+          fontController,
+          outlineCache,
+          positionedGlyph,
+          _depth + 1
+        );
       }
       break;
     }
 
-    // ── Clip to glyph outline ──────────────────────────────────────────────
     case "PaintGlyph": {
-      const path2d = _getOutlinePath2D(paint.glyph, fontController, outlineCache);
-      if (!path2d) {
-        // No outline found — render fill without clipping (better than nothing)
-        _renderPaint(
-          ctx,
-          paint.paint,
-          palette,
-          axisValues,
-          fontController,
-          outlineCache
-        );
-        break;
-      }
+      const path2d = positionedGlyph?.glyph?.flattenedPath2d;
       ctx.save();
-      ctx.clip(path2d, "nonzero");
-      _renderPaint(ctx, paint.paint, palette, axisValues, fontController, outlineCache);
+      if (path2d) ctx.clip(path2d);
+      _renderPaint(
+        ctx,
+        paint.paint,
+        palette,
+        axisValues,
+        fontController,
+        outlineCache,
+        positionedGlyph,
+        _depth + 1
+      );
       ctx.restore();
       break;
     }
 
-    // ── Solid fill ─────────────────────────────────────────────────────────
     case "PaintSolid":
     case "PaintVarSolid": {
       const alpha = resolveVal(paint.alpha, axisValues);
       if (alpha <= 0) break;
-      const color = _paletteColor(palette, paint.paletteIndex, alpha);
-      ctx.fillStyle = color;
-      ctx.fill(new Path2D(), "nonzero"); // fill current clip region
-      // fill() with no path fills the clip region in most browsers;
-      // use a full-canvas rect as fallback:
-      _fillClipRect(ctx, color);
+      ctx.fillStyle = _paletteColor(palette, paint.paletteIndex, alpha);
+      ctx.fillRect(-100000, -100000, 200000, 200000);
       break;
     }
 
-    // ── Linear gradient ────────────────────────────────────────────────────
     case "PaintLinearGradient":
     case "PaintVarLinearGradient": {
-      const x0 = resolveVal(paint.x0, axisValues);
-      const y0 = resolveVal(paint.y0, axisValues);
-      const x1 = resolveVal(paint.x1, axisValues);
-      const y1 = resolveVal(paint.y1, axisValues);
-      // x2/y2 define rotation — approximate via angle
-      const grad = ctx.createLinearGradient(x0, y0, x1, y1);
+      const grad = ctx.createLinearGradient(
+        resolveVal(paint.x0, axisValues),
+        resolveVal(paint.y0, axisValues),
+        resolveVal(paint.x1, axisValues),
+        resolveVal(paint.y1, axisValues)
+      );
       _applyColorLine(grad, paint.colorLine, palette, axisValues);
-      _fillClipRect(ctx, grad);
+      ctx.fillStyle = grad;
+      ctx.fillRect(-100000, -100000, 200000, 200000);
       break;
     }
 
-    // ── Radial gradient ────────────────────────────────────────────────────
     case "PaintRadialGradient":
     case "PaintVarRadialGradient": {
-      const x0 = resolveVal(paint.x0, axisValues);
-      const y0 = resolveVal(paint.y0, axisValues);
-      const r0 = Math.max(0, resolveVal(paint.r0, axisValues));
-      const x1 = resolveVal(paint.x1, axisValues);
-      const y1 = resolveVal(paint.y1, axisValues);
-      const r1 = Math.max(0, resolveVal(paint.r1, axisValues));
       try {
-        const grad = ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
+        const grad = ctx.createRadialGradient(
+          resolveVal(paint.x0, axisValues),
+          resolveVal(paint.y0, axisValues),
+          Math.max(0, resolveVal(paint.r0, axisValues)),
+          resolveVal(paint.x1, axisValues),
+          resolveVal(paint.y1, axisValues),
+          Math.max(0, resolveVal(paint.r1, axisValues))
+        );
         _applyColorLine(grad, paint.colorLine, palette, axisValues);
-        _fillClipRect(ctx, grad);
-      } catch (e) {
-        // createRadialGradient throws if r0 or r1 is negative (shouldn't happen)
-      }
+        ctx.fillStyle = grad;
+        ctx.fillRect(-100000, -100000, 200000, 200000);
+      } catch (e) {}
       break;
     }
 
-    // ── Sweep gradient ─────────────────────────────────────────────────────
     case "PaintSweepGradient":
     case "PaintVarSweepGradient": {
-      const cx = resolveVal(paint.centerX, axisValues);
-      const cy = resolveVal(paint.centerY, axisValues);
-      const start = resolveVal(paint.startAngle, axisValues) * Math.PI * 2;
-      const end = resolveVal(paint.endAngle, axisValues) * Math.PI * 2;
       try {
-        const grad = ctx.createConicGradient(start, cx, cy);
+        const grad = ctx.createConicGradient(
+          resolveVal(paint.startAngle, axisValues) * Math.PI * 2,
+          resolveVal(paint.centerX, axisValues),
+          resolveVal(paint.centerY, axisValues)
+        );
         _applyColorLine(grad, paint.colorLine, palette, axisValues);
-        _fillClipRect(ctx, grad);
-      } catch (e) {
-        // createConicGradient may not be available in all browsers
-      }
+        ctx.fillStyle = grad;
+        ctx.fillRect(-100000, -100000, 200000, 200000);
+      } catch (e) {}
       break;
     }
 
-    // ── Transform paints ───────────────────────────────────────────────────
     case "PaintTranslate":
     case "PaintVarTranslate": {
-      const dx = resolveVal(paint.dx, axisValues);
-      const dy = resolveVal(paint.dy, axisValues);
       ctx.save();
-      ctx.translate(dx, dy);
-      _renderPaint(ctx, paint.paint, palette, axisValues, fontController, outlineCache);
+      ctx.translate(resolveVal(paint.dx, axisValues), resolveVal(paint.dy, axisValues));
+      _renderPaint(
+        ctx,
+        paint.paint,
+        palette,
+        axisValues,
+        fontController,
+        outlineCache,
+        positionedGlyph,
+        _depth + 1
+      );
       ctx.restore();
       break;
     }
 
     case "PaintRotate":
     case "PaintVarRotate": {
-      const angle = resolveVal(paint.angle, axisValues) * Math.PI * 2;
-      const cx = resolveVal(paint.centerX, axisValues);
-      const cy = resolveVal(paint.centerY, axisValues);
       ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(angle);
-      ctx.translate(-cx, -cy);
-      _renderPaint(ctx, paint.paint, palette, axisValues, fontController, outlineCache);
+      ctx.rotate(resolveVal(paint.angle, axisValues) * Math.PI * 2);
+      _renderPaint(
+        ctx,
+        paint.paint,
+        palette,
+        axisValues,
+        fontController,
+        outlineCache,
+        positionedGlyph,
+        _depth + 1
+      );
       ctx.restore();
       break;
     }
 
     case "PaintScale":
     case "PaintVarScale": {
-      const sx = resolveVal(paint.scaleX ?? paint.scale, axisValues) ?? 1;
-      const sy = resolveVal(paint.scaleY ?? paint.scale, axisValues) ?? 1;
-      const cx = resolveVal(paint.centerX, axisValues);
-      const cy = resolveVal(paint.centerY, axisValues);
       ctx.save();
-      ctx.translate(cx, cy);
-      ctx.scale(sx, sy);
-      ctx.translate(-cx, -cy);
-      _renderPaint(ctx, paint.paint, palette, axisValues, fontController, outlineCache);
+      ctx.scale(
+        resolveVal(paint.scaleX ?? paint.scale, axisValues) ?? 1,
+        resolveVal(paint.scaleY ?? paint.scale, axisValues) ?? 1
+      );
+      _renderPaint(
+        ctx,
+        paint.paint,
+        palette,
+        axisValues,
+        fontController,
+        outlineCache,
+        positionedGlyph,
+        _depth + 1
+      );
       ctx.restore();
       break;
     }
 
     case "PaintSkew":
     case "PaintVarSkew": {
-      const xAngle = resolveVal(paint.xSkewAngle, axisValues) * Math.PI * 2;
-      const yAngle = resolveVal(paint.ySkewAngle, axisValues) * Math.PI * 2;
-      const cx = resolveVal(paint.centerX, axisValues);
-      const cy = resolveVal(paint.centerY, axisValues);
       ctx.save();
-      ctx.translate(cx, cy);
-      ctx.transform(1, Math.tan(yAngle), Math.tan(xAngle), 1, 0, 0);
-      ctx.translate(-cx, -cy);
-      _renderPaint(ctx, paint.paint, palette, axisValues, fontController, outlineCache);
+      ctx.transform(
+        1,
+        Math.tan(resolveVal(paint.ySkewAngle, axisValues) * Math.PI * 2),
+        Math.tan(resolveVal(paint.xSkewAngle, axisValues) * Math.PI * 2),
+        1,
+        0,
+        0
+      );
+      _renderPaint(
+        ctx,
+        paint.paint,
+        palette,
+        axisValues,
+        fontController,
+        outlineCache,
+        positionedGlyph,
+        _depth + 1
+      );
       ctx.restore();
       break;
     }
@@ -266,22 +307,30 @@ function _renderPaint(ctx, paint, palette, axisValues, fontController, outlineCa
     case "PaintTransform":
     case "PaintVarTransform": {
       const t = paint.transform ?? {};
-      const xx = resolveVal(t.xx, axisValues) ?? 1;
-      const yx = resolveVal(t.yx, axisValues) ?? 0;
-      const xy = resolveVal(t.xy, axisValues) ?? 0;
-      const yy = resolveVal(t.yy, axisValues) ?? 1;
-      const dx = resolveVal(t.dx, axisValues) ?? 0;
-      const dy = resolveVal(t.dy, axisValues) ?? 0;
       ctx.save();
-      ctx.transform(xx, yx, xy, yy, dx, dy);
-      _renderPaint(ctx, paint.paint, palette, axisValues, fontController, outlineCache);
+      ctx.transform(
+        resolveVal(t.xx, axisValues) ?? 1,
+        resolveVal(t.yx, axisValues) ?? 0,
+        resolveVal(t.xy, axisValues) ?? 0,
+        resolveVal(t.yy, axisValues) ?? 1,
+        resolveVal(t.dx, axisValues) ?? 0,
+        resolveVal(t.dy, axisValues) ?? 0
+      );
+      _renderPaint(
+        ctx,
+        paint.paint,
+        palette,
+        axisValues,
+        fontController,
+        outlineCache,
+        positionedGlyph,
+        _depth + 1
+      );
       ctx.restore();
       break;
     }
 
-    // ── Composite ──────────────────────────────────────────────────────────
     case "PaintComposite": {
-      // Render backdrop first, then source on top with composite mode
       ctx.save();
       _renderPaint(
         ctx,
@@ -289,7 +338,9 @@ function _renderPaint(ctx, paint, palette, axisValues, fontController, outlineCa
         palette,
         axisValues,
         fontController,
-        outlineCache
+        outlineCache,
+        positionedGlyph,
+        _depth + 1
       );
       ctx.globalCompositeOperation = paint.compositeMode ?? "source-over";
       _renderPaint(
@@ -298,14 +349,15 @@ function _renderPaint(ctx, paint, palette, axisValues, fontController, outlineCa
         palette,
         axisValues,
         fontController,
-        outlineCache
+        outlineCache,
+        positionedGlyph,
+        _depth + 1
       );
       ctx.restore();
       break;
     }
 
     default:
-      // Unknown paint type — skip silently
       break;
   }
 }
