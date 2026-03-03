@@ -6,14 +6,73 @@ import { Form } from "@fontra/web-components/ui-form.js";
 import Panel from "./panel.js";
 
 const PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes";
-
-// MAPPING_KEY is the canonical UFO lib key used by ufo2ft.
-// The backend reads/writes it at the top level of the .glif lib.
-// Internally, Fontra transfers it through glyph.customData under the
-// short key below so the backend's pop("colorLayerMapping") finds it.
 const MAPPING_KEY = "com.github.googlei18n.ufo2ft.colorLayerMapping"; // kept for reference
-const CUSTOM_DATA_KEY = "colorLayerMapping"; // short key used in glyph.customData
-const COLRV1_KEY = "colorv1"; // key used in glyph.customData for COLRv1 paint graph
+const CUSTOM_DATA_KEY = "colorLayerMapping";
+const COLRV1_KEY = "colorv1";
+
+// ---------------------------------------------------------------------------
+// COLRv1 parameter schema
+// pairWith/paired groups two consecutive fields into an edit-number-x-y row.
+// ---------------------------------------------------------------------------
+const PAINT_PARAM_SCHEMA = {
+  PaintSolid: [
+    { key: "paletteIndex", label: "Color Index", min: 0, integer: true },
+    { key: "alpha", label: "Alpha", min: 0, max: 1 },
+  ],
+  PaintLinearGradient: [
+    { key: "x0", label: "x0", pairWith: "y0" },
+    { key: "y0", label: "y0", paired: true },
+    { key: "x1", label: "x1", pairWith: "y1" },
+    { key: "y1", label: "y1", paired: true },
+    { key: "x2", label: "x2", pairWith: "y2" },
+    { key: "y2", label: "y2", paired: true },
+  ],
+  PaintRadialGradient: [
+    { key: "x0", label: "x0", pairWith: "y0" },
+    { key: "y0", label: "y0", paired: true },
+    { key: "r0", label: "r0", min: 0 },
+    { key: "x1", label: "x1", pairWith: "y1" },
+    { key: "y1", label: "y1", paired: true },
+    { key: "r1", label: "r1", min: 0 },
+  ],
+  PaintSweepGradient: [
+    { key: "centerX", label: "centerX", pairWith: "centerY" },
+    { key: "centerY", label: "centerY", paired: true },
+    { key: "startAngle", label: "Start °", min: -1, max: 1 },
+    { key: "endAngle", label: "End °", min: -1, max: 1 },
+  ],
+  PaintTranslate: [
+    { key: "dx", label: "dx", pairWith: "dy" },
+    { key: "dy", label: "dy", paired: true },
+  ],
+  PaintScale: [
+    { key: "scaleX", label: "scaleX", pairWith: "scaleY" },
+    { key: "scaleY", label: "scaleY", paired: true },
+  ],
+  PaintScaleUniform: [{ key: "scale", label: "Scale" }],
+  PaintRotate: [{ key: "angle", label: "Angle (turns)", min: -1, max: 1 }],
+  PaintSkew: [
+    {
+      key: "xSkewAngle",
+      label: "xSkewAngle",
+      pairWith: "ySkewAngle",
+      min: -0.5,
+      max: 0.5,
+    },
+    { key: "ySkewAngle", label: "ySkewAngle", paired: true, min: -0.5, max: 0.5 },
+  ],
+  PaintTransform: [
+    { key: "xx", label: "xx", pairWith: "yx" },
+    { key: "yx", label: "yx", paired: true },
+    { key: "xy", label: "xy", pairWith: "yy" },
+    { key: "yy", label: "yy", paired: true },
+    { key: "dx", label: "dx", pairWith: "dy" },
+    { key: "dy", label: "dy", paired: true },
+  ],
+};
+
+// PaintVar* types share the same schema as their static counterparts.
+const normalizePaintType = (t) => t?.replace(/^PaintVar/, "Paint") ?? t;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -22,7 +81,7 @@ const COLRV1_KEY = "colorv1"; // key used in glyph.customData for COLRv1 paint g
 function makePlusButton(onclick, title) {
   return html.div(
     {
-      style: "cursor: pointer; font-size: 1.2em; line-height: 1; padding: 0 0.3em;",
+      style: "cursor:pointer;font-size:1.2em;line-height:1;padding:0 0.3em;",
       onclick,
       title,
     },
@@ -33,7 +92,7 @@ function makePlusButton(onclick, title) {
 function makeMinusButton(onclick, title) {
   return html.div(
     {
-      style: "cursor: pointer; font-size: 1.2em; line-height: 1; padding: 0 0.3em;",
+      style: "cursor:pointer;font-size:1.2em;line-height:1;padding:0 0.3em;",
       onclick,
       title,
     },
@@ -57,12 +116,72 @@ export default class ColorLayersPanel extends Panel {
       ["selectedGlyphName"],
       () => this.update()
     );
-
     this.sceneController.addCurrentGlyphChangeListener(() => this.update());
   }
 
   getContentElement() {
     this.colorLayersForm = new Form();
+
+    // ── Central field-change dispatcher ──────────────────────────────────
+    // Mirrors the pattern from panel-transformation.js: one onFieldChange
+    // handler parses the structured JSON key and routes to the right mutator.
+    this.colorLayersForm.onFieldChange = async (fieldItem, value) => {
+      let parsed;
+      try {
+        parsed = JSON.parse(fieldItem.key);
+      } catch {
+        return;
+      }
+
+      const [tag, ...rest] = parsed;
+
+      // COLRv0 color-index change
+      if (tag === "colorIndex") {
+        const [idx] = rest;
+        await this._setColorIndex(this._currentGlyphName, idx, value);
+        return;
+      }
+
+      // COLRv1 paint-type text change
+      if (tag === "v1PaintType") {
+        const [layerIdx] = rest;
+        await this._setV1LayerField(
+          this._currentGlyphName,
+          this._currentPaint,
+          layerIdx,
+          "type",
+          value
+        );
+        return;
+      }
+
+      // COLRv1 glyph-reference text change
+      if (tag === "v1GlyphRef") {
+        const [layerIdx] = rest;
+        await this._setV1LayerField(
+          this._currentGlyphName,
+          this._currentPaint,
+          layerIdx,
+          "glyph",
+          value
+        );
+        return;
+      }
+
+      // COLRv1 typed parameter (paletteIndex, alpha, dx, dy, angle, …)
+      if (tag === "v1Param") {
+        const [layerIdx, paramKey] = rest;
+        await this._setV1PaintParam(
+          this._currentGlyphName,
+          this._currentPaint,
+          layerIdx,
+          paramKey,
+          value
+        );
+        return;
+      }
+    };
+
     return html.div({ class: "panel" }, [
       html.div(
         { class: "panel-section panel-section--flex panel-section--scrollable" },
@@ -72,24 +191,20 @@ export default class ColorLayersPanel extends Panel {
   }
 
   async toggle(on, focus) {
-    if (on) {
-      this.update();
-    }
+    if (on) this.update();
   }
 
-  // ── Entry point ────────────────────────────────────────────────────────────
+  // ── Entry point ───────────────────────────────────────────────────────────
 
   async update() {
-    // Guard: catch font-not-ready errors during startup
     let customData;
     try {
       customData = this.fontController.customData ?? {};
     } catch {
-      return; // Font not ready yet, will be called again when ready
+      return;
     }
 
     const palettes = customData[PALETTES_KEY];
-
     if (!palettes?.length || !palettes[0]?.length) {
       this.colorLayersForm.setFieldDescriptions([
         { type: "text", value: translate("color-layers.no-palette") },
@@ -98,7 +213,6 @@ export default class ColorLayersPanel extends Panel {
     }
 
     const palette = palettes[0];
-
     const glyphName = this.sceneController.sceneSettings.selectedGlyphName;
     if (!glyphName) {
       this.colorLayersForm.setFieldDescriptions([
@@ -106,6 +220,9 @@ export default class ColorLayersPanel extends Panel {
       ]);
       return;
     }
+
+    // Cache for use by onFieldChange
+    this._currentGlyphName = glyphName;
 
     const pg = this.sceneController.sceneModel.getSelectedPositionedGlyph();
     const layerGlyph = pg?.glyph?.instance;
@@ -126,39 +243,35 @@ export default class ColorLayersPanel extends Panel {
     }
   }
 
-  // ── Empty state ────────────────────────────────────────────────────────────
+  // ── Empty state ───────────────────────────────────────────────────────────
 
   _renderEmptyUI(glyphName, palette) {
-    const formContents = [
+    this.colorLayersForm.setFieldDescriptions([
       { type: "text", value: translate("color-layers.no-layers-yet") },
-    ];
-
-    // Offer both V0 and V1 as starting points
-    formContents.push({
-      type: "header",
-      label: translate("color-layers.title"),
-      auxiliaryElement: html.div({ style: "display:flex; gap:4px;" }, [
-        html.button(
-          {
-            title: "Start COLRv0 (layer mapping)",
-            onclick: () => this._addLayer(glyphName, palette.length, []),
-          },
-          ["v0 +"]
-        ),
-        html.button(
-          {
-            title: "Start COLRv1 (paint graph)",
-            onclick: () => this._initV1(glyphName),
-          },
-          ["v1 +"]
-        ),
-      ]),
-    });
-
-    this.colorLayersForm.setFieldDescriptions(formContents);
+      {
+        type: "header",
+        label: translate("color-layers.title"),
+        auxiliaryElement: html.div({ style: "display:flex;gap:4px;" }, [
+          html.button(
+            {
+              title: "Start COLRv0 (layer mapping)",
+              onclick: () => this._addLayer(glyphName, palette.length, []),
+            },
+            ["v0 +"]
+          ),
+          html.button(
+            {
+              title: "Start COLRv1 (paint graph)",
+              onclick: () => this._initV1(glyphName),
+            },
+            ["v1 +"]
+          ),
+        ]),
+      },
+    ]);
   }
 
-  // ── COLRv0 UI (original logic, unchanged) ─────────────────────────────────
+  // ── COLRv0 UI ─────────────────────────────────────────────────────────────
 
   _renderV0UI(glyph, glyphName, palette) {
     const mapping = glyph?.customData?.[CUSTOM_DATA_KEY] ?? [];
@@ -199,27 +312,22 @@ export default class ColorLayersPanel extends Panel {
           integer: true,
           minValue: 0,
           maxValue: palette.length - 1,
-          getValue: () => mapping[i][1],
-          setValue: async (glyph, layerGlyph, fieldItem, value) => {
-            await this._setColorIndex(glyphName, i, value);
-          },
         });
       }
-    }
 
-    // Allow converting to COLRv1
-    formContents.push({
-      type: "header",
-      label: "",
-      auxiliaryElement: html.button(
-        {
-          title: "Convert this glyph to COLRv1 paint graph",
-          onclick: () => this._convertV0toV1(glyphName, mapping, palette),
-          style: "font-size:0.75em; opacity:0.6;",
-        },
-        ["→ COLRv1"]
-      ),
-    });
+      formContents.push({
+        type: "header",
+        label: "",
+        auxiliaryElement: html.button(
+          {
+            title: "Convert this glyph to COLRv1 paint graph",
+            onclick: () => this._convertV0toV1(glyphName, mapping, palette),
+            style: "font-size:0.75em;opacity:0.6;",
+          },
+          ["→ COLRv1"]
+        ),
+      });
+    }
 
     this.colorLayersForm.setFieldDescriptions(formContents);
   }
@@ -231,15 +339,18 @@ export default class ColorLayersPanel extends Panel {
       type: "PaintColrLayers",
       layers: [],
     };
+
+    // Cache current paint snapshot so onFieldChange can reference it.
+    this._currentPaint = paint;
+
     const layers = paint.layers ?? [];
     const formContents = [];
 
-    // Header with version badge and add-layer button
     formContents.push({
       type: "header",
       label: "COLRv1",
       auxiliaryElement: html.div(
-        { style: "display:flex; gap:6px; align-items:center;" },
+        { style: "display:flex;gap:6px;align-items:center;" },
         [
           makePlusButton(
             () => this._addV1Layer(glyphName, paint, palette.length),
@@ -258,9 +369,8 @@ export default class ColorLayersPanel extends Panel {
       for (let i = 0; i < layers.length; i++) {
         const layer = layers[i];
 
-        // Determine label: use referenced glyph name or layer index
         const layerLabel =
-          layer.type === "PaintGlyph"
+          layer.type === "PaintGlyph" || layer.type === "PaintVarGlyph"
             ? `${i}: PaintGlyph "${layer.glyph ?? "?"}"`
             : `${i}: ${layer.type ?? "Paint"}`;
 
@@ -273,75 +383,97 @@ export default class ColorLayersPanel extends Panel {
           ),
         });
 
-        // Paint type selector
+        // Paint type (editable text)
         formContents.push({
           type: "edit-text",
           key: JSON.stringify(["v1PaintType", i]),
           label: "Paint type",
           value: layer.type ?? "",
-          getValue: () => layers[i]?.type ?? "",
-          setValue: async (g, lg, fi, value) => {
-            await this._setV1LayerField(glyphName, paint, i, "type", value);
-          },
         });
 
-        // If PaintGlyph: show referenced glyph name
-        if (layer.type === "PaintGlyph") {
+        // Glyph reference for PaintGlyph nodes
+        if (layer.type === "PaintGlyph" || layer.type === "PaintVarGlyph") {
           formContents.push({
             type: "edit-text",
             key: JSON.stringify(["v1GlyphRef", i]),
             label: "Glyph",
             value: layer.glyph ?? "",
-            getValue: () => layers[i]?.glyph ?? "",
-            setValue: async (g, lg, fi, value) => {
-              await this._setV1LayerField(glyphName, paint, i, "glyph", value);
-            },
           });
         }
 
-        // Fill paint: paletteIndex + alpha if present
+        // Type-specific numeric parameters
+        // The fill lives in layer.paint for PaintGlyph; otherwise it IS layer.
         const fillPaint = layer.paint ?? layer;
-        if (fillPaint?.paletteIndex != null) {
-          formContents.push({
-            type: "edit-number",
-            key: JSON.stringify(["v1ColorIndex", i]),
-            label: translate("sidebar.selection-info.color-index"),
-            value: fillPaint.paletteIndex,
-            integer: true,
-            minValue: 0,
-            maxValue: palette.length - 1,
-            getValue: () => {
-              const l = layers[i];
-              return (l?.paint ?? l)?.paletteIndex ?? 0;
-            },
-            setValue: async (g, lg, fi, value) => {
-              await this._setV1ColorIndex(glyphName, paint, i, value);
-            },
-          });
+        const normalType = normalizePaintType(fillPaint?.type ?? layer.type);
+        const schema = PAINT_PARAM_SCHEMA[normalType] ?? [];
 
-          formContents.push({
-            type: "edit-number",
-            key: JSON.stringify(["v1Alpha", i]),
-            label: "Alpha",
-            value: fillPaint.alpha ?? 1.0,
-            minValue: 0,
-            maxValue: 1,
-            getValue: () => {
-              const l = layers[i];
-              return (l?.paint ?? l)?.alpha ?? 1.0;
-            },
-            setValue: async (g, lg, fi, value) => {
-              await this._setV1Alpha(glyphName, paint, i, value);
-            },
-          });
-        }
+        this._pushParamFields(formContents, schema, fillPaint, i, layer, palette);
       }
     }
 
     this.colorLayersForm.setFieldDescriptions(formContents);
   }
 
-  // ── COLRv0 mutations (original, unchanged) ────────────────────────────────
+  // ── Schema-driven parameter field builder ─────────────────────────────────
+  // Emits edit-number-x-y for paired fields (dx/dy, x0/y0, …) and
+  // edit-number for singletons — exactly as panel-transformation.js does.
+
+  _pushParamFields(formContents, schema, fillPaint, layerIdx, layer, palette) {
+    const targetObj = layer.paint != null ? fillPaint ?? layer : layer;
+
+    let j = 0;
+    while (j < schema.length) {
+      const fd = schema[j];
+
+      if (fd.paired) {
+        j++;
+        continue;
+      } // consumed with its partner
+
+      if (fd.pairWith) {
+        const partnerFd = schema[j + 1];
+        const keyA = fd.key;
+        const keyB = partnerFd?.key ?? fd.pairWith;
+
+        formContents.push({
+          type: "edit-number-x-y",
+          label: `${fd.label} / ${partnerFd?.label ?? keyB}`,
+          fieldX: {
+            key: JSON.stringify(["v1Param", layerIdx, keyA]),
+            value: targetObj?.[keyA] ?? 0,
+          },
+          fieldY: {
+            key: JSON.stringify(["v1Param", layerIdx, keyB]),
+            value: targetObj?.[keyB] ?? 0,
+          },
+        });
+        j += 2;
+      } else {
+        const isIndex = fd.key === "paletteIndex";
+        const defaultVal =
+          fd.key === "alpha"
+            ? 1.0
+            : fd.key === "scaleX" || fd.key === "scaleY" || fd.key === "scale"
+            ? 1.0
+            : fd.key === "xx" || fd.key === "yy"
+            ? 1.0
+            : 0;
+
+        formContents.push({
+          type: "edit-number",
+          key: JSON.stringify(["v1Param", layerIdx, fd.key]),
+          label: fd.label,
+          value: targetObj?.[fd.key] ?? defaultVal,
+          integer: fd.integer ?? false,
+          minValue: fd.min ?? (isIndex ? 0 : undefined),
+          maxValue: isIndex ? palette.length - 1 : fd.max ?? undefined,
+        });
+        j++;
+      }
+    }
+  }
+
+  // ── COLRv0 mutations ──────────────────────────────────────────────────────
 
   _nextLayerName(mapping) {
     const existing = new Set(mapping.map(([n]) => n));
@@ -353,8 +485,6 @@ export default class ColorLayersPanel extends Panel {
   async _writeMapping(glyphName, newMapping) {
     await this.sceneController.editGlyphAndRecordChanges((glyph) => {
       if (newMapping.length > 0) {
-        // Use the short key — backend pops "colorLayerMapping" and writes it
-        // to the top-level .glif lib as "com.github.googlei18n.ufo2ft.colorLayerMapping"
         glyph.customData[CUSTOM_DATA_KEY] = newMapping;
       } else {
         delete glyph.customData[CUSTOM_DATA_KEY];
@@ -370,11 +500,8 @@ export default class ColorLayersPanel extends Panel {
 
     await this.sceneController.editGlyphAndRecordChanges((glyph) => {
       if (!glyph.layers[layerName]) {
-        glyph.layers[layerName] = {
-          glyph: { path: { contours: [] }, components: [] },
-        };
+        glyph.layers[layerName] = { glyph: { path: { contours: [] }, components: [] } };
       }
-      // Use the short key — same contract as _writeMapping
       glyph.customData[CUSTOM_DATA_KEY] = newMapping;
       return translate("color-layers.add-layer");
     });
@@ -389,17 +516,9 @@ export default class ColorLayersPanel extends Panel {
   async _setColorIndex(glyphName, index, value) {
     const varGlyphController =
       await this.sceneController.sceneModel.getSelectedVariableGlyphController();
-
-    // Read from CUSTOM_DATA_KEY — matches what the backend and update() use.
     const currentMapping = varGlyphController?.glyph?.customData?.[CUSTOM_DATA_KEY];
+    if (!currentMapping?.length || index >= currentMapping.length) return;
 
-    // Guard: if the mapping is absent or the index is stale, bail out silently.
-    if (!currentMapping?.length || index >= currentMapping.length) {
-      return;
-    }
-
-    // Deep-clone each [layerName, colorIndex] pair so we never mutate
-    // the live glyph object before the write completes.
     const mapping = currentMapping.map((entry) => [...entry]);
     mapping[index] = [mapping[index][0], value];
     await this._writeMapping(glyphName, mapping);
@@ -408,11 +527,7 @@ export default class ColorLayersPanel extends Panel {
   // ── COLRv1 mutations ──────────────────────────────────────────────────────
 
   async _initV1(glyphName) {
-    const paint = {
-      type: "PaintColrLayers",
-      layers: [],
-    };
-    await this._writeV1Paint(paint);
+    await this._writeV1Paint({ type: "PaintColrLayers", layers: [] });
   }
 
   async _addV1Layer(glyphName, paint, paletteSize) {
@@ -426,10 +541,7 @@ export default class ColorLayersPanel extends Panel {
         alpha: 1.0,
       },
     };
-    await this._writeV1Paint({
-      ...paint,
-      layers: [...layers, newLayer],
-    });
+    await this._writeV1Paint({ ...paint, layers: [...layers, newLayer] });
   }
 
   async _removeV1Layer(glyphName, paint, index) {
@@ -438,24 +550,15 @@ export default class ColorLayersPanel extends Panel {
     await this._writeV1Paint({ ...paint, layers });
   }
 
-  async _setV1ColorIndex(glyphName, paint, layerIndex, value) {
+  // Generic single-parameter mutator for all COLRv1 paint fields.
+  // Handles both nested (PaintGlyph → layer.paint) and flat paint nodes.
+  async _setV1PaintParam(glyphName, paint, layerIndex, key, value) {
     const layers = (paint.layers ?? []).map((layer, i) => {
       if (i !== layerIndex) return layer;
-      const fillPaint = layer.paint
-        ? { ...layer.paint, paletteIndex: value }
-        : { ...layer, paletteIndex: value };
-      return layer.paint ? { ...layer, paint: fillPaint } : fillPaint;
-    });
-    await this._writeV1Paint({ ...paint, layers });
-  }
-
-  async _setV1Alpha(glyphName, paint, layerIndex, value) {
-    const layers = (paint.layers ?? []).map((layer, i) => {
-      if (i !== layerIndex) return layer;
-      const fillPaint = layer.paint
-        ? { ...layer.paint, alpha: value }
-        : { ...layer, alpha: value };
-      return layer.paint ? { ...layer, paint: fillPaint } : fillPaint;
+      if (layer.paint != null) {
+        return { ...layer, paint: { ...layer.paint, [key]: value } };
+      }
+      return { ...layer, [key]: value };
     });
     await this._writeV1Paint({ ...paint, layers });
   }
@@ -467,7 +570,6 @@ export default class ColorLayersPanel extends Panel {
     await this._writeV1Paint({ ...paint, layers });
   }
 
-  // ✅ Fix — writes to StaticGlyph.customData in the default layer
   async _writeV1Paint(newPaint) {
     await this.sceneController.editGlyphAndRecordChanges((varGlyph) => {
       const defaultSource =
@@ -485,18 +587,11 @@ export default class ColorLayersPanel extends Panel {
   // ── COLRv0 → COLRv1 converter ─────────────────────────────────────────────
 
   async _convertV0toV1(glyphName, mapping, palette) {
-    // Each V0 [layerName, colorIndex] becomes a PaintGlyph + PaintSolid
     const layers = mapping.map(([layerName, colorIndex]) => ({
       type: "PaintGlyph",
       glyph: layerName,
-      paint: {
-        type: "PaintSolid",
-        paletteIndex: colorIndex,
-        alpha: 1.0,
-      },
+      paint: { type: "PaintSolid", paletteIndex: colorIndex, alpha: 1.0 },
     }));
-
-    const newPaint = { type: "PaintColrLayers", layers };
 
     await this.sceneController.editGlyphAndRecordChanges((varGlyph) => {
       const defaultSource =
@@ -505,9 +600,9 @@ export default class ColorLayersPanel extends Panel {
       const layerGlyph = varGlyph.layers?.[defaultSource?.layerName]?.glyph;
       if (layerGlyph) {
         if (!layerGlyph.customData) layerGlyph.customData = {};
-        layerGlyph.customData[COLRV1_KEY] = newPaint;
+        layerGlyph.customData[COLRV1_KEY] = { type: "PaintColrLayers", layers };
       }
-      delete varGlyph.customData[CUSTOM_DATA_KEY]; // V0 mapping IS on VariableGlyph
+      delete varGlyph.customData[CUSTOM_DATA_KEY];
       return "Convert COLRv0 → COLRv1";
     });
   }
