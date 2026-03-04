@@ -1,6 +1,5 @@
 ,color-palettes.title,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes
-,panel-color-layers.title,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers
-,sidebar.color-layers.color-index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index
+,sidebar.color-layers.title,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers
 ,color-layers.title,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers
 ,color-layers.no-glyph-selected,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers
 ,color-layers.no-layers-yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet
@@ -12,7 +11,32 @@
 ,color-palettes.color-index-tooltip,"Color index %0","Color index %0","Color index %0","Color index %0","Color index %0","Color index %0","Color index %0","Color index %0","Color index %0","Color index %0"
 ,color-palettes.edit-description,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes
 ,color-palettes.palette-label,"Palette %0","Palette %0","Palette %0","Palette %0","Palette %0","Palette %0","Palette %0","Palette %0","Palette %0","Palette %0"
-,sidebar.selection-info.color-index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index
 ,color-palettes.add-color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color
 ,color-palettes.remove-palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette
 ,color-palettes.palette-entry-count,"%0 entries","%0 entries","%0 entries","%0 entries","%0 entries","%0 entries","%0 entries","%0 entries","%0 entries","%0 entries"
+,color-layers.color-index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index
+,color-layers.alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha
+,color-layers.paint-type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type
+,color-layers.glyph,Glyph,Glyph,Glyph,Glyph,Glyph,Glyph,Glyph,Glyph,Glyph,Glyph
+,color-layers.colrv1-header,COLRv1,COLRv1,COLRv1,COLRv1,COLRv1,COLRv1,COLRv1,COLRv1,COLRv1,COLRv1
+,color-layers.color-stops,Color Stops,Color Stops,Color Stops,Color Stops,Color Stops,Color Stops,Color Stops,Color Stops,Color Stops,Color Stops
+,color-layers.stop,Stop,Stop,Stop,Stop,Stop,Stop,Stop,Stop,Stop,Stop
+,color-layers.edit-colrv1-paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint
+,color-layers.convert-v0-to-v1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1
+,color-layers.add-stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop
+,color-layers.remove-stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop
+,color-layers.no-stops-yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet
+,color-layers.stop-offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,
+,color-layers.x0,x0,x0,x0,x0,x0,x0,x0,x0,x0,x0
+,color-layers.y0,y0,y0,y0,y0,y0,y0,y0,y0,y0,y0
+,color-layers.x1,x1,x1,x1,x1,x1,x1,x1,x1,x1,x1
+,color-layers.y1,y1,y1,y1,y1,y1,y1,y1,y1,y1,y1
+,color-layers.x2,x2,x2,x2,x2,x2,x2,x2,x2,x2,x2
+,color-layers.y2,y2,y2,y2,y2,y2,y2,y2,y2,y2,y2
+,color-layers.r0,r0,r0,r0,r0,r0,r0,r0,r0,r0,r0
+,color-layers.r1,r1,r1,r1,r1,r1,r1,r1,r1,r1,r1
+,color-layers.centerX,centerX,centerX,centerX,centerX,centerX,centerX,centerX,centerX,centerX,centerX
+,color-layers.centerY,centerY,centerY,centerY,centerY,centerY,centerY,centerY,centerY,centerY,centerY
+,color-layers.start-angle,Start °,Start °,Start °,Start °,Start °,Start °,Start °,Start °,Start °,Start °
+,color-layers.end-angle,End °,End °,End °,End °,End °,End °,End °,End °,End °,End °
+,color-layers.stop-offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset
