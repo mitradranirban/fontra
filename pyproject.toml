@@ -24,6 +24,7 @@ dependencies = [
     "ufo2ft>=3.7.0",
     "paintcompiler>=0.3"
 ]
+
 dynamic = ["version"]
 requires-python = ">=3.10"
 classifiers = [

@@ -1,72 +1,111 @@
 {
-  "name": "A.grad_radial",
-  "sources": [
-    {
-      "name": "",
-      "layerName": "28e6e158",
-      "locationBase": "28e6e158"
-    }
-  ],
-  "layers": {
-    "28e6e158": {
-      "glyph": {
-        "xAdvance": 500,
-        "path": {
-          "contours": [
-            {
-              "points": [
-                {"x": 37, "y": -2},
-                {"x": 111, "y": -4},
-                {"x": 149, "y": 137},
-                {"x": 322, "y": 135},
-                {"x": 348, "y": -4},
-                {"x": 405, "y": 3},
-                {"x": 262, "y": 496},
-                {"x": 190, "y": 496}
-              ],
-              "isClosed": true
-            },
-            {
-              "points": [
-                {"x": 173, "y": 197},
-                {"x": 234, "y": 381},
-                {"x": 290, "y": 200}
-              ],
-              "isClosed": true
-            }
-          ]
-        },
-        "customData": {
-          "colorv1": {
-            "type": "PaintColrLayers",
-            "layers": [
-              {
-                "type": "PaintGlyph",
-                "glyph": "A.grad_radial",
-                "paint": {
-                  "type": "PaintRadialGradient",
-                  "colorLine": {
-                    "extend": "pad",
-                    "colorStops": [
-                      {"stopOffset": 0.0, "paletteIndex": 4, "alpha": 1.0},
-                      {"stopOffset": 1.0, "paletteIndex": 2, "alpha": 0.0}
-                    ]
-                  },
-                  "x0": 330, "y0": 350, "r0": 0,
-                  "x1": 330, "y1": 350,
-                  "r1": {
-                    "default": 300,
-                    "keyframes": [
-                      {"axis": "SHDW", "loc": 0.0, "value": 300},
-                      {"axis": "SHDW", "loc": 1.0, "value": 500}
-                    ]
-                  }
-                }
-              }
-            ]
-          }
-        }
-      }
-    }
-  }
+"name": "A.grad_radial",
+"sources": [
+{
+"name": "",
+"layerName": "28e6e158",
+"locationBase": "28e6e158"
+}
+],
+"layers": {
+"28e6e158": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 37,
+"y": -2
+},
+{
+"x": 111,
+"y": -4
+},
+{
+"x": 149,
+"y": 137
+},
+{
+"x": 322,
+"y": 135
+},
+{
+"x": 348,
+"y": -4
+},
+{
+"x": 405,
+"y": 3
+},
+{
+"x": 262,
+"y": 496
+},
+{
+"x": 190,
+"y": 496
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 173,
+"y": 197
+},
+{
+"x": 234,
+"y": 381
+},
+{
+"x": 290,
+"y": 200
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 500,
+"customData": {
+"colorv1": {
+"layers": [
+{
+"glyph": "A.grad_radial",
+"paint": {
+"colorLine": {
+"colorStops": [
+{
+"alpha": 1,
+"paletteIndex": 3,
+"stopOffset": 0
+},
+{
+"alpha": 0,
+"paletteIndex": 1,
+"stopOffset": 1
+}
+],
+"extend": "pad"
+},
+"r0": 28,
+"r1": 369,
+"type": "PaintRadialGradient",
+"varStopColor": [],
+"x0": 150,
+"x1": 330,
+"y0": 272,
+"y1": 350
+},
+"type": "PaintGlyph"
+}
+],
+"type": "PaintColrLayers"
+}
+}
+}
+}
+}
 }
