@@ -80,29 +80,6 @@
 "type": "PaintSolid"
 },
 "type": "PaintGlyph"
-},
-{
-"glyph": "A.solid",
-"paint": {
-"alpha": {
-"default": 0,
-"keyframes": [
-{
-"axis": "SHDW",
-"loc": 0,
-"value": 0
-},
-{
-"axis": "SHDW",
-"loc": 1,
-"value": 0.85
-}
-]
-},
-"paletteIndex": 0,
-"type": "PaintSolid"
-},
-"type": "PaintGlyph"
 }
 ],
 "type": "PaintColrLayers"
