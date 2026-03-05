@@ -548,6 +548,64 @@ export default class ColorLayersPanel extends Panel {
         );
         return;
       }
+      if (tag === "v1FillPaintType") {
+        const [layerIdx] = rest;
+        const layers = this._currentPaint.layers ?? [];
+        const layer = layers[layerIdx];
+        if (!layer) return;
+        const defaults = {
+          PaintSolid: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
+          PaintLinearGradient: {
+            type: "PaintLinearGradient",
+            x0: 0,
+            y0: 0,
+            x1: 500,
+            y1: 0,
+            x2: 500,
+            y2: 500,
+            colorLine: {
+              colorStops: [
+                { paletteIndex: 0, alpha: 1.0, stopOffset: 0 },
+                { paletteIndex: 1, alpha: 1.0, stopOffset: 1 },
+              ],
+            },
+          },
+          PaintRadialGradient: {
+            type: "PaintRadialGradient",
+            x0: 250,
+            y0: 250,
+            r0: 0,
+            x1: 250,
+            y1: 250,
+            r1: 250,
+            colorLine: {
+              colorStops: [
+                { paletteIndex: 0, alpha: 1.0, stopOffset: 0 },
+                { paletteIndex: 1, alpha: 1.0, stopOffset: 1 },
+              ],
+            },
+          },
+          PaintSweepGradient: {
+            type: "PaintSweepGradient",
+            centerX: 250,
+            centerY: 250,
+            startAngle: 0,
+            endAngle: 1,
+            colorLine: {
+              colorStops: [
+                { paletteIndex: 0, alpha: 1.0, stopOffset: 0 },
+                { paletteIndex: 1, alpha: 1.0, stopOffset: 1 },
+              ],
+            },
+          },
+        };
+        const newFillPaint = defaults[value] ?? { type: value };
+        const newLayers = layers.map((l, i) =>
+          i === layerIdx ? { ...l, paint: newFillPaint } : l
+        );
+        await this._writeV1Paint({ ...this._currentPaint, layers: newLayers });
+        return;
+      }
     };
 
     return html.div({ class: "panel" }, [
@@ -670,12 +728,14 @@ export default class ColorLayersPanel extends Panel {
             translate("color-layers.remove-layer")
           ),
         });
+
         formContents.push({
           type: "edit-text",
           key: JSON.stringify(["v1PaintType", i]),
           label: translate("color-layers.paint-type"),
           value: layer.type ?? "",
         });
+
         if (layer.type === "PaintGlyph" || layer.type === "PaintVarGlyph") {
           formContents.push({
             type: "edit-text",
@@ -683,7 +743,99 @@ export default class ColorLayersPanel extends Panel {
             label: translate("color-layers.glyph"),
             value: layer.glyph ?? "",
           });
+
+          // ── Fill paint type selector ──────────────────────────────────
+          const fillPaintTypes = [
+            "PaintSolid",
+            "PaintLinearGradient",
+            "PaintRadialGradient",
+            "PaintSweepGradient",
+          ];
+          const currentFillType = normalizePaintType(layer.paint?.type) ?? "PaintSolid";
+
+          formContents.push({
+            type: "header",
+            label: translate("color-layers.fill-paint-type"),
+          });
+
+          for (const pt of fillPaintTypes) {
+            const isSelected = currentFillType === pt;
+            formContents.push({
+              type: "header",
+              label: isSelected ? `▶ ${pt}` : `　${pt}`,
+              auxiliaryElement: isSelected
+                ? null
+                : html.button(
+                    {
+                      style: "font-size:0.75em;opacity:0.7;",
+                      onclick: async () => {
+                        const defaults = {
+                          PaintSolid: {
+                            type: "PaintSolid",
+                            paletteIndex: 0,
+                            alpha: 1.0,
+                          },
+                          PaintLinearGradient: {
+                            type: "PaintLinearGradient",
+                            x0: 0,
+                            y0: 0,
+                            x1: 500,
+                            y1: 0,
+                            x2: 500,
+                            y2: 500,
+                            colorLine: {
+                              colorStops: [
+                                { paletteIndex: 0, alpha: 1.0, stopOffset: 0 },
+                                { paletteIndex: 1, alpha: 1.0, stopOffset: 1 },
+                              ],
+                            },
+                          },
+                          PaintRadialGradient: {
+                            type: "PaintRadialGradient",
+                            x0: 250,
+                            y0: 250,
+                            r0: 0,
+                            x1: 250,
+                            y1: 250,
+                            r1: 250,
+                            colorLine: {
+                              colorStops: [
+                                { paletteIndex: 0, alpha: 1.0, stopOffset: 0 },
+                                { paletteIndex: 1, alpha: 1.0, stopOffset: 1 },
+                              ],
+                            },
+                          },
+                          PaintSweepGradient: {
+                            type: "PaintSweepGradient",
+                            centerX: 250,
+                            centerY: 250,
+                            startAngle: 0,
+                            endAngle: 1,
+                            colorLine: {
+                              colorStops: [
+                                { paletteIndex: 0, alpha: 1.0, stopOffset: 0 },
+                                { paletteIndex: 1, alpha: 1.0, stopOffset: 1 },
+                              ],
+                            },
+                          },
+                        };
+                        const newFillPaint = defaults[pt] ?? { type: pt };
+                        const newLayers = (this._currentPaint.layers ?? []).map(
+                          (l, idx) => (idx === i ? { ...l, paint: newFillPaint } : l)
+                        );
+                        await this._writeV1Paint({
+                          ...this._currentPaint,
+                          layers: newLayers,
+                        });
+                      },
+                    },
+                    ["use"]
+                  ),
+            });
+          }
+          // ─────────────────────────────────────────────────────────────
         }
+
         const fillPaint = layer.paint ?? layer;
         const normalType = normalizePaintType(fillPaint?.type ?? layer.type);
         this._pushParamFields(
@@ -695,6 +847,7 @@ export default class ColorLayersPanel extends Panel {
         );
       }
     }
+
     this.colorLayersForm.setFieldDescriptions(formContents);
   }
 
@@ -703,21 +856,34 @@ export default class ColorLayersPanel extends Panel {
     let j = 0;
     while (j < schema.length) {
       const fd = schema[j];
+
       if (fd.type === "array") {
         this._pushArrayParamFields(formContents, fd, targetObj, layerIdx, palette);
         j++;
         continue;
       }
+
       if (fd.paired) {
         j++;
         continue;
       }
+
+      const isIndex = fd.key === "paletteIndex";
+      const defaultVal =
+        fd.key === "alpha"
+          ? 1.0
+          : ["scaleX", "scaleY", "scale", "xx", "yy"].includes(fd.key)
+          ? 1.0
+          : 0;
+      const rawVal = targetObj?.[fd.key] ?? defaultVal;
+      const displayVal = isVariable(rawVal) ? rawVal.default : rawVal;
+
       if (fd.pairWith) {
         const partnerFd = schema[j + 1];
         const keyA = fd.key,
           keyB = partnerFd?.key ?? fd.pairWith;
-        const rawA = targetObj?.[keyA] ?? 0,
-          rawB = targetObj?.[keyB] ?? 0;
+        const rawA = targetObj?.[keyA] ?? 0;
+        const rawB = targetObj?.[keyB] ?? 0;
         formContents.push({
           type: "edit-number-x-y",
           label: `${translate(fd.label)} / ${translate(partnerFd?.label ?? keyB)}`,
@@ -732,16 +898,6 @@ export default class ColorLayersPanel extends Panel {
         });
         j += 2;
       } else {
-        const isIndex = fd.key === "paletteIndex";
-        const defaultVal =
-          fd.key === "alpha"
-            ? 1.0
-            : ["scaleX", "scaleY", "scale", "xx", "yy"].includes(fd.key)
-            ? 1.0
-            : 0;
-        const rawVal = targetObj?.[fd.key] ?? defaultVal;
-        const displayVal = isVariable(rawVal) ? rawVal.default : rawVal;
-
         formContents.push({
           type: "edit-number",
           key: JSON.stringify(["v1Param", layerIdx, fd.key]),
@@ -775,7 +931,7 @@ export default class ColorLayersPanel extends Panel {
                 {
                   title: translate("color-panel.remove-keyframe"),
                   onclick: async () => {
-                    const newKfs = rawVal.keyframes.filter((_, j) => j !== ki);
+                    const newKfs = rawVal.keyframes.filter((_, i) => i !== ki);
                     await this._setV1FieldKeyframes(
                       this._currentGlyphName,
                       this._currentPaint,
@@ -791,6 +947,13 @@ export default class ColorLayersPanel extends Panel {
           }
         }
         j++;
+      }
+
+      // safety: should never be needed, but prevents infinite loop if fd
+      // somehow matches none of the above branches
+      if (j === 0) {
+        j = schema.length;
+        break;
       }
     }
   }

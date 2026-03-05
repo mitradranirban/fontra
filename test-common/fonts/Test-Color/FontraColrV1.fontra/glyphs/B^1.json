@@ -260,9 +260,25 @@
 {
 "glyph": "B",
 "paint": {
+"centerX": 250,
+"centerY": 250,
+"colorLine": {
+"colorStops": [
+{
+"alpha": 1,
+"paletteIndex": 0,
+"stopOffset": 0
+},
+{
 "alpha": 1,
 "paletteIndex": 1,
-"type": "PaintSolid"
+"stopOffset": 1
+}
+]
+},
+"endAngle": 1,
+"startAngle": 0,
+"type": "PaintSweepGradient"
 },
 "type": "PaintGlyph"
 }
