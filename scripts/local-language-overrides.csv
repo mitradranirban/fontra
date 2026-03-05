@@ -40,3 +40,11 @@
 ,color-layers.start-angle,Start °,Start °,Start °,Start °,Start °,Start °,Start °,Start °,Start °,Start °
 ,color-layers.end-angle,End °,End °,End °,End °,End °,End °,End °,End °,End °,End °
 ,color-layers.stop-offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset
+,color-panel.make-variable,Make variable on axis,,,,,,,,,
+,color-panel.make-variable-short,⬦,⬦,⬦,⬦,⬦,⬦,⬦,⬦,⬦,⬦
+,color-panel.remove-variable,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value
+,color-panel.remove-variable-short,⬧,⬧,⬧,⬧,⬧,⬧,⬧,⬧,⬧,⬧
+,color-panel.remove-keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,
+,color-panel.remove-keyframe-short,×,×,×,×,×,×,×,×,×,×
+,color-panel.add-keyframe,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location
+,color-panel.add-keyframe-short,+,+,+,+,+,+,+,+,+,+
