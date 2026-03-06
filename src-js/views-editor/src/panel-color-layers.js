@@ -439,18 +439,24 @@ export default class ColorLayersPanel extends Panel {
       ["selectedGlyphName"],
       () => this.update()
     );
-    this.sceneController.sceneSettingsController.addKeyListener(["location"], () =>
-      this._onLocationChange()
+    this.sceneController.sceneSettingsController.addKeyListener(
+      ["fontLocationSourceMapped"],
+      () => this._onLocationChange()
     );
     this.sceneController.addCurrentGlyphChangeListener(() => this.update());
   }
 
-  _onLocationChange() {
+  _onLocationChange = () => {
+    // Read the fully-mapped source location — this is what drive interpolation
+    const axisValues =
+      this.sceneController.sceneSettings.fontLocationSourceMapped ?? {};
+
     const pg = this.sceneController.sceneModel.getSelectedPositionedGlyph();
     const layerGlyph = pg?.glyph?.instance;
-    if (!layerGlyph?.customData?.[COLRV1_KEY]) return;
-    this.update();
-  }
+    if (!layerGlyph?.customData?.[COLRV1KEY]) return;
+
+    this.renderPreview(layerGlyph, axisValues);
+  };
 
   getContentElement() {
     this.colorLayersForm = new Form();
