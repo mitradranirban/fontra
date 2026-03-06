@@ -1,0 +1,37 @@
+{
+"unitsPerEm": 600,
+"axes": {
+"axes": [
+{
+"name": "ANIM",
+"label": "Frame",
+"tag": "ANIM",
+"minValue": 0,
+"defaultValue": 0,
+"maxValue": 263
+}
+]
+},
+"sources": {
+"f713eee3": {
+"name": "Regular",
+"lineMetricsHorizontalLayout": {
+"baseline": {
+"value": 0
+},
+"ascender": {
+"value": 600
+},
+"descender": {
+"value": 0
+},
+"capHeight": {
+"value": 600
+},
+"xHeight": {
+"value": 600
+}
+}
+}
+}
+}

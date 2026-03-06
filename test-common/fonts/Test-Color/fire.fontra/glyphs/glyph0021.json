@@ -1,0 +1,102 @@
+{
+"name": "glyph0021",
+"sources": [
+{
+"name": "",
+"layerName": "f713eee3",
+"locationBase": "f713eee3"
+}
+],
+"layers": {
+"f713eee3": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 8,
+"y": -29
+},
+{
+"x": 8,
+"y": -29,
+"type": "quad"
+},
+{
+"x": 8,
+"y": -29,
+"type": "quad"
+},
+{
+"x": 8,
+"y": -29
+},
+{
+"x": 12,
+"y": -29,
+"type": "quad"
+},
+{
+"x": 19,
+"y": -4,
+"type": "quad"
+},
+{
+"x": 19,
+"y": 5,
+"smooth": true
+},
+{
+"x": 19,
+"y": 30,
+"type": "quad"
+},
+{
+"x": 3,
+"y": 29
+},
+{
+"x": -4,
+"y": 29,
+"type": "quad"
+},
+{
+"x": -13,
+"y": 17,
+"type": "quad"
+},
+{
+"x": -10,
+"y": 5,
+"smooth": true
+},
+{
+"x": -8,
+"y": -3,
+"type": "quad"
+},
+{
+"x": 3,
+"y": -17,
+"type": "quad"
+},
+{
+"x": 4,
+"y": -23
+},
+{
+"x": 6,
+"y": -29,
+"type": "quad"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 600
+}
+}
+}
+}

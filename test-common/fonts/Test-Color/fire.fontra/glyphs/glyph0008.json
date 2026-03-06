@@ -1,0 +1,66 @@
+{
+"name": "glyph0008",
+"sources": [
+{
+"name": "",
+"layerName": "f713eee3",
+"locationBase": "f713eee3"
+}
+],
+"layers": {
+"f713eee3": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -9,
+"y": 0,
+"smooth": true
+},
+{
+"x": -9,
+"y": -9,
+"type": "quad"
+},
+{
+"x": 0,
+"y": -9,
+"smooth": true
+},
+{
+"x": 9,
+"y": -9,
+"type": "quad"
+},
+{
+"x": 9,
+"y": 0,
+"smooth": true
+},
+{
+"x": 9,
+"y": 9,
+"type": "quad"
+},
+{
+"x": 0,
+"y": 9,
+"smooth": true
+},
+{
+"x": -9,
+"y": 9,
+"type": "quad"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 600
+}
+}
+}
+}

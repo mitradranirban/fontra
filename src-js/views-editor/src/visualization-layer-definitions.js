@@ -16,7 +16,6 @@ import {
 } from "@fontra/core/utils.js";
 import { subVectors } from "@fontra/core/vector.js";
 import { colrv1PaintOverlayDefinition } from "./visualization-layers.js";
-
 export const visualizationLayerDefinitions = [];
 
 export function registerVisualizationLayerDefinition(newLayerDef) {
@@ -32,7 +31,8 @@ export function registerVisualizationLayerDefinition(newLayerDef) {
 }
 registerVisualizationLayerDefinition({
   ...colrv1PaintOverlayDefinition,
-  zIndex: -10,
+  zIndex: 10,
+  selectionFunc: glyphSelector("all"),
 });
 export function glyphSelector(selectionMode) {
   return (visContext, layer) => {

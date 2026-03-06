@@ -124,43 +124,21 @@ export class VisualizationContext {
 // Having it here as well means it is available to unit tests and to any
 // custom VisualizationLayers instances built outside the editor.
 // ---------------------------------------------------------------------------
+let _currentAxisValues = {};
 
+export function setColrv1AxisValues(axisValues) {
+  _currentAxisValues = axisValues ?? {};
+}
+export const visualizationLayerDefinitions = [];
 export const colrv1PaintOverlayDefinition = {
-  identifier: "fontra.colrv1-paint-overlay",
-  name: "color-layers.colrv1-title",
-  userSwitchable: true,
-  defaultOn: true,
-
-  // Draw for every glyph in the text string (all modes: selected, editing,
-  // unselected) so the colour preview is always visible.
-  selectionFunc(visContext) {
-    return visContext.glyphsBySelectionMode.all;
-  },
+  identifier: "fontra.colrv1.paint",
+  name: "COLRv1 Paint",
 
   draw(context, positionedGlyph, parameters, model, controller) {
-    const fontController = model.fontController;
-    if (!fontController) return;
-
-    // Only render if this glyph actually carries a COLRv1 paint graph.
     const paint = positionedGlyph?.glyph?.instance?.customData?.[COLRV1_KEY];
     if (!paint) return;
 
-    // Axis values at the current designspace location.
-    // model.fontLocation is the normalised location dict { axisTag: value }.
-    const axisValues = model.fontLocation ?? {};
-
-    // Which CPAL palette row to render (persisted in localStorage so the
-    // palette panel and the canvas stay in sync).
-    const activePaletteIndex =
-      parseInt(localStorage.getItem("fontra-colrv1-active-palette") ?? "0", 10) || 0;
-
-    renderCOLRv1(
-      context,
-      positionedGlyph,
-      fontController,
-      axisValues,
-      activePaletteIndex
-    );
+    renderCOLRv1(context, positionedGlyph, model.fontController, _currentAxisValues, 0);
   },
 };
 

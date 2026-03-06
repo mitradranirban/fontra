@@ -85,30 +85,25 @@ export function resolveVal(val, axisValues) {
     byAxis.get(kf.axis).push(kf);
   }
 
-  let result = base;
-  for (const [axis, kfs] of byAxis) {
-    const loc = axisValues?.[axis] ?? 0;
-    // Sort by loc
-    const sorted = [...kfs].sort((a, b) => a.loc - b.loc);
+  // Use first axis (single-axis masterless model)
+  const [axis, kfs] = [...byAxis.entries()][0];
+  const loc = axisValues?.[axis] ?? 0;
+  const sorted = [...kfs].sort((a, b) => a.loc - b.loc);
 
-    // Find surrounding keyframes
-    if (loc <= sorted[0].loc) {
-      result += sorted[0].value - base;
-    } else if (loc >= sorted[sorted.length - 1].loc) {
-      result += sorted[sorted.length - 1].value - base;
-    } else {
-      for (let i = 0; i < sorted.length - 1; i++) {
-        const lo = sorted[i],
-          hi = sorted[i + 1];
-        if (loc >= lo.loc && loc <= hi.loc) {
-          const t = (loc - lo.loc) / (hi.loc - lo.loc);
-          result += lo.value + t * (hi.value - lo.value) - base;
-          break;
-        }
-      }
+  // Clamp to endpoints
+  if (loc <= sorted[0].loc) return sorted[0].value;
+  if (loc >= sorted[sorted.length - 1].loc) return sorted[sorted.length - 1].value;
+
+  // Linear interpolation — return ABSOLUTE value, not delta
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const lo = sorted[i],
+      hi = sorted[i + 1];
+    if (loc >= lo.loc && loc <= hi.loc) {
+      const t = (loc - lo.loc) / (hi.loc - lo.loc);
+      return lo.value + t * (hi.value - lo.value); // ← no "- base"
     }
   }
-  return result;
+  return base;
 }
 
 // ---------------------------------------------------------------------------
