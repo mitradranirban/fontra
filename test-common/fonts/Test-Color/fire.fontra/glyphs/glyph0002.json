@@ -1,0 +1,44 @@
+{
+"name": "glyph0002",
+"sources": [
+{
+"name": "",
+"layerName": "f713eee3",
+"locationBase": "f713eee3"
+}
+],
+"layers": {
+"f713eee3": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 103,
+"y": 48
+},
+{
+"x": 48,
+"y": 48
+},
+{
+"x": 59,
+"y": 59,
+"type": "quad"
+},
+{
+"x": 91,
+"y": 58,
+"type": "quad"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 600
+}
+}
+}
+}

@@ -1,0 +1,4176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ttFont sfntVersion="\x00\x01\x00\x00" ttLibVersion="4.46">
+
+  <GlyphOrder>
+    <!-- The 'id' attribute is only for humans; it is ignored when parsed. -->
+    <GlyphID id="0" name=".notdef"/>
+    <GlyphID id="1" name="baseglyph"/>
+    <GlyphID id="2" name="glyph0001"/>
+    <GlyphID id="3" name="glyph0002"/>
+    <GlyphID id="4" name="glyph0003"/>
+    <GlyphID id="5" name="glyph0004"/>
+    <GlyphID id="6" name="glyph0005"/>
+    <GlyphID id="7" name="glyph0006"/>
+    <GlyphID id="8" name="glyph0007"/>
+    <GlyphID id="9" name="glyph0008"/>
+    <GlyphID id="10" name="glyph0009"/>
+    <GlyphID id="11" name="glyph0010"/>
+    <GlyphID id="12" name="glyph0011"/>
+    <GlyphID id="13" name="glyph0012"/>
+    <GlyphID id="14" name="glyph0013"/>
+    <GlyphID id="15" name="glyph0014"/>
+    <GlyphID id="16" name="glyph0015"/>
+    <GlyphID id="17" name="glyph0016"/>
+    <GlyphID id="18" name="glyph0017"/>
+    <GlyphID id="19" name="glyph0018"/>
+    <GlyphID id="20" name="glyph0019"/>
+    <GlyphID id="21" name="glyph0020"/>
+    <GlyphID id="22" name="glyph0021"/>
+    <GlyphID id="23" name="glyph0022"/>
+    <GlyphID id="24" name="glyph0023"/>
+    <GlyphID id="25" name="glyph0024"/>
+    <GlyphID id="26" name="glyph0025"/>
+  </GlyphOrder>
+
+  <head>
+    <!-- Most of this table will be recalculated by the compiler -->
+    <tableVersion value="1.0"/>
+    <fontRevision value="1.0"/>
+    <checkSumAdjustment value="0xd9fb856e"/>
+    <magicNumber value="0x5f0f3cf5"/>
+    <flags value="00000000 00000001"/>
+    <unitsPerEm value="600"/>
+    <created value="Tue Sep 20 13:00:10 2022"/>
+    <modified value="Tue Sep 20 13:00:10 2022"/>
+    <xMin value="-171"/>
+    <yMin value="-244"/>
+    <xMax value="174"/>
+    <yMax value="206"/>
+    <macStyle value="00000000 00000000"/>
+    <lowestRecPPEM value="10"/>
+    <fontDirectionHint value="2"/>
+    <indexToLocFormat value="0"/>
+    <glyphDataFormat value="0"/>
+  </head>
+
+  <hhea>
+    <tableVersion value="0x00010000"/>
+    <ascent value="600"/>
+    <descent value="0"/>
+    <lineGap value="0"/>
+    <advanceWidthMax value="600"/>
+    <minLeftSideBearing value="-168"/>
+    <minRightSideBearing value="423"/>
+    <xMaxExtent value="177"/>
+    <caretSlopeRise value="1"/>
+    <caretSlopeRun value="0"/>
+    <caretOffset value="0"/>
+    <reserved0 value="0"/>
+    <reserved1 value="0"/>
+    <reserved2 value="0"/>
+    <reserved3 value="0"/>
+    <metricDataFormat value="0"/>
+    <numberOfHMetrics value="3"/>
+  </hhea>
+
+  <maxp>
+    <!-- Most of this table will be recalculated by the compiler -->
+    <tableVersion value="0x10000"/>
+    <numGlyphs value="27"/>
+    <maxPoints value="36"/>
+    <maxContours value="1"/>
+    <maxCompositePoints value="0"/>
+    <maxCompositeContours value="0"/>
+    <maxZones value="2"/>
+    <maxTwilightPoints value="0"/>
+    <maxStorage value="0"/>
+    <maxFunctionDefs value="0"/>
+    <maxInstructionDefs value="0"/>
+    <maxStackElements value="0"/>
+    <maxSizeOfInstructions value="0"/>
+    <maxComponentElements value="0"/>
+    <maxComponentDepth value="0"/>
+  </maxp>
+
+  <OS_2>
+    <!-- The fields 'usFirstCharIndex' and 'usLastCharIndex'
+         will be recalculated by the compiler -->
+    <version value="3"/>
+    <xAvgCharWidth value="600"/>
+    <usWeightClass value="400"/>
+    <usWidthClass value="5"/>
+    <fsType value="00000000 00000100"/>
+    <ySubscriptXSize value="0"/>
+    <ySubscriptYSize value="0"/>
+    <ySubscriptXOffset value="0"/>
+    <ySubscriptYOffset value="0"/>
+    <ySuperscriptXSize value="0"/>
+    <ySuperscriptYSize value="0"/>
+    <ySuperscriptXOffset value="0"/>
+    <ySuperscriptYOffset value="0"/>
+    <yStrikeoutSize value="0"/>
+    <yStrikeoutPosition value="0"/>
+    <sFamilyClass value="0"/>
+    <panose>
+      <bFamilyType value="0"/>
+      <bSerifStyle value="0"/>
+      <bWeight value="0"/>
+      <bProportion value="0"/>
+      <bContrast value="0"/>
+      <bStrokeVariation value="0"/>
+      <bArmStyle value="0"/>
+      <bLetterForm value="0"/>
+      <bMidline value="0"/>
+      <bXHeight value="0"/>
+    </panose>
+    <ulUnicodeRange1 value="00000000 00000000 00000000 00000001"/>
+    <ulUnicodeRange2 value="00000000 00000000 00000000 00000000"/>
+    <ulUnicodeRange3 value="00000000 00000000 00000000 00000000"/>
+    <ulUnicodeRange4 value="00000000 00000000 00000000 00000000"/>
+    <achVendID value="????"/>
+    <fsSelection value="00000000 00000000"/>
+    <usFirstCharIndex value="97"/>
+    <usLastCharIndex value="97"/>
+    <sTypoAscender value="600"/>
+    <sTypoDescender value="0"/>
+    <sTypoLineGap value="0"/>
+    <usWinAscent value="0"/>
+    <usWinDescent value="0"/>
+    <ulCodePageRange1 value="00000000 00000000 00000000 00000000"/>
+    <ulCodePageRange2 value="00000000 00000000 00000000 00000000"/>
+    <sxHeight value="600"/>
+    <sCapHeight value="600"/>
+    <usDefaultChar value="0"/>
+    <usBreakChar value="32"/>
+    <usMaxContext value="0"/>
+  </OS_2>
+
+  <hmtx>
+    <mtx name=".notdef" width="0" lsb="600"/>
+    <mtx name="baseglyph" width="0" lsb="600"/>
+    <mtx name="glyph0001" width="600" lsb="-168"/>
+    <mtx name="glyph0002" width="600" lsb="48"/>
+    <mtx name="glyph0003" width="600" lsb="-15"/>
+    <mtx name="glyph0004" width="600" lsb="-53"/>
+    <mtx name="glyph0005" width="600" lsb="-41"/>
+    <mtx name="glyph0006" width="600" lsb="-15"/>
+    <mtx name="glyph0007" width="600" lsb="-8"/>
+    <mtx name="glyph0008" width="600" lsb="-9"/>
+    <mtx name="glyph0009" width="600" lsb="-9"/>
+    <mtx name="glyph0010" width="600" lsb="-13"/>
+    <mtx name="glyph0011" width="600" lsb="-13"/>
+    <mtx name="glyph0012" width="600" lsb="-13"/>
+    <mtx name="glyph0013" width="600" lsb="-9"/>
+    <mtx name="glyph0014" width="600" lsb="-9"/>
+    <mtx name="glyph0015" width="600" lsb="-13"/>
+    <mtx name="glyph0016" width="600" lsb="-13"/>
+    <mtx name="glyph0017" width="600" lsb="-9"/>
+    <mtx name="glyph0018" width="600" lsb="-9"/>
+    <mtx name="glyph0019" width="600" lsb="-9"/>
+    <mtx name="glyph0020" width="600" lsb="-13"/>
+    <mtx name="glyph0021" width="600" lsb="-13"/>
+    <mtx name="glyph0022" width="600" lsb="-53"/>
+    <mtx name="glyph0023" width="600" lsb="-41"/>
+    <mtx name="glyph0024" width="600" lsb="-15"/>
+    <mtx name="glyph0025" width="600" lsb="-8"/>
+  </hmtx>
+
+  <cmap>
+    <tableVersion version="0"/>
+    <cmap_format_4 platformID="0" platEncID="3" language="0">
+      <map code="0x61" name="baseglyph"/><!-- LATIN SMALL LETTER A -->
+    </cmap_format_4>
+    <cmap_format_4 platformID="3" platEncID="1" language="0">
+      <map code="0x61" name="baseglyph"/><!-- LATIN SMALL LETTER A -->
+    </cmap_format_4>
+  </cmap>
+
+  <loca>
+    <!-- The 'loca' table will be calculated by the compiler -->
+  </loca>
+
+  <glyf>
+
+    <!-- The xMin, yMin, xMax and yMax values
+         will be recalculated by the compiler. -->
+
+    <TTGlyph name=".notdef"/><!-- contains no outline data -->
+
+    <TTGlyph name="baseglyph"/><!-- contains no outline data -->
+
+    <TTGlyph name="glyph0001" xMin="-171" yMin="-244" xMax="174" yMax="206">
+      <contour>
+        <pt x="-61" y="-236" on="1"/>
+        <pt x="-61" y="-244" on="0"/>
+        <pt x="-53" y="-244" on="1"/>
+        <pt x="-49" y="-244" on="0"/>
+        <pt x="-47" y="-241" on="1"/>
+        <pt x="-34" y="-227" on="0"/>
+        <pt x="4" y="-176" on="0"/>
+        <pt x="18" y="-141" on="1"/>
+        <pt x="32" y="-107" on="0"/>
+        <pt x="40" y="-77" on="0"/>
+        <pt x="52" y="-70" on="1"/>
+        <pt x="67" y="-61" on="0"/>
+        <pt x="90" y="-80" on="0"/>
+        <pt x="96" y="-89" on="1"/>
+        <pt x="98" y="-93" on="0"/>
+        <pt x="107" y="-93" on="0"/>
+        <pt x="109" y="-90" on="1"/>
+        <pt x="120" y="-77" on="0"/>
+        <pt x="154" y="-18" on="0"/>
+        <pt x="174" y="62" on="0"/>
+        <pt x="161" y="106" on="1"/>
+        <pt x="154" y="131" on="0"/>
+        <pt x="123" y="168" on="0"/>
+        <pt x="81" y="193" on="0"/>
+        <pt x="31" y="206" on="0"/>
+        <pt x="4" y="206" on="1"/>
+        <pt x="-24" y="206" on="0"/>
+        <pt x="-80" y="191" on="0"/>
+        <pt x="-127" y="161" on="0"/>
+        <pt x="-159" y="114" on="0"/>
+        <pt x="-165" y="83" on="1"/>
+        <pt x="-171" y="46" on="0"/>
+        <pt x="-156" y="-7" on="0"/>
+        <pt x="-125" y="-54" on="0"/>
+        <pt x="-90" y="-107" on="0"/>
+        <pt x="-64" y="-181" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0002" xMin="48" yMin="48" xMax="103" yMax="59">
+      <contour>
+        <pt x="103" y="48" on="1"/>
+        <pt x="48" y="48" on="1"/>
+        <pt x="59" y="59" on="0"/>
+        <pt x="91" y="58" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0003" xMin="-15" yMin="-15" xMax="15" yMax="15">
+      <contour>
+        <pt x="0" y="-15" on="1"/>
+        <pt x="-6" y="-15" on="0"/>
+        <pt x="-15" y="-6" on="0"/>
+        <pt x="-15" y="0" on="1"/>
+        <pt x="-15" y="15" on="0"/>
+        <pt x="0" y="15" on="1"/>
+        <pt x="15" y="15" on="0"/>
+        <pt x="15" y="0" on="1"/>
+        <pt x="15" y="-6" on="0"/>
+        <pt x="6" y="-15" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0004" xMin="-53" yMin="-53" xMax="53" yMax="53">
+      <contour>
+        <pt x="53" y="0" on="1"/>
+        <pt x="53" y="-22" on="0"/>
+        <pt x="22" y="-53" on="0"/>
+        <pt x="0" y="-53" on="1"/>
+        <pt x="-22" y="-53" on="0"/>
+        <pt x="-53" y="-22" on="0"/>
+        <pt x="-53" y="0" on="1"/>
+        <pt x="-53" y="22" on="0"/>
+        <pt x="-22" y="53" on="0"/>
+        <pt x="0" y="53" on="1"/>
+        <pt x="22" y="53" on="0"/>
+        <pt x="53" y="22" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0005" xMin="-41" yMin="-41" xMax="41" yMax="41">
+      <contour>
+        <pt x="41" y="0" on="1"/>
+        <pt x="41" y="-17" on="0"/>
+        <pt x="17" y="-41" on="0"/>
+        <pt x="0" y="-41" on="1"/>
+        <pt x="-17" y="-41" on="0"/>
+        <pt x="-41" y="-17" on="0"/>
+        <pt x="-41" y="0" on="1"/>
+        <pt x="-41" y="17" on="0"/>
+        <pt x="-17" y="41" on="0"/>
+        <pt x="0" y="41" on="1"/>
+        <pt x="17" y="41" on="0"/>
+        <pt x="41" y="17" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0006" xMin="-15" yMin="-15" xMax="15" yMax="15">
+      <contour>
+        <pt x="15" y="0" on="1"/>
+        <pt x="15" y="-15" on="0"/>
+        <pt x="0" y="-15" on="1"/>
+        <pt x="-15" y="-15" on="0"/>
+        <pt x="-15" y="0" on="1"/>
+        <pt x="-15" y="15" on="0"/>
+        <pt x="0" y="15" on="1"/>
+        <pt x="15" y="15" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0007" xMin="-8" yMin="-8" xMax="8" yMax="8">
+      <contour>
+        <pt x="8" y="0" on="1"/>
+        <pt x="8" y="-8" on="0"/>
+        <pt x="0" y="-8" on="1"/>
+        <pt x="-8" y="-8" on="0"/>
+        <pt x="-8" y="0" on="1"/>
+        <pt x="-8" y="8" on="0"/>
+        <pt x="0" y="8" on="1"/>
+        <pt x="8" y="8" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0008" xMin="-9" yMin="-9" xMax="9" yMax="9">
+      <contour>
+        <pt x="-9" y="0" on="1"/>
+        <pt x="-9" y="-9" on="0"/>
+        <pt x="0" y="-9" on="1"/>
+        <pt x="9" y="-9" on="0"/>
+        <pt x="9" y="0" on="1"/>
+        <pt x="9" y="9" on="0"/>
+        <pt x="0" y="9" on="1"/>
+        <pt x="-9" y="9" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0009" xMin="-9" yMin="-9" xMax="9" yMax="9">
+      <contour>
+        <pt x="-9" y="0" on="1"/>
+        <pt x="-9" y="-9" on="0"/>
+        <pt x="0" y="-9" on="1"/>
+        <pt x="9" y="-9" on="0"/>
+        <pt x="9" y="0" on="1"/>
+        <pt x="9" y="9" on="0"/>
+        <pt x="0" y="9" on="1"/>
+        <pt x="-9" y="9" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0010" xMin="-15" yMin="-29" xMax="17" yMax="30">
+      <contour>
+        <pt x="6" y="-29" on="1"/>
+        <pt x="6" y="-29" on="0"/>
+        <pt x="6" y="-29" on="0"/>
+        <pt x="6" y="-29" on="1"/>
+        <pt x="10" y="-29" on="0"/>
+        <pt x="17" y="-4" on="0"/>
+        <pt x="17" y="5" on="1"/>
+        <pt x="17" y="30" on="0"/>
+        <pt x="1" y="29" on="1"/>
+        <pt x="-6" y="29" on="0"/>
+        <pt x="-15" y="17" on="0"/>
+        <pt x="-12" y="5" on="1"/>
+        <pt x="-10" y="-3" on="0"/>
+        <pt x="1" y="-17" on="0"/>
+        <pt x="2" y="-23" on="1"/>
+        <pt x="4" y="-29" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0011" xMin="-15" yMin="-29" xMax="17" yMax="30">
+      <contour>
+        <pt x="6" y="-29" on="1"/>
+        <pt x="6" y="-29" on="0"/>
+        <pt x="6" y="-29" on="0"/>
+        <pt x="6" y="-29" on="1"/>
+        <pt x="10" y="-29" on="0"/>
+        <pt x="17" y="-4" on="0"/>
+        <pt x="17" y="5" on="1"/>
+        <pt x="17" y="30" on="0"/>
+        <pt x="1" y="29" on="1"/>
+        <pt x="-6" y="29" on="0"/>
+        <pt x="-15" y="17" on="0"/>
+        <pt x="-12" y="5" on="1"/>
+        <pt x="-10" y="-3" on="0"/>
+        <pt x="1" y="-17" on="0"/>
+        <pt x="2" y="-23" on="1"/>
+        <pt x="4" y="-29" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0012" xMin="-15" yMin="-29" xMax="17" yMax="30">
+      <contour>
+        <pt x="6" y="-29" on="1"/>
+        <pt x="6" y="-29" on="0"/>
+        <pt x="6" y="-29" on="0"/>
+        <pt x="6" y="-29" on="1"/>
+        <pt x="10" y="-29" on="0"/>
+        <pt x="17" y="-4" on="0"/>
+        <pt x="17" y="5" on="1"/>
+        <pt x="17" y="30" on="0"/>
+        <pt x="1" y="29" on="1"/>
+        <pt x="-6" y="29" on="0"/>
+        <pt x="-15" y="17" on="0"/>
+        <pt x="-12" y="5" on="1"/>
+        <pt x="-10" y="-3" on="0"/>
+        <pt x="1" y="-17" on="0"/>
+        <pt x="2" y="-23" on="1"/>
+        <pt x="4" y="-29" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0013" xMin="-9" yMin="-9" xMax="9" yMax="9">
+      <contour>
+        <pt x="-9" y="0" on="1"/>
+        <pt x="-9" y="-9" on="0"/>
+        <pt x="0" y="-9" on="1"/>
+        <pt x="9" y="-9" on="0"/>
+        <pt x="9" y="0" on="1"/>
+        <pt x="9" y="9" on="0"/>
+        <pt x="0" y="9" on="1"/>
+        <pt x="-9" y="9" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0014" xMin="-9" yMin="-9" xMax="9" yMax="9">
+      <contour>
+        <pt x="-9" y="0" on="1"/>
+        <pt x="-9" y="-9" on="0"/>
+        <pt x="0" y="-9" on="1"/>
+        <pt x="9" y="-9" on="0"/>
+        <pt x="9" y="0" on="1"/>
+        <pt x="9" y="9" on="0"/>
+        <pt x="0" y="9" on="1"/>
+        <pt x="-9" y="9" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0015" xMin="-15" yMin="-29" xMax="17" yMax="30">
+      <contour>
+        <pt x="6" y="-29" on="1"/>
+        <pt x="6" y="-29" on="0"/>
+        <pt x="6" y="-29" on="0"/>
+        <pt x="6" y="-29" on="1"/>
+        <pt x="10" y="-29" on="0"/>
+        <pt x="17" y="-4" on="0"/>
+        <pt x="17" y="5" on="1"/>
+        <pt x="17" y="30" on="0"/>
+        <pt x="1" y="29" on="1"/>
+        <pt x="-6" y="29" on="0"/>
+        <pt x="-15" y="17" on="0"/>
+        <pt x="-12" y="5" on="1"/>
+        <pt x="-10" y="-3" on="0"/>
+        <pt x="1" y="-17" on="0"/>
+        <pt x="2" y="-23" on="1"/>
+        <pt x="4" y="-29" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0016" xMin="-15" yMin="-29" xMax="17" yMax="30">
+      <contour>
+        <pt x="6" y="-29" on="1"/>
+        <pt x="6" y="-29" on="0"/>
+        <pt x="6" y="-29" on="0"/>
+        <pt x="6" y="-29" on="1"/>
+        <pt x="10" y="-29" on="0"/>
+        <pt x="17" y="-4" on="0"/>
+        <pt x="17" y="5" on="1"/>
+        <pt x="17" y="30" on="0"/>
+        <pt x="1" y="29" on="1"/>
+        <pt x="-6" y="29" on="0"/>
+        <pt x="-15" y="17" on="0"/>
+        <pt x="-12" y="5" on="1"/>
+        <pt x="-10" y="-3" on="0"/>
+        <pt x="1" y="-17" on="0"/>
+        <pt x="2" y="-23" on="1"/>
+        <pt x="4" y="-29" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0017" xMin="-9" yMin="-9" xMax="9" yMax="9">
+      <contour>
+        <pt x="-9" y="0" on="1"/>
+        <pt x="-9" y="-9" on="0"/>
+        <pt x="0" y="-9" on="1"/>
+        <pt x="9" y="-9" on="0"/>
+        <pt x="9" y="0" on="1"/>
+        <pt x="9" y="9" on="0"/>
+        <pt x="0" y="9" on="1"/>
+        <pt x="-9" y="9" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0018" xMin="-9" yMin="-9" xMax="9" yMax="9">
+      <contour>
+        <pt x="-9" y="0" on="1"/>
+        <pt x="-9" y="-9" on="0"/>
+        <pt x="0" y="-9" on="1"/>
+        <pt x="9" y="-9" on="0"/>
+        <pt x="9" y="0" on="1"/>
+        <pt x="9" y="9" on="0"/>
+        <pt x="0" y="9" on="1"/>
+        <pt x="-9" y="9" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0019" xMin="-9" yMin="-9" xMax="9" yMax="9">
+      <contour>
+        <pt x="-9" y="0" on="1"/>
+        <pt x="-9" y="-9" on="0"/>
+        <pt x="0" y="-9" on="1"/>
+        <pt x="9" y="-9" on="0"/>
+        <pt x="9" y="0" on="1"/>
+        <pt x="9" y="9" on="0"/>
+        <pt x="0" y="9" on="1"/>
+        <pt x="-9" y="9" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0020" xMin="-15" yMin="-29" xMax="17" yMax="30">
+      <contour>
+        <pt x="6" y="-29" on="1"/>
+        <pt x="6" y="-29" on="0"/>
+        <pt x="6" y="-29" on="0"/>
+        <pt x="6" y="-29" on="1"/>
+        <pt x="10" y="-29" on="0"/>
+        <pt x="17" y="-4" on="0"/>
+        <pt x="17" y="5" on="1"/>
+        <pt x="17" y="30" on="0"/>
+        <pt x="1" y="29" on="1"/>
+        <pt x="-6" y="29" on="0"/>
+        <pt x="-15" y="17" on="0"/>
+        <pt x="-12" y="5" on="1"/>
+        <pt x="-10" y="-3" on="0"/>
+        <pt x="1" y="-17" on="0"/>
+        <pt x="2" y="-23" on="1"/>
+        <pt x="4" y="-29" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0021" xMin="-15" yMin="-29" xMax="17" yMax="30">
+      <contour>
+        <pt x="6" y="-29" on="1"/>
+        <pt x="6" y="-29" on="0"/>
+        <pt x="6" y="-29" on="0"/>
+        <pt x="6" y="-29" on="1"/>
+        <pt x="10" y="-29" on="0"/>
+        <pt x="17" y="-4" on="0"/>
+        <pt x="17" y="5" on="1"/>
+        <pt x="17" y="30" on="0"/>
+        <pt x="1" y="29" on="1"/>
+        <pt x="-6" y="29" on="0"/>
+        <pt x="-15" y="17" on="0"/>
+        <pt x="-12" y="5" on="1"/>
+        <pt x="-10" y="-3" on="0"/>
+        <pt x="1" y="-17" on="0"/>
+        <pt x="2" y="-23" on="1"/>
+        <pt x="4" y="-29" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0022" xMin="-53" yMin="-53" xMax="53" yMax="53">
+      <contour>
+        <pt x="53" y="0" on="1"/>
+        <pt x="53" y="-22" on="0"/>
+        <pt x="22" y="-53" on="0"/>
+        <pt x="0" y="-53" on="1"/>
+        <pt x="-22" y="-53" on="0"/>
+        <pt x="-53" y="-22" on="0"/>
+        <pt x="-53" y="0" on="1"/>
+        <pt x="-53" y="22" on="0"/>
+        <pt x="-22" y="53" on="0"/>
+        <pt x="0" y="53" on="1"/>
+        <pt x="22" y="53" on="0"/>
+        <pt x="53" y="22" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0023" xMin="-41" yMin="-41" xMax="41" yMax="41">
+      <contour>
+        <pt x="41" y="0" on="1"/>
+        <pt x="41" y="-17" on="0"/>
+        <pt x="17" y="-41" on="0"/>
+        <pt x="0" y="-41" on="1"/>
+        <pt x="-17" y="-41" on="0"/>
+        <pt x="-41" y="-17" on="0"/>
+        <pt x="-41" y="0" on="1"/>
+        <pt x="-41" y="17" on="0"/>
+        <pt x="-17" y="41" on="0"/>
+        <pt x="0" y="41" on="1"/>
+        <pt x="17" y="41" on="0"/>
+        <pt x="41" y="17" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0024" xMin="-15" yMin="-15" xMax="15" yMax="15">
+      <contour>
+        <pt x="15" y="0" on="1"/>
+        <pt x="15" y="-15" on="0"/>
+        <pt x="0" y="-15" on="1"/>
+        <pt x="-15" y="-15" on="0"/>
+        <pt x="-15" y="0" on="1"/>
+        <pt x="-15" y="15" on="0"/>
+        <pt x="0" y="15" on="1"/>
+        <pt x="15" y="15" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+    <TTGlyph name="glyph0025" xMin="-8" yMin="-8" xMax="8" yMax="8">
+      <contour>
+        <pt x="8" y="0" on="1"/>
+        <pt x="8" y="-8" on="0"/>
+        <pt x="0" y="-8" on="1"/>
+        <pt x="-8" y="-8" on="0"/>
+        <pt x="-8" y="0" on="1"/>
+        <pt x="-8" y="8" on="0"/>
+        <pt x="0" y="8" on="1"/>
+        <pt x="8" y="8" on="0"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+
+  </glyf>
+
+  <name>
+    <namerecord nameID="256" platformID="1" platEncID="0" langID="0x0" unicode="True">
+      Frame
+    </namerecord>
+    <namerecord nameID="256" platformID="3" platEncID="1" langID="0x409">
+      Frame
+    </namerecord>
+  </name>
+
+  <post>
+    <formatType value="2.0"/>
+    <italicAngle value="0.0"/>
+    <underlinePosition value="0"/>
+    <underlineThickness value="0"/>
+    <isFixedPitch value="0"/>
+    <minMemType42 value="0"/>
+    <maxMemType42 value="0"/>
+    <minMemType1 value="0"/>
+    <maxMemType1 value="0"/>
+    <psNames>
+      <!-- This file uses unique glyph names based on the information
+           found in the 'post' table. Since these names might not be unique,
+           we have to invent artificial names in case of clashes. In order to
+           be able to retain the original information, we need a name to
+           ps name mapping for those cases where they differ. That's what
+           you see below.
+            -->
+    </psNames>
+    <extraNames>
+      <!-- following are the name that are not taken from the standard Mac glyph order -->
+      <psName name="baseglyph"/>
+      <psName name="glyph0001"/>
+      <psName name="glyph0002"/>
+      <psName name="glyph0003"/>
+      <psName name="glyph0004"/>
+      <psName name="glyph0005"/>
+      <psName name="glyph0006"/>
+      <psName name="glyph0007"/>
+      <psName name="glyph0008"/>
+      <psName name="glyph0009"/>
+      <psName name="glyph0010"/>
+      <psName name="glyph0011"/>
+      <psName name="glyph0012"/>
+      <psName name="glyph0013"/>
+      <psName name="glyph0014"/>
+      <psName name="glyph0015"/>
+      <psName name="glyph0016"/>
+      <psName name="glyph0017"/>
+      <psName name="glyph0018"/>
+      <psName name="glyph0019"/>
+      <psName name="glyph0020"/>
+      <psName name="glyph0021"/>
+      <psName name="glyph0022"/>
+      <psName name="glyph0023"/>
+      <psName name="glyph0024"/>
+      <psName name="glyph0025"/>
+    </extraNames>
+  </post>
+
+  <COLR>
+    <Version value="1"/>
+    <!-- BaseGlyphRecordCount=0 -->
+    <!-- LayerRecordCount=0 -->
+    <BaseGlyphList>
+      <!-- BaseGlyphCount=1 -->
+      <BaseGlyphPaintRecord index="0">
+        <BaseGlyph value="baseglyph"/>
+        <Paint Format="12"><!-- PaintTransform -->
+          <Paint Format="1"><!-- PaintColrLayers -->
+            <NumLayers value="24"/>
+            <FirstLayerIndex value="0"/>
+          </Paint>
+          <Transform>
+            <xx value="1.0"/>
+            <yx value="0.0"/>
+            <xy value="0.0"/>
+            <yy value="-1.0"/>
+            <dx value="0.0"/>
+            <dy value="600.0"/>
+          </Transform>
+        </Paint>
+      </BaseGlyphPaintRecord>
+    </BaseGlyphList>
+    <LayerList>
+      <!-- LayerCount=24 -->
+      <Paint index="0" Format="12"><!-- PaintTransform -->
+        <Paint Format="12"><!-- PaintTransform -->
+          <Paint Format="10"><!-- PaintGlyph -->
+            <Paint Format="4"><!-- PaintLinearGradient -->
+              <ColorLine>
+                <Extend value="pad"/>
+                <!-- StopCount=3 -->
+                <ColorStop index="0">
+                  <StopOffset value="0.0"/>
+                  <PaletteIndex value="0"/>
+                  <Alpha value="1.0"/>
+                </ColorStop>
+                <ColorStop index="1">
+                  <StopOffset value="0.5"/>
+                  <PaletteIndex value="1"/>
+                  <Alpha value="1.0"/>
+                </ColorStop>
+                <ColorStop index="2">
+                  <StopOffset value="1.0"/>
+                  <PaletteIndex value="2"/>
+                  <Alpha value="1.0"/>
+                </ColorStop>
+              </ColorLine>
+              <x0 value="17"/>
+              <y0 value="-192"/>
+              <x1 value="-80"/>
+              <y1 value="162"/>
+              <x2 value="27"/>
+              <y2 value="-189"/>
+            </Paint>
+            <Glyph value="glyph0001"/>
+          </Paint>
+          <Transform>
+            <xx value="1.0"/>
+            <yx value="0.0"/>
+            <xy value="0.0"/>
+            <yy value="1.0"/>
+            <dx value="172.304"/>
+            <dy value="250.624"/>
+          </Transform>
+        </Paint>
+        <Transform>
+          <xx value="1.0"/>
+          <yx value="0.0"/>
+          <xy value="0.0"/>
+          <yy value="1.0"/>
+          <dx value="127.628"/>
+          <dy value="73.593"/>
+        </Transform>
+      </Paint>
+      <Paint index="1" Format="15"><!-- PaintVarTranslate -->
+        <Paint Format="17"><!-- PaintVarScale -->
+          <Paint Format="14"><!-- PaintTranslate -->
+            <Paint Format="12"><!-- PaintTransform -->
+              <Paint Format="10"><!-- PaintGlyph -->
+                <Paint Format="2"><!-- PaintSolid -->
+                  <PaletteIndex value="3"/>
+                  <Alpha value="1.0"/>
+                </Paint>
+                <Glyph value="glyph0003"/>
+              </Paint>
+              <Transform>
+                <xx value="1.0"/>
+                <yx value="0.0"/>
+                <xy value="0.0"/>
+                <yy value="1.0"/>
+                <dx value="-214.0"/>
+                <dy value="102.0"/>
+              </Transform>
+            </Paint>
+            <dx value="214"/>
+            <dy value="-102"/>
+          </Paint>
+          <scaleX value="1.64"/>
+          <scaleY value="1.64"/>
+          <VarIndexBase value="0"/>
+        </Paint>
+        <dx value="300"/>
+        <dy value="432"/>
+        <VarIndexBase value="2"/>
+      </Paint>
+      <Paint index="2" Format="15"><!-- PaintVarTranslate -->
+        <Paint Format="14"><!-- PaintTranslate -->
+          <Paint Format="12"><!-- PaintTransform -->
+            <Paint Format="10"><!-- PaintGlyph -->
+              <Paint Format="2"><!-- PaintSolid -->
+                <PaletteIndex value="4"/>
+                <Alpha value="1.0"/>
+              </Paint>
+              <Glyph value="glyph0004"/>
+            </Paint>
+            <Transform>
+              <xx value="1.0"/>
+              <yx value="0.0"/>
+              <xy value="0.0"/>
+              <yy value="1.0"/>
+              <dx value="53.518"/>
+              <dy value="53.519"/>
+            </Transform>
+          </Paint>
+          <dx value="-54"/>
+          <dy value="-54"/>
+        </Paint>
+        <dx value="238"/>
+        <dy value="340"/>
+        <VarIndexBase value="4"/>
+      </Paint>
+      <Paint index="3" Format="15"><!-- PaintVarTranslate -->
+        <Paint Format="14"><!-- PaintTranslate -->
+          <Paint Format="12"><!-- PaintTransform -->
+            <Paint Format="10"><!-- PaintGlyph -->
+              <Paint Format="2"><!-- PaintSolid -->
+                <PaletteIndex value="5"/>
+                <Alpha value="1.0"/>
+              </Paint>
+              <Glyph value="glyph0005"/>
+            </Paint>
+            <Transform>
+              <xx value="1.0"/>
+              <yx value="0.0"/>
+              <xy value="0.0"/>
+              <yy value="1.0"/>
+              <dx value="53.518"/>
+              <dy value="53.519"/>
+            </Transform>
+          </Paint>
+          <dx value="-54"/>
+          <dy value="-54"/>
+        </Paint>
+        <dx value="238"/>
+        <dy value="340"/>
+        <VarIndexBase value="6"/>
+      </Paint>
+      <Paint index="4" Format="15"><!-- PaintVarTranslate -->
+        <Paint Format="14"><!-- PaintTranslate -->
+          <Paint Format="14"><!-- PaintTranslate -->
+            <Paint Format="17"><!-- PaintVarScale -->
+              <Paint Format="10"><!-- PaintGlyph -->
+                <Paint Format="3"><!-- PaintVarSolid -->
+                  <PaletteIndex value="4"/>
+                  <Alpha value="1.0"/>
+                  <VarIndexBase value="8"/>
+                </Paint>
+                <Glyph value="glyph0006"/>
+              </Paint>
+              <scaleX value="1.0"/>
+              <scaleY value="1.0"/>
+              <VarIndexBase value="9"/>
+            </Paint>
+            <dx value="44"/>
+            <dy value="43"/>
+          </Paint>
+          <dx value="-54"/>
+          <dy value="-54"/>
+        </Paint>
+        <dx value="238"/>
+        <dy value="340"/>
+        <VarIndexBase value="11"/>
+      </Paint>
+      <Paint index="5" Format="15"><!-- PaintVarTranslate -->
+        <Paint Format="14"><!-- PaintTranslate -->
+          <Paint Format="14"><!-- PaintTranslate -->
+            <Paint Format="17"><!-- PaintVarScale -->
+              <Paint Format="10"><!-- PaintGlyph -->
+                <Paint Format="3"><!-- PaintVarSolid -->
+                  <PaletteIndex value="4"/>
+                  <Alpha value="1.0"/>
+                  <VarIndexBase value="13"/>
+                </Paint>
+                <Glyph value="glyph0007"/>
+              </Paint>
+              <scaleX value="1.0"/>
+              <scaleY value="1.0"/>
+              <VarIndexBase value="14"/>
+            </Paint>
+            <dx value="66"/>
+            <dy value="65"/>
+          </Paint>
+          <dx value="-54"/>
+          <dy value="-54"/>
+        </Paint>
+        <dx value="238"/>
+        <dy value="340"/>
+        <VarIndexBase value="16"/>
+      </Paint>
+      <Paint index="6" Format="12"><!-- PaintTransform -->
+        <Paint Format="15"><!-- PaintVarTranslate -->
+          <Paint Format="17"><!-- PaintVarScale -->
+            <Paint Format="10"><!-- PaintGlyph -->
+              <Paint Format="4"><!-- PaintLinearGradient -->
+                <ColorLine>
+                  <Extend value="pad"/>
+                  <!-- StopCount=3 -->
+                  <ColorStop index="0">
+                    <StopOffset value="0.0"/>
+                    <PaletteIndex value="0"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                  <ColorStop index="1">
+                    <StopOffset value="0.5"/>
+                    <PaletteIndex value="1"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                  <ColorStop index="2">
+                    <StopOffset value="1.0"/>
+                    <PaletteIndex value="2"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                </ColorLine>
+                <x0 value="17"/>
+                <y0 value="-192"/>
+                <x1 value="-80"/>
+                <y1 value="162"/>
+                <x2 value="27"/>
+                <y2 value="-189"/>
+              </Paint>
+              <Glyph value="glyph0008"/>
+            </Paint>
+            <scaleX value="0.0"/>
+            <scaleY value="0.0"/>
+            <VarIndexBase value="18"/>
+          </Paint>
+          <dx value="67"/>
+          <dy value="145"/>
+          <VarIndexBase value="20"/>
+        </Paint>
+        <Transform>
+          <xx value="1.0"/>
+          <yx value="0.0"/>
+          <xy value="0.0"/>
+          <yy value="1.0"/>
+          <dx value="227.628"/>
+          <dy value="173.593"/>
+        </Transform>
+      </Paint>
+      <Paint index="7" Format="12"><!-- PaintTransform -->
+        <Paint Format="15"><!-- PaintVarTranslate -->
+          <Paint Format="17"><!-- PaintVarScale -->
+            <Paint Format="10"><!-- PaintGlyph -->
+              <Paint Format="4"><!-- PaintLinearGradient -->
+                <ColorLine>
+                  <Extend value="pad"/>
+                  <!-- StopCount=3 -->
+                  <ColorStop index="0">
+                    <StopOffset value="0.0"/>
+                    <PaletteIndex value="0"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                  <ColorStop index="1">
+                    <StopOffset value="0.5"/>
+                    <PaletteIndex value="1"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                  <ColorStop index="2">
+                    <StopOffset value="1.0"/>
+                    <PaletteIndex value="2"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                </ColorLine>
+                <x0 value="17"/>
+                <y0 value="-192"/>
+                <x1 value="-80"/>
+                <y1 value="162"/>
+                <x2 value="27"/>
+                <y2 value="-189"/>
+              </Paint>
+              <Glyph value="glyph0009"/>
+            </Paint>
+            <scaleX value="0.0"/>
+            <scaleY value="0.0"/>
+            <VarIndexBase value="22"/>
+          </Paint>
+          <dx value="258"/>
+          <dy value="186"/>
+          <VarIndexBase value="24"/>
+        </Paint>
+        <Transform>
+          <xx value="1.0"/>
+          <yx value="0.0"/>
+          <xy value="0.0"/>
+          <yy value="1.0"/>
+          <dx value="227.628"/>
+          <dy value="173.593"/>
+        </Transform>
+      </Paint>
+      <Paint index="8" Format="12"><!-- PaintTransform -->
+        <Paint Format="15"><!-- PaintVarTranslate -->
+          <Paint Format="27"><!-- PaintVarRotateAroundCenter -->
+            <Paint Format="17"><!-- PaintVarScale -->
+              <Paint Format="10"><!-- PaintGlyph -->
+                <Paint Format="4"><!-- PaintLinearGradient -->
+                  <ColorLine>
+                    <Extend value="pad"/>
+                    <!-- StopCount=3 -->
+                    <ColorStop index="0">
+                      <StopOffset value="0.0"/>
+                      <PaletteIndex value="0"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                    <ColorStop index="1">
+                      <StopOffset value="0.5"/>
+                      <PaletteIndex value="1"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                    <ColorStop index="2">
+                      <StopOffset value="1.0"/>
+                      <PaletteIndex value="2"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                  </ColorLine>
+                  <x0 value="17"/>
+                  <y0 value="-192"/>
+                  <x1 value="-80"/>
+                  <y1 value="162"/>
+                  <x2 value="27"/>
+                  <y2 value="-189"/>
+                </Paint>
+                <Glyph value="glyph0010"/>
+              </Paint>
+              <scaleX value="0.0"/>
+              <scaleY value="0.0"/>
+              <VarIndexBase value="26"/>
+            </Paint>
+            <angle value="0.0"/>
+            <centerX value="0"/>
+            <centerY value="0"/>
+            <VarIndexBase value="28"/>
+          </Paint>
+          <dx value="35"/>
+          <dy value="211"/>
+          <VarIndexBase value="31"/>
+        </Paint>
+        <Transform>
+          <xx value="1.0"/>
+          <yx value="0.0"/>
+          <xy value="0.0"/>
+          <yy value="1.0"/>
+          <dx value="227.628"/>
+          <dy value="173.593"/>
+        </Transform>
+      </Paint>
+      <Paint index="9" Format="12"><!-- PaintTransform -->
+        <Paint Format="15"><!-- PaintVarTranslate -->
+          <Paint Format="27"><!-- PaintVarRotateAroundCenter -->
+            <Paint Format="17"><!-- PaintVarScale -->
+              <Paint Format="10"><!-- PaintGlyph -->
+                <Paint Format="4"><!-- PaintLinearGradient -->
+                  <ColorLine>
+                    <Extend value="pad"/>
+                    <!-- StopCount=3 -->
+                    <ColorStop index="0">
+                      <StopOffset value="0.0"/>
+                      <PaletteIndex value="0"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                    <ColorStop index="1">
+                      <StopOffset value="0.5"/>
+                      <PaletteIndex value="1"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                    <ColorStop index="2">
+                      <StopOffset value="1.0"/>
+                      <PaletteIndex value="2"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                  </ColorLine>
+                  <x0 value="17"/>
+                  <y0 value="-192"/>
+                  <x1 value="-80"/>
+                  <y1 value="162"/>
+                  <x2 value="27"/>
+                  <y2 value="-189"/>
+                </Paint>
+                <Glyph value="glyph0011"/>
+              </Paint>
+              <scaleX value="0.0"/>
+              <scaleY value="0.0"/>
+              <VarIndexBase value="33"/>
+            </Paint>
+            <angle value="0.0"/>
+            <centerX value="0"/>
+            <centerY value="0"/>
+            <VarIndexBase value="35"/>
+          </Paint>
+          <dx value="35"/>
+          <dy value="211"/>
+          <VarIndexBase value="38"/>
+        </Paint>
+        <Transform>
+          <xx value="1.0"/>
+          <yx value="0.0"/>
+          <xy value="0.0"/>
+          <yy value="1.0"/>
+          <dx value="227.628"/>
+          <dy value="173.593"/>
+        </Transform>
+      </Paint>
+      <Paint index="10" Format="12"><!-- PaintTransform -->
+        <Paint Format="15"><!-- PaintVarTranslate -->
+          <Paint Format="27"><!-- PaintVarRotateAroundCenter -->
+            <Paint Format="17"><!-- PaintVarScale -->
+              <Paint Format="10"><!-- PaintGlyph -->
+                <Paint Format="4"><!-- PaintLinearGradient -->
+                  <ColorLine>
+                    <Extend value="pad"/>
+                    <!-- StopCount=3 -->
+                    <ColorStop index="0">
+                      <StopOffset value="0.0"/>
+                      <PaletteIndex value="0"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                    <ColorStop index="1">
+                      <StopOffset value="0.5"/>
+                      <PaletteIndex value="1"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                    <ColorStop index="2">
+                      <StopOffset value="1.0"/>
+                      <PaletteIndex value="2"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                  </ColorLine>
+                  <x0 value="17"/>
+                  <y0 value="-192"/>
+                  <x1 value="-80"/>
+                  <y1 value="162"/>
+                  <x2 value="27"/>
+                  <y2 value="-189"/>
+                </Paint>
+                <Glyph value="glyph0012"/>
+              </Paint>
+              <scaleX value="0.0"/>
+              <scaleY value="0.0"/>
+              <VarIndexBase value="40"/>
+            </Paint>
+            <angle value="0.0"/>
+            <centerX value="0"/>
+            <centerY value="0"/>
+            <VarIndexBase value="42"/>
+          </Paint>
+          <dx value="35"/>
+          <dy value="211"/>
+          <VarIndexBase value="45"/>
+        </Paint>
+        <Transform>
+          <xx value="-0.99756"/>
+          <yx value="-0.06976"/>
+          <xy value="-0.06976"/>
+          <yy value="0.99756"/>
+          <dx value="601.8318"/>
+          <dy value="186.66049"/>
+        </Transform>
+      </Paint>
+      <Paint index="11" Format="12"><!-- PaintTransform -->
+        <Paint Format="15"><!-- PaintVarTranslate -->
+          <Paint Format="17"><!-- PaintVarScale -->
+            <Paint Format="10"><!-- PaintGlyph -->
+              <Paint Format="4"><!-- PaintLinearGradient -->
+                <ColorLine>
+                  <Extend value="pad"/>
+                  <!-- StopCount=3 -->
+                  <ColorStop index="0">
+                    <StopOffset value="0.0"/>
+                    <PaletteIndex value="0"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                  <ColorStop index="1">
+                    <StopOffset value="0.5"/>
+                    <PaletteIndex value="1"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                  <ColorStop index="2">
+                    <StopOffset value="1.0"/>
+                    <PaletteIndex value="2"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                </ColorLine>
+                <x0 value="17"/>
+                <y0 value="-192"/>
+                <x1 value="-80"/>
+                <y1 value="162"/>
+                <x2 value="27"/>
+                <y2 value="-189"/>
+              </Paint>
+              <Glyph value="glyph0013"/>
+            </Paint>
+            <scaleX value="0.0"/>
+            <scaleY value="0.0"/>
+            <VarIndexBase value="47"/>
+          </Paint>
+          <dx value="67"/>
+          <dy value="145"/>
+          <VarIndexBase value="49"/>
+        </Paint>
+        <Transform>
+          <xx value="1.0"/>
+          <yx value="0.0"/>
+          <xy value="0.0"/>
+          <yy value="1.0"/>
+          <dx value="227.628"/>
+          <dy value="173.593"/>
+        </Transform>
+      </Paint>
+      <Paint index="12" Format="12"><!-- PaintTransform -->
+        <Paint Format="15"><!-- PaintVarTranslate -->
+          <Paint Format="17"><!-- PaintVarScale -->
+            <Paint Format="10"><!-- PaintGlyph -->
+              <Paint Format="4"><!-- PaintLinearGradient -->
+                <ColorLine>
+                  <Extend value="pad"/>
+                  <!-- StopCount=3 -->
+                  <ColorStop index="0">
+                    <StopOffset value="0.0"/>
+                    <PaletteIndex value="0"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                  <ColorStop index="1">
+                    <StopOffset value="0.5"/>
+                    <PaletteIndex value="1"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                  <ColorStop index="2">
+                    <StopOffset value="1.0"/>
+                    <PaletteIndex value="2"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                </ColorLine>
+                <x0 value="17"/>
+                <y0 value="-192"/>
+                <x1 value="-80"/>
+                <y1 value="162"/>
+                <x2 value="27"/>
+                <y2 value="-189"/>
+              </Paint>
+              <Glyph value="glyph0014"/>
+            </Paint>
+            <scaleX value="0.0"/>
+            <scaleY value="0.0"/>
+            <VarIndexBase value="51"/>
+          </Paint>
+          <dx value="258"/>
+          <dy value="186"/>
+          <VarIndexBase value="53"/>
+        </Paint>
+        <Transform>
+          <xx value="1.0"/>
+          <yx value="0.0"/>
+          <xy value="0.0"/>
+          <yy value="1.0"/>
+          <dx value="227.628"/>
+          <dy value="173.593"/>
+        </Transform>
+      </Paint>
+      <Paint index="13" Format="12"><!-- PaintTransform -->
+        <Paint Format="15"><!-- PaintVarTranslate -->
+          <Paint Format="27"><!-- PaintVarRotateAroundCenter -->
+            <Paint Format="17"><!-- PaintVarScale -->
+              <Paint Format="10"><!-- PaintGlyph -->
+                <Paint Format="4"><!-- PaintLinearGradient -->
+                  <ColorLine>
+                    <Extend value="pad"/>
+                    <!-- StopCount=3 -->
+                    <ColorStop index="0">
+                      <StopOffset value="0.0"/>
+                      <PaletteIndex value="0"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                    <ColorStop index="1">
+                      <StopOffset value="0.5"/>
+                      <PaletteIndex value="1"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                    <ColorStop index="2">
+                      <StopOffset value="1.0"/>
+                      <PaletteIndex value="2"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                  </ColorLine>
+                  <x0 value="17"/>
+                  <y0 value="-192"/>
+                  <x1 value="-80"/>
+                  <y1 value="162"/>
+                  <x2 value="27"/>
+                  <y2 value="-189"/>
+                </Paint>
+                <Glyph value="glyph0015"/>
+              </Paint>
+              <scaleX value="0.0"/>
+              <scaleY value="0.0"/>
+              <VarIndexBase value="55"/>
+            </Paint>
+            <angle value="0.0"/>
+            <centerX value="0"/>
+            <centerY value="0"/>
+            <VarIndexBase value="57"/>
+          </Paint>
+          <dx value="35"/>
+          <dy value="211"/>
+          <VarIndexBase value="60"/>
+        </Paint>
+        <Transform>
+          <xx value="1.0"/>
+          <yx value="0.0"/>
+          <xy value="0.0"/>
+          <yy value="1.0"/>
+          <dx value="227.628"/>
+          <dy value="173.593"/>
+        </Transform>
+      </Paint>
+      <Paint index="14" Format="12"><!-- PaintTransform -->
+        <Paint Format="15"><!-- PaintVarTranslate -->
+          <Paint Format="27"><!-- PaintVarRotateAroundCenter -->
+            <Paint Format="17"><!-- PaintVarScale -->
+              <Paint Format="10"><!-- PaintGlyph -->
+                <Paint Format="4"><!-- PaintLinearGradient -->
+                  <ColorLine>
+                    <Extend value="pad"/>
+                    <!-- StopCount=3 -->
+                    <ColorStop index="0">
+                      <StopOffset value="0.0"/>
+                      <PaletteIndex value="0"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                    <ColorStop index="1">
+                      <StopOffset value="0.5"/>
+                      <PaletteIndex value="1"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                    <ColorStop index="2">
+                      <StopOffset value="1.0"/>
+                      <PaletteIndex value="2"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                  </ColorLine>
+                  <x0 value="17"/>
+                  <y0 value="-192"/>
+                  <x1 value="-80"/>
+                  <y1 value="162"/>
+                  <x2 value="27"/>
+                  <y2 value="-189"/>
+                </Paint>
+                <Glyph value="glyph0016"/>
+              </Paint>
+              <scaleX value="0.0"/>
+              <scaleY value="0.0"/>
+              <VarIndexBase value="62"/>
+            </Paint>
+            <angle value="0.0"/>
+            <centerX value="0"/>
+            <centerY value="0"/>
+            <VarIndexBase value="64"/>
+          </Paint>
+          <dx value="35"/>
+          <dy value="211"/>
+          <VarIndexBase value="67"/>
+        </Paint>
+        <Transform>
+          <xx value="-0.99756"/>
+          <yx value="-0.06976"/>
+          <xy value="-0.06976"/>
+          <yy value="0.99756"/>
+          <dx value="601.8318"/>
+          <dy value="186.66049"/>
+        </Transform>
+      </Paint>
+      <Paint index="15" Format="12"><!-- PaintTransform -->
+        <Paint Format="15"><!-- PaintVarTranslate -->
+          <Paint Format="17"><!-- PaintVarScale -->
+            <Paint Format="10"><!-- PaintGlyph -->
+              <Paint Format="4"><!-- PaintLinearGradient -->
+                <ColorLine>
+                  <Extend value="pad"/>
+                  <!-- StopCount=3 -->
+                  <ColorStop index="0">
+                    <StopOffset value="0.0"/>
+                    <PaletteIndex value="0"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                  <ColorStop index="1">
+                    <StopOffset value="0.5"/>
+                    <PaletteIndex value="1"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                  <ColorStop index="2">
+                    <StopOffset value="1.0"/>
+                    <PaletteIndex value="2"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                </ColorLine>
+                <x0 value="17"/>
+                <y0 value="-192"/>
+                <x1 value="-80"/>
+                <y1 value="162"/>
+                <x2 value="27"/>
+                <y2 value="-189"/>
+              </Paint>
+              <Glyph value="glyph0017"/>
+            </Paint>
+            <scaleX value="0.0"/>
+            <scaleY value="0.0"/>
+            <VarIndexBase value="69"/>
+          </Paint>
+          <dx value="67"/>
+          <dy value="145"/>
+          <VarIndexBase value="71"/>
+        </Paint>
+        <Transform>
+          <xx value="1.0"/>
+          <yx value="0.0"/>
+          <xy value="0.0"/>
+          <yy value="1.0"/>
+          <dx value="227.628"/>
+          <dy value="173.593"/>
+        </Transform>
+      </Paint>
+      <Paint index="16" Format="12"><!-- PaintTransform -->
+        <Paint Format="15"><!-- PaintVarTranslate -->
+          <Paint Format="17"><!-- PaintVarScale -->
+            <Paint Format="10"><!-- PaintGlyph -->
+              <Paint Format="4"><!-- PaintLinearGradient -->
+                <ColorLine>
+                  <Extend value="pad"/>
+                  <!-- StopCount=3 -->
+                  <ColorStop index="0">
+                    <StopOffset value="0.0"/>
+                    <PaletteIndex value="0"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                  <ColorStop index="1">
+                    <StopOffset value="0.5"/>
+                    <PaletteIndex value="1"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                  <ColorStop index="2">
+                    <StopOffset value="1.0"/>
+                    <PaletteIndex value="2"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                </ColorLine>
+                <x0 value="17"/>
+                <y0 value="-192"/>
+                <x1 value="-80"/>
+                <y1 value="162"/>
+                <x2 value="27"/>
+                <y2 value="-189"/>
+              </Paint>
+              <Glyph value="glyph0018"/>
+            </Paint>
+            <scaleX value="0.0"/>
+            <scaleY value="0.0"/>
+            <VarIndexBase value="73"/>
+          </Paint>
+          <dx value="67"/>
+          <dy value="145"/>
+          <VarIndexBase value="75"/>
+        </Paint>
+        <Transform>
+          <xx value="1.0"/>
+          <yx value="0.0"/>
+          <xy value="0.0"/>
+          <yy value="1.0"/>
+          <dx value="227.628"/>
+          <dy value="173.593"/>
+        </Transform>
+      </Paint>
+      <Paint index="17" Format="12"><!-- PaintTransform -->
+        <Paint Format="15"><!-- PaintVarTranslate -->
+          <Paint Format="17"><!-- PaintVarScale -->
+            <Paint Format="10"><!-- PaintGlyph -->
+              <Paint Format="4"><!-- PaintLinearGradient -->
+                <ColorLine>
+                  <Extend value="pad"/>
+                  <!-- StopCount=3 -->
+                  <ColorStop index="0">
+                    <StopOffset value="0.0"/>
+                    <PaletteIndex value="0"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                  <ColorStop index="1">
+                    <StopOffset value="0.5"/>
+                    <PaletteIndex value="1"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                  <ColorStop index="2">
+                    <StopOffset value="1.0"/>
+                    <PaletteIndex value="2"/>
+                    <Alpha value="1.0"/>
+                  </ColorStop>
+                </ColorLine>
+                <x0 value="17"/>
+                <y0 value="-192"/>
+                <x1 value="-80"/>
+                <y1 value="162"/>
+                <x2 value="27"/>
+                <y2 value="-189"/>
+              </Paint>
+              <Glyph value="glyph0019"/>
+            </Paint>
+            <scaleX value="0.0"/>
+            <scaleY value="0.0"/>
+            <VarIndexBase value="77"/>
+          </Paint>
+          <dx value="258"/>
+          <dy value="186"/>
+          <VarIndexBase value="79"/>
+        </Paint>
+        <Transform>
+          <xx value="1.0"/>
+          <yx value="0.0"/>
+          <xy value="0.0"/>
+          <yy value="1.0"/>
+          <dx value="227.628"/>
+          <dy value="173.593"/>
+        </Transform>
+      </Paint>
+      <Paint index="18" Format="12"><!-- PaintTransform -->
+        <Paint Format="15"><!-- PaintVarTranslate -->
+          <Paint Format="27"><!-- PaintVarRotateAroundCenter -->
+            <Paint Format="17"><!-- PaintVarScale -->
+              <Paint Format="10"><!-- PaintGlyph -->
+                <Paint Format="4"><!-- PaintLinearGradient -->
+                  <ColorLine>
+                    <Extend value="pad"/>
+                    <!-- StopCount=3 -->
+                    <ColorStop index="0">
+                      <StopOffset value="0.0"/>
+                      <PaletteIndex value="0"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                    <ColorStop index="1">
+                      <StopOffset value="0.5"/>
+                      <PaletteIndex value="1"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                    <ColorStop index="2">
+                      <StopOffset value="1.0"/>
+                      <PaletteIndex value="2"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                  </ColorLine>
+                  <x0 value="17"/>
+                  <y0 value="-192"/>
+                  <x1 value="-80"/>
+                  <y1 value="162"/>
+                  <x2 value="27"/>
+                  <y2 value="-189"/>
+                </Paint>
+                <Glyph value="glyph0020"/>
+              </Paint>
+              <scaleX value="0.0"/>
+              <scaleY value="0.0"/>
+              <VarIndexBase value="81"/>
+            </Paint>
+            <angle value="0.0"/>
+            <centerX value="0"/>
+            <centerY value="0"/>
+            <VarIndexBase value="83"/>
+          </Paint>
+          <dx value="35"/>
+          <dy value="211"/>
+          <VarIndexBase value="86"/>
+        </Paint>
+        <Transform>
+          <xx value="1.0"/>
+          <yx value="0.0"/>
+          <xy value="0.0"/>
+          <yy value="1.0"/>
+          <dx value="227.628"/>
+          <dy value="173.593"/>
+        </Transform>
+      </Paint>
+      <Paint index="19" Format="12"><!-- PaintTransform -->
+        <Paint Format="15"><!-- PaintVarTranslate -->
+          <Paint Format="27"><!-- PaintVarRotateAroundCenter -->
+            <Paint Format="17"><!-- PaintVarScale -->
+              <Paint Format="10"><!-- PaintGlyph -->
+                <Paint Format="4"><!-- PaintLinearGradient -->
+                  <ColorLine>
+                    <Extend value="pad"/>
+                    <!-- StopCount=3 -->
+                    <ColorStop index="0">
+                      <StopOffset value="0.0"/>
+                      <PaletteIndex value="0"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                    <ColorStop index="1">
+                      <StopOffset value="0.5"/>
+                      <PaletteIndex value="1"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                    <ColorStop index="2">
+                      <StopOffset value="1.0"/>
+                      <PaletteIndex value="2"/>
+                      <Alpha value="1.0"/>
+                    </ColorStop>
+                  </ColorLine>
+                  <x0 value="17"/>
+                  <y0 value="-192"/>
+                  <x1 value="-80"/>
+                  <y1 value="162"/>
+                  <x2 value="27"/>
+                  <y2 value="-189"/>
+                </Paint>
+                <Glyph value="glyph0021"/>
+              </Paint>
+              <scaleX value="0.0"/>
+              <scaleY value="0.0"/>
+              <VarIndexBase value="88"/>
+            </Paint>
+            <angle value="0.0"/>
+            <centerX value="0"/>
+            <centerY value="0"/>
+            <VarIndexBase value="90"/>
+          </Paint>
+          <dx value="35"/>
+          <dy value="211"/>
+          <VarIndexBase value="93"/>
+        </Paint>
+        <Transform>
+          <xx value="-0.99756"/>
+          <yx value="-0.06976"/>
+          <xy value="-0.06976"/>
+          <yy value="0.99756"/>
+          <dx value="601.8318"/>
+          <dy value="186.66049"/>
+        </Transform>
+      </Paint>
+      <Paint index="20" Format="15"><!-- PaintVarTranslate -->
+        <Paint Format="14"><!-- PaintTranslate -->
+          <Paint Format="12"><!-- PaintTransform -->
+            <Paint Format="10"><!-- PaintGlyph -->
+              <Paint Format="2"><!-- PaintSolid -->
+                <PaletteIndex value="4"/>
+                <Alpha value="1.0"/>
+              </Paint>
+              <Glyph value="glyph0022"/>
+            </Paint>
+            <Transform>
+              <xx value="1.0"/>
+              <yx value="0.0"/>
+              <xy value="0.0"/>
+              <yy value="1.0"/>
+              <dx value="53.518"/>
+              <dy value="53.519"/>
+            </Transform>
+          </Paint>
+          <dx value="-54"/>
+          <dy value="-54"/>
+        </Paint>
+        <dx value="358"/>
+        <dy value="340"/>
+        <VarIndexBase value="95"/>
+      </Paint>
+      <Paint index="21" Format="15"><!-- PaintVarTranslate -->
+        <Paint Format="14"><!-- PaintTranslate -->
+          <Paint Format="12"><!-- PaintTransform -->
+            <Paint Format="10"><!-- PaintGlyph -->
+              <Paint Format="2"><!-- PaintSolid -->
+                <PaletteIndex value="5"/>
+                <Alpha value="1.0"/>
+              </Paint>
+              <Glyph value="glyph0023"/>
+            </Paint>
+            <Transform>
+              <xx value="1.0"/>
+              <yx value="0.0"/>
+              <xy value="0.0"/>
+              <yy value="1.0"/>
+              <dx value="53.518"/>
+              <dy value="53.519"/>
+            </Transform>
+          </Paint>
+          <dx value="-54"/>
+          <dy value="-54"/>
+        </Paint>
+        <dx value="358"/>
+        <dy value="340"/>
+        <VarIndexBase value="97"/>
+      </Paint>
+      <Paint index="22" Format="15"><!-- PaintVarTranslate -->
+        <Paint Format="14"><!-- PaintTranslate -->
+          <Paint Format="14"><!-- PaintTranslate -->
+            <Paint Format="17"><!-- PaintVarScale -->
+              <Paint Format="10"><!-- PaintGlyph -->
+                <Paint Format="3"><!-- PaintVarSolid -->
+                  <PaletteIndex value="4"/>
+                  <Alpha value="1.0"/>
+                  <VarIndexBase value="99"/>
+                </Paint>
+                <Glyph value="glyph0024"/>
+              </Paint>
+              <scaleX value="1.0"/>
+              <scaleY value="1.0"/>
+              <VarIndexBase value="100"/>
+            </Paint>
+            <dx value="44"/>
+            <dy value="43"/>
+          </Paint>
+          <dx value="-54"/>
+          <dy value="-54"/>
+        </Paint>
+        <dx value="358"/>
+        <dy value="340"/>
+        <VarIndexBase value="102"/>
+      </Paint>
+      <Paint index="23" Format="15"><!-- PaintVarTranslate -->
+        <Paint Format="14"><!-- PaintTranslate -->
+          <Paint Format="14"><!-- PaintTranslate -->
+            <Paint Format="17"><!-- PaintVarScale -->
+              <Paint Format="10"><!-- PaintGlyph -->
+                <Paint Format="3"><!-- PaintVarSolid -->
+                  <PaletteIndex value="4"/>
+                  <Alpha value="1.0"/>
+                  <VarIndexBase value="104"/>
+                </Paint>
+                <Glyph value="glyph0025"/>
+              </Paint>
+              <scaleX value="1.0"/>
+              <scaleY value="1.0"/>
+              <VarIndexBase value="105"/>
+            </Paint>
+            <dx value="66"/>
+            <dy value="65"/>
+          </Paint>
+          <dx value="-54"/>
+          <dy value="-54"/>
+        </Paint>
+        <dx value="358"/>
+        <dy value="340"/>
+        <VarIndexBase value="107"/>
+      </Paint>
+    </LayerList>
+    <VarIndexMap Format="0">
+      <!-- Omitted values default to 0xFFFF/0xFFFF (no variations) -->
+      <Map index="0" outer="5" inner="1"/>
+      <Map index="1" outer="5" inner="1"/>
+      <Map index="2"/>
+      <Map index="3" outer="16" inner="0"/>
+      <Map index="4"/>
+      <Map index="5" outer="16" inner="1"/>
+      <Map index="6"/>
+      <Map index="7" outer="16" inner="1"/>
+      <Map index="8" outer="1" inner="0"/>
+      <Map index="9" outer="31" inner="0"/>
+      <Map index="10" outer="31" inner="1"/>
+      <Map index="11"/>
+      <Map index="12" outer="16" inner="1"/>
+      <Map index="13" outer="1" inner="0"/>
+      <Map index="14" outer="32" inner="0"/>
+      <Map index="15" outer="32" inner="1"/>
+      <Map index="16"/>
+      <Map index="17" outer="16" inner="1"/>
+      <Map index="18" outer="2" inner="0"/>
+      <Map index="19" outer="2" inner="0"/>
+      <Map index="20" outer="3" inner="1"/>
+      <Map index="21" outer="3" inner="0"/>
+      <Map index="22" outer="4" inner="0"/>
+      <Map index="23" outer="4" inner="0"/>
+      <Map index="24" outer="25" inner="1"/>
+      <Map index="25" outer="25" inner="0"/>
+      <Map index="26"/>
+      <Map index="27"/>
+      <Map index="28" outer="24" inner="0"/>
+      <Map index="29"/>
+      <Map index="30"/>
+      <Map index="31" outer="25" inner="3"/>
+      <Map index="32" outer="25" inner="2"/>
+      <Map index="33" outer="5" inner="0"/>
+      <Map index="34" outer="5" inner="0"/>
+      <Map index="35" outer="6" inner="0"/>
+      <Map index="36"/>
+      <Map index="37"/>
+      <Map index="38" outer="0" inner="1"/>
+      <Map index="39" outer="0" inner="0"/>
+      <Map index="40" outer="12" inner="1"/>
+      <Map index="41" outer="12" inner="1"/>
+      <Map index="42" outer="26" inner="0"/>
+      <Map index="43"/>
+      <Map index="44"/>
+      <Map index="45" outer="7" inner="1"/>
+      <Map index="46" outer="7" inner="0"/>
+      <Map index="47" outer="8" inner="0"/>
+      <Map index="48" outer="8" inner="0"/>
+      <Map index="49" outer="9" inner="1"/>
+      <Map index="50" outer="9" inner="0"/>
+      <Map index="51" outer="10" inner="0"/>
+      <Map index="52" outer="10" inner="0"/>
+      <Map index="53" outer="11" inner="1"/>
+      <Map index="54" outer="11" inner="0"/>
+      <Map index="55" outer="12" inner="0"/>
+      <Map index="56" outer="12" inner="0"/>
+      <Map index="57" outer="27" inner="0"/>
+      <Map index="58"/>
+      <Map index="59"/>
+      <Map index="60" outer="13" inner="1"/>
+      <Map index="61" outer="13" inner="0"/>
+      <Map index="62" outer="15" inner="1"/>
+      <Map index="63" outer="15" inner="1"/>
+      <Map index="64" outer="28" inner="0"/>
+      <Map index="65"/>
+      <Map index="66"/>
+      <Map index="67" outer="14" inner="1"/>
+      <Map index="68" outer="14" inner="0"/>
+      <Map index="69" outer="15" inner="0"/>
+      <Map index="70" outer="15" inner="0"/>
+      <Map index="71" outer="16" inner="3"/>
+      <Map index="72" outer="16" inner="2"/>
+      <Map index="73" outer="17" inner="0"/>
+      <Map index="74" outer="17" inner="0"/>
+      <Map index="75" outer="18" inner="1"/>
+      <Map index="76" outer="18" inner="0"/>
+      <Map index="77" outer="19" inner="0"/>
+      <Map index="78" outer="19" inner="0"/>
+      <Map index="79" outer="20" inner="1"/>
+      <Map index="80" outer="20" inner="0"/>
+      <Map index="81" outer="22" inner="1"/>
+      <Map index="82" outer="22" inner="1"/>
+      <Map index="83" outer="29" inner="0"/>
+      <Map index="84"/>
+      <Map index="85"/>
+      <Map index="86" outer="21" inner="1"/>
+      <Map index="87" outer="21" inner="0"/>
+      <Map index="88" outer="22" inner="0"/>
+      <Map index="89" outer="22" inner="0"/>
+      <Map index="90" outer="30" inner="0"/>
+      <Map index="91"/>
+      <Map index="92"/>
+      <Map index="93" outer="23" inner="1"/>
+      <Map index="94" outer="23" inner="0"/>
+      <Map index="95"/>
+      <Map index="96" outer="16" inner="1"/>
+      <Map index="97"/>
+      <Map index="98" outer="16" inner="1"/>
+      <Map index="99" outer="1" inner="0"/>
+      <Map index="100" outer="31" inner="0"/>
+      <Map index="101" outer="31" inner="1"/>
+      <Map index="102"/>
+      <Map index="103" outer="16" inner="1"/>
+      <Map index="104" outer="1" inner="0"/>
+      <Map index="105" outer="32" inner="0"/>
+      <Map index="106" outer="32" inner="1"/>
+      <Map index="107"/>
+      <Map index="108" outer="16" inner="1"/>
+    </VarIndexMap>
+    <VarStore Format="1">
+      <Format value="1"/>
+      <VarRegionList>
+        <!-- RegionAxisCount=1 -->
+        <!-- RegionCount=216 -->
+        <Region index="0">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.63116"/>
+            <EndCoord value="0.9734"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="1">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.63116"/>
+            <PeakCoord value="0.78705"/>
+            <EndCoord value="0.9734"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="2">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.78705"/>
+            <PeakCoord value="0.9734"/>
+            <EndCoord value="0.9734"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="3">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.6692"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="4">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.6692"/>
+            <PeakCoord value="0.6768"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="5">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.6768"/>
+            <PeakCoord value="1.0"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="6">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.1445"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="7">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.1445"/>
+            <PeakCoord value="0.61975"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="8">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.61975"/>
+            <PeakCoord value="1.0"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="9">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.308"/>
+            <EndCoord value="0.673"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="10">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.308"/>
+            <PeakCoord value="0.3194"/>
+            <EndCoord value="0.673"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="11">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.3194"/>
+            <PeakCoord value="0.6616"/>
+            <EndCoord value="0.673"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="12">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.6616"/>
+            <PeakCoord value="0.673"/>
+            <EndCoord value="0.673"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="13">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.0228"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="14">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0228"/>
+            <PeakCoord value="0.04565"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="15">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.04565"/>
+            <PeakCoord value="0.0684"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="16">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0684"/>
+            <PeakCoord value="0.08746"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="17">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.08746"/>
+            <PeakCoord value="0.1103"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="18">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.1103"/>
+            <PeakCoord value="0.13306"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="19">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.13306"/>
+            <PeakCoord value="0.1559"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="20">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.1559"/>
+            <PeakCoord value="0.1787"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="21">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.1787"/>
+            <PeakCoord value="0.20154"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="22">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.20154"/>
+            <PeakCoord value="0.2205"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="23">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.2205"/>
+            <PeakCoord value="0.24335"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="24">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.24335"/>
+            <PeakCoord value="0.2662"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="25">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.2662"/>
+            <PeakCoord value="0.289"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="26">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.289"/>
+            <PeakCoord value="0.31177"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="27">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.31177"/>
+            <PeakCoord value="0.3346"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="28">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.3346"/>
+            <PeakCoord value="0.35364"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="29">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.35364"/>
+            <PeakCoord value="0.3764"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="30">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.3764"/>
+            <PeakCoord value="0.39923"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="31">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.39923"/>
+            <PeakCoord value="0.42206"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="32">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.42206"/>
+            <PeakCoord value="0.4449"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="33">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.4449"/>
+            <PeakCoord value="0.46765"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="34">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.46765"/>
+            <PeakCoord value="0.4867"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="35">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.4867"/>
+            <PeakCoord value="0.5095"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="36">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.5095"/>
+            <PeakCoord value="0.53235"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="37">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.53235"/>
+            <PeakCoord value="0.5551"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="38">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.5551"/>
+            <PeakCoord value="0.57794"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="39">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.57794"/>
+            <PeakCoord value="0.60077"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="40">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.60077"/>
+            <PeakCoord value="0.61975"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="41">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.61975"/>
+            <PeakCoord value="0.6426"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="42">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.6426"/>
+            <PeakCoord value="0.6654"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="43">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.6654"/>
+            <PeakCoord value="0.68823"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="44">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.68823"/>
+            <PeakCoord value="0.711"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="45">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.711"/>
+            <PeakCoord value="0.7338"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="46">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.7338"/>
+            <PeakCoord value="0.75287"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="47">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.75287"/>
+            <PeakCoord value="0.7757"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="48">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.7757"/>
+            <PeakCoord value="0.79846"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="49">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.79846"/>
+            <PeakCoord value="0.8213"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="50">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.8213"/>
+            <PeakCoord value="0.8441"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="51">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.8441"/>
+            <PeakCoord value="0.86694"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="52">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.86694"/>
+            <PeakCoord value="0.8859"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="53">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.8859"/>
+            <PeakCoord value="0.90875"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="54">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.90875"/>
+            <PeakCoord value="0.9316"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="55">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.9316"/>
+            <PeakCoord value="0.95435"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="56">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.95435"/>
+            <PeakCoord value="0.9772"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="57">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.9772"/>
+            <PeakCoord value="1.0"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="58">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.019"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="59">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.019"/>
+            <PeakCoord value="0.038"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="60">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.038"/>
+            <PeakCoord value="0.057"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="61">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.057"/>
+            <PeakCoord value="0.07605"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="62">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.07605"/>
+            <PeakCoord value="0.09503"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="63">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.09503"/>
+            <PeakCoord value="0.1141"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="64">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.1141"/>
+            <PeakCoord value="0.13306"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="65">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.13306"/>
+            <PeakCoord value="0.1521"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="66">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.1521"/>
+            <PeakCoord value="0.1711"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="67">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.1711"/>
+            <PeakCoord value="0.1901"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="68">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.1901"/>
+            <PeakCoord value="0.2091"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="69">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.2091"/>
+            <PeakCoord value="0.22815"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="70">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.22815"/>
+            <PeakCoord value="0.24713"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="71">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.24713"/>
+            <PeakCoord value="0.2662"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="72">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.2662"/>
+            <PeakCoord value="0.28516"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="73">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.28516"/>
+            <PeakCoord value="0.3042"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="74">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.3042"/>
+            <PeakCoord value="0.3232"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="75">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.3232"/>
+            <PeakCoord value="0.3422"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="76">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.3422"/>
+            <PeakCoord value="0.3612"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="77">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.3612"/>
+            <PeakCoord value="0.38025"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="78">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.38025"/>
+            <PeakCoord value="0.39923"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="79">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.39923"/>
+            <PeakCoord value="0.4183"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="80">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.4183"/>
+            <PeakCoord value="0.43726"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="81">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.43726"/>
+            <PeakCoord value="0.4563"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="82">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.4563"/>
+            <PeakCoord value="0.4753"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="83">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.4753"/>
+            <PeakCoord value="0.4943"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="84">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.4943"/>
+            <PeakCoord value="0.5133"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="85">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.5133"/>
+            <PeakCoord value="0.53235"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="86">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.53235"/>
+            <PeakCoord value="0.55133"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="87">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.55133"/>
+            <PeakCoord value="0.5703"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="88">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.5703"/>
+            <PeakCoord value="0.58936"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="89">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.58936"/>
+            <PeakCoord value="0.60834"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="90">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.60834"/>
+            <PeakCoord value="0.63116"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="91">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.63116"/>
+            <PeakCoord value="0.6502"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="92">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.6502"/>
+            <PeakCoord value="0.6692"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="93">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.6692"/>
+            <PeakCoord value="0.68823"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="94">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.68823"/>
+            <PeakCoord value="0.7072"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="95">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.7072"/>
+            <PeakCoord value="0.72626"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="96">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.72626"/>
+            <PeakCoord value="0.74524"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="97">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.74524"/>
+            <PeakCoord value="0.7643"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="98">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.7643"/>
+            <PeakCoord value="0.78326"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="99">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.78326"/>
+            <PeakCoord value="0.8023"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="100">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.8023"/>
+            <PeakCoord value="0.8213"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="101">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.8213"/>
+            <PeakCoord value="0.84033"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="102">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.84033"/>
+            <PeakCoord value="0.8593"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="103">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.8593"/>
+            <PeakCoord value="0.87836"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="104">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.87836"/>
+            <PeakCoord value="0.89734"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="105">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.89734"/>
+            <PeakCoord value="0.9163"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="106">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.9163"/>
+            <PeakCoord value="0.93536"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="107">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.93536"/>
+            <PeakCoord value="0.95435"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="108">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.1635"/>
+            <EndCoord value="0.5171"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="109">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.1635"/>
+            <PeakCoord value="0.25476"/>
+            <EndCoord value="0.5171"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="110">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.25476"/>
+            <PeakCoord value="0.5171"/>
+            <EndCoord value="0.5171"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="111">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.13007"/>
+            <EndCoord value="0.5217"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="112">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.13007"/>
+            <PeakCoord value="0.2966"/>
+            <EndCoord value="0.5217"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="113">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.2966"/>
+            <PeakCoord value="0.3764"/>
+            <EndCoord value="0.5217"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="114">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.3764"/>
+            <PeakCoord value="0.5217"/>
+            <EndCoord value="0.5217"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="115">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.08746"/>
+            <EndCoord value="0.403"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="116">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.08746"/>
+            <PeakCoord value="0.403"/>
+            <EndCoord value="0.403"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="117">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.13306"/>
+            <EndCoord value="0.403"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="118">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.13306"/>
+            <PeakCoord value="0.21674"/>
+            <EndCoord value="0.403"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="119">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.21674"/>
+            <PeakCoord value="0.403"/>
+            <EndCoord value="0.403"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="120">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.0038"/>
+            <EndCoord value="0.1711"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="121">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0038"/>
+            <PeakCoord value="0.09125"/>
+            <EndCoord value="0.1711"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="122">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.09125"/>
+            <PeakCoord value="0.1711"/>
+            <EndCoord value="0.1711"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="123">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.0304"/>
+            <EndCoord value="0.1711"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="124">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0304"/>
+            <PeakCoord value="0.1711"/>
+            <EndCoord value="0.1711"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="125">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.8479"/>
+            <EndCoord value="0.9772"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="126">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.8479"/>
+            <PeakCoord value="0.9772"/>
+            <EndCoord value="0.9772"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="127">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.8517"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="128">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.8517"/>
+            <PeakCoord value="0.92773"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="129">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.92773"/>
+            <PeakCoord value="1.0"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="130">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.8479"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="131">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.8479"/>
+            <PeakCoord value="0.9696"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="132">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.9696"/>
+            <PeakCoord value="1.0"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="133">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.13306"/>
+            <EndCoord value="0.2623"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="134">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.13306"/>
+            <PeakCoord value="0.2623"/>
+            <EndCoord value="0.2623"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="135">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.1369"/>
+            <EndCoord value="0.4563"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="136">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.1369"/>
+            <PeakCoord value="0.21295"/>
+            <EndCoord value="0.4563"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="137">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.21295"/>
+            <PeakCoord value="0.289"/>
+            <EndCoord value="0.4563"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="138">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.289"/>
+            <PeakCoord value="0.3764"/>
+            <EndCoord value="0.4563"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="139">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.3764"/>
+            <PeakCoord value="0.4563"/>
+            <EndCoord value="0.4563"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="140">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.13306"/>
+            <EndCoord value="0.4563"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="141">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.13306"/>
+            <PeakCoord value="0.25476"/>
+            <EndCoord value="0.4563"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="142">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.25476"/>
+            <PeakCoord value="0.3194"/>
+            <EndCoord value="0.4563"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="143">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.3194"/>
+            <PeakCoord value="0.4563"/>
+            <EndCoord value="0.4563"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="144">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.4563"/>
+            <EndCoord value="0.8099"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="145">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.4563"/>
+            <PeakCoord value="0.54755"/>
+            <EndCoord value="0.8099"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="146">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.54755"/>
+            <PeakCoord value="0.8099"/>
+            <EndCoord value="0.8099"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="147">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.42206"/>
+            <EndCoord value="0.81366"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="148">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.42206"/>
+            <PeakCoord value="0.58936"/>
+            <EndCoord value="0.81366"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="149">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.58936"/>
+            <PeakCoord value="0.6692"/>
+            <EndCoord value="0.81366"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="150">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.6692"/>
+            <PeakCoord value="0.81366"/>
+            <EndCoord value="0.81366"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="151">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.30035"/>
+            <EndCoord value="0.7034"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="152">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.30035"/>
+            <PeakCoord value="0.3878"/>
+            <EndCoord value="0.7034"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="153">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.3878"/>
+            <PeakCoord value="0.7034"/>
+            <EndCoord value="0.7034"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="154">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.30035"/>
+            <PeakCoord value="0.43726"/>
+            <EndCoord value="0.7034"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="155">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.43726"/>
+            <PeakCoord value="0.52094"/>
+            <EndCoord value="0.7034"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="156">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.52094"/>
+            <PeakCoord value="0.7034"/>
+            <EndCoord value="0.7034"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="157">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.2357"/>
+            <EndCoord value="0.365"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="158">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.2357"/>
+            <PeakCoord value="0.365"/>
+            <EndCoord value="0.365"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="159">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.23956"/>
+            <EndCoord value="0.55896"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="160">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.23956"/>
+            <PeakCoord value="0.3156"/>
+            <EndCoord value="0.55896"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="161">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.3156"/>
+            <PeakCoord value="0.39166"/>
+            <EndCoord value="0.55896"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="162">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.39166"/>
+            <PeakCoord value="0.47906"/>
+            <EndCoord value="0.55896"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="163">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.47906"/>
+            <PeakCoord value="0.55896"/>
+            <EndCoord value="0.55896"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="164">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.2357"/>
+            <EndCoord value="0.55896"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="165">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.2357"/>
+            <PeakCoord value="0.35364"/>
+            <EndCoord value="0.55896"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="166">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.35364"/>
+            <PeakCoord value="0.42206"/>
+            <EndCoord value="0.55896"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="167">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.42206"/>
+            <PeakCoord value="0.55896"/>
+            <EndCoord value="0.55896"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="168">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.36884"/>
+            <EndCoord value="0.4981"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="169">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.36884"/>
+            <PeakCoord value="0.4981"/>
+            <EndCoord value="0.4981"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="170">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.3726"/>
+            <EndCoord value="0.692"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="171">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.3726"/>
+            <PeakCoord value="0.44867"/>
+            <EndCoord value="0.692"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="172">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.44867"/>
+            <PeakCoord value="0.5247"/>
+            <EndCoord value="0.692"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="173">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.5247"/>
+            <PeakCoord value="0.6122"/>
+            <EndCoord value="0.692"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="174">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.6122"/>
+            <PeakCoord value="0.692"/>
+            <EndCoord value="0.692"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="175">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.36884"/>
+            <EndCoord value="0.692"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="176">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.36884"/>
+            <PeakCoord value="0.4905"/>
+            <EndCoord value="0.692"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="177">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.4905"/>
+            <PeakCoord value="0.55896"/>
+            <EndCoord value="0.692"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="178">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.55896"/>
+            <PeakCoord value="0.692"/>
+            <EndCoord value="0.692"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="179">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.13306"/>
+            <EndCoord value="0.13306"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="180">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.1369"/>
+            <EndCoord value="0.1369"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="181">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.78326"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="182">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.78326"/>
+            <PeakCoord value="0.8745"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="183">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.8745"/>
+            <PeakCoord value="1.0"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="184">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.749"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="185">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.749"/>
+            <PeakCoord value="0.9163"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="186">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.9163"/>
+            <PeakCoord value="0.9962"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="187">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.9962"/>
+            <PeakCoord value="1.0"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="188">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.5817"/>
+            <EndCoord value="0.9848"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="189">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.5817"/>
+            <PeakCoord value="0.6692"/>
+            <EndCoord value="0.9848"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="190">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.6692"/>
+            <PeakCoord value="0.9848"/>
+            <EndCoord value="0.9848"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="191">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.5817"/>
+            <PeakCoord value="0.7186"/>
+            <EndCoord value="0.9848"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="192">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.7186"/>
+            <PeakCoord value="0.8023"/>
+            <EndCoord value="0.9848"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="193">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.8023"/>
+            <PeakCoord value="0.9848"/>
+            <EndCoord value="0.9848"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="194">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.4905"/>
+            <EndCoord value="0.61975"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="195">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.4905"/>
+            <PeakCoord value="0.61975"/>
+            <EndCoord value="0.61975"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="196">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.4943"/>
+            <EndCoord value="0.81366"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="197">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.4943"/>
+            <PeakCoord value="0.5703"/>
+            <EndCoord value="0.81366"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="198">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.5703"/>
+            <PeakCoord value="0.64636"/>
+            <EndCoord value="0.81366"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="199">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.64636"/>
+            <PeakCoord value="0.7338"/>
+            <EndCoord value="0.81366"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="200">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.7338"/>
+            <PeakCoord value="0.81366"/>
+            <EndCoord value="0.81366"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="201">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.4905"/>
+            <EndCoord value="0.81366"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="202">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.4905"/>
+            <PeakCoord value="0.6122"/>
+            <EndCoord value="0.81366"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="203">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.6122"/>
+            <PeakCoord value="0.6768"/>
+            <EndCoord value="0.81366"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="204">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.6768"/>
+            <PeakCoord value="0.81366"/>
+            <EndCoord value="0.81366"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="205">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.6768"/>
+            <EndCoord value="0.8061"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="206">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.6768"/>
+            <PeakCoord value="0.8061"/>
+            <EndCoord value="0.8061"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="207">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.6806"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="208">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.6806"/>
+            <PeakCoord value="0.75665"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="209">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.75665"/>
+            <PeakCoord value="0.8327"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="210">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.8327"/>
+            <PeakCoord value="0.92017"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="211">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.92017"/>
+            <PeakCoord value="1.0"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="212">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.0"/>
+            <PeakCoord value="0.6768"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="213">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.6768"/>
+            <PeakCoord value="0.79846"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="214">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.79846"/>
+            <PeakCoord value="0.8631"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+        <Region index="215">
+          <VarRegionAxis index="0">
+            <StartCoord value="0.8631"/>
+            <PeakCoord value="1.0"/>
+            <EndCoord value="1.0"/>
+          </VarRegionAxis>
+        </Region>
+      </VarRegionList>
+      <!-- VarDataCount=33 -->
+      <VarData index="0">
+        <!-- ItemCount=2 -->
+        <NumShorts value="0"/>
+        <!-- VarRegionCount=2 -->
+        <VarRegionIndex index="0" value="131"/>
+        <VarRegionIndex index="1" value="132"/>
+        <Item index="0" value="[-57, -106]"/>
+        <Item index="1" value="[-19, 7]"/>
+      </VarData>
+      <VarData index="1">
+        <!-- ItemCount=1 -->
+        <NumShorts value="2"/>
+        <!-- VarRegionCount=2 -->
+        <VarRegionIndex index="0" value="10"/>
+        <VarRegionIndex index="1" value="11"/>
+        <Item index="0" value="[-16384, -15855]"/>
+      </VarData>
+      <VarData index="2">
+        <!-- ItemCount=1 -->
+        <NumShorts value="2"/>
+        <!-- VarRegionCount=2 -->
+        <VarRegionIndex index="0" value="109"/>
+        <VarRegionIndex index="1" value="110"/>
+        <Item index="0" value="[16384, 19333]"/>
+      </VarData>
+      <VarData index="3">
+        <!-- ItemCount=2 -->
+        <NumShorts value="1"/>
+        <!-- VarRegionCount=3 -->
+        <VarRegionIndex index="0" value="114"/>
+        <VarRegionIndex index="1" value="112"/>
+        <VarRegionIndex index="2" value="113"/>
+        <Item index="0" value="[-181, -75, -75]"/>
+        <Item index="1" value="[-32, -27, 32]"/>
+      </VarData>
+      <VarData index="4">
+        <!-- ItemCount=1 -->
+        <NumShorts value="2"/>
+        <!-- VarRegionCount=2 -->
+        <VarRegionIndex index="0" value="115"/>
+        <VarRegionIndex index="1" value="116"/>
+        <Item index="0" value="[16384, 17531]"/>
+      </VarData>
+      <VarData index="5">
+        <!-- ItemCount=2 -->
+        <NumShorts value="2"/>
+        <!-- VarRegionCount=2 -->
+        <VarRegionIndex index="0" value="1"/>
+        <VarRegionIndex index="1" value="126"/>
+        <Item index="0" value="[0, 16384]"/>
+        <Item index="1" value="[3768, 0]"/>
+      </VarData>
+      <VarData index="6">
+        <!-- ItemCount=1 -->
+        <NumShorts value="2"/>
+        <!-- VarRegionCount=2 -->
+        <VarRegionIndex index="0" value="128"/>
+        <VarRegionIndex index="1" value="129"/>
+        <Item index="0" value="[455, -1274]"/>
+      </VarData>
+      <VarData index="7">
+        <!-- ItemCount=2 -->
+        <NumShorts value="1"/>
+        <!-- VarRegionCount=3 -->
+        <VarRegionIndex index="0" value="143"/>
+        <VarRegionIndex index="1" value="141"/>
+        <VarRegionIndex index="2" value="142"/>
+        <Item index="0" value="[-154, -57, -67]"/>
+        <Item index="1" value="[-19, -19, 20]"/>
+      </VarData>
+      <VarData index="8">
+        <!-- ItemCount=1 -->
+        <NumShorts value="2"/>
+        <!-- VarRegionCount=2 -->
+        <VarRegionIndex index="0" value="145"/>
+        <VarRegionIndex index="1" value="146"/>
+        <Item index="0" value="[16384, 19333]"/>
+      </VarData>
+      <VarData index="9">
+        <!-- ItemCount=2 -->
+        <NumShorts value="1"/>
+        <!-- VarRegionCount=3 -->
+        <VarRegionIndex index="0" value="150"/>
+        <VarRegionIndex index="1" value="148"/>
+        <VarRegionIndex index="2" value="149"/>
+        <Item index="0" value="[-181, -75, -75]"/>
+        <Item index="1" value="[-32, -27, 32]"/>
+      </VarData>
+      <VarData index="10">
+        <!-- ItemCount=1 -->
+        <NumShorts value="2"/>
+        <!-- VarRegionCount=2 -->
+        <VarRegionIndex index="0" value="152"/>
+        <VarRegionIndex index="1" value="153"/>
+        <Item index="0" value="[16384, 17531]"/>
+      </VarData>
+      <VarData index="11">
+        <!-- ItemCount=2 -->
+        <NumShorts value="1"/>
+        <!-- VarRegionCount=3 -->
+        <VarRegionIndex index="0" value="156"/>
+        <VarRegionIndex index="1" value="154"/>
+        <VarRegionIndex index="2" value="155"/>
+        <Item index="0" value="[-158, -56, -60]"/>
+        <Item index="1" value="[-2, -22, 33]"/>
+      </VarData>
+      <VarData index="12">
+        <!-- ItemCount=2 -->
+        <NumShorts value="2"/>
+        <!-- VarRegionCount=2 -->
+        <VarRegionIndex index="0" value="134"/>
+        <VarRegionIndex index="1" value="158"/>
+        <Item index="0" value="[0, 16384]"/>
+        <Item index="1" value="[16384, 0]"/>
+      </VarData>
+      <VarData index="13">
+        <!-- ItemCount=2 -->
+        <NumShorts value="1"/>
+        <!-- VarRegionCount=3 -->
+        <VarRegionIndex index="0" value="167"/>
+        <VarRegionIndex index="1" value="165"/>
+        <VarRegionIndex index="2" value="166"/>
+        <Item index="0" value="[-154, -57, -68]"/>
+        <Item index="1" value="[-19, -19, 20]"/>
+      </VarData>
+      <VarData index="14">
+        <!-- ItemCount=2 -->
+        <NumShorts value="1"/>
+        <!-- VarRegionCount=3 -->
+        <VarRegionIndex index="0" value="178"/>
+        <VarRegionIndex index="1" value="176"/>
+        <VarRegionIndex index="2" value="177"/>
+        <Item index="0" value="[-154, -57, -68]"/>
+        <Item index="1" value="[-19, -19, 20]"/>
+      </VarData>
+      <VarData index="15">
+        <!-- ItemCount=2 -->
+        <NumShorts value="2"/>
+        <!-- VarRegionCount=2 -->
+        <VarRegionIndex index="0" value="169"/>
+        <VarRegionIndex index="1" value="179"/>
+        <Item index="0" value="[0, 19333]"/>
+        <Item index="1" value="[16384, 0]"/>
+      </VarData>
+      <VarData index="16">
+        <!-- ItemCount=4 -->
+        <NumShorts value="1"/>
+        <!-- VarRegionCount=3 -->
+        <VarRegionIndex index="0" value="180"/>
+        <VarRegionIndex index="1" value="4"/>
+        <VarRegionIndex index="2" value="7"/>
+        <Item index="0" value="[0, -48, 0]"/>
+        <Item index="1" value="[0, 0, -54]"/>
+        <Item index="2" value="[-181, 0, 0]"/>
+        <Item index="3" value="[-32, 0, 0]"/>
+      </VarData>
+      <VarData index="17">
+        <!-- ItemCount=1 -->
+        <NumShorts value="2"/>
+        <!-- VarRegionCount=2 -->
+        <VarRegionIndex index="0" value="182"/>
+        <VarRegionIndex index="1" value="183"/>
+        <Item index="0" value="[16384, 19333]"/>
+      </VarData>
+      <VarData index="18">
+        <!-- ItemCount=2 -->
+        <NumShorts value="1"/>
+        <!-- VarRegionCount=3 -->
+        <VarRegionIndex index="0" value="187"/>
+        <VarRegionIndex index="1" value="185"/>
+        <VarRegionIndex index="2" value="186"/>
+        <Item index="0" value="[-181, -75, -120]"/>
+        <Item index="1" value="[-32, -27, 16]"/>
+      </VarData>
+      <VarData index="19">
+        <!-- ItemCount=1 -->
+        <NumShorts value="2"/>
+        <!-- VarRegionCount=2 -->
+        <VarRegionIndex index="0" value="189"/>
+        <VarRegionIndex index="1" value="190"/>
+        <Item index="0" value="[16384, 17531]"/>
+      </VarData>
+      <VarData index="20">
+        <!-- ItemCount=2 -->
+        <NumShorts value="1"/>
+        <!-- VarRegionCount=3 -->
+        <VarRegionIndex index="0" value="193"/>
+        <VarRegionIndex index="1" value="191"/>
+        <VarRegionIndex index="2" value="192"/>
+        <Item index="0" value="[-158, -56, -60]"/>
+        <Item index="1" value="[-2, -22, 33]"/>
+      </VarData>
+      <VarData index="21">
+        <!-- ItemCount=2 -->
+        <NumShorts value="1"/>
+        <!-- VarRegionCount=3 -->
+        <VarRegionIndex index="0" value="204"/>
+        <VarRegionIndex index="1" value="202"/>
+        <VarRegionIndex index="2" value="203"/>
+        <Item index="0" value="[-154, -57, -67]"/>
+        <Item index="1" value="[-19, -19, 20]"/>
+      </VarData>
+      <VarData index="22">
+        <!-- ItemCount=2 -->
+        <NumShorts value="2"/>
+        <!-- VarRegionCount=2 -->
+        <VarRegionIndex index="0" value="195"/>
+        <VarRegionIndex index="1" value="206"/>
+        <Item index="0" value="[0, 16384]"/>
+        <Item index="1" value="[16384, 0]"/>
+      </VarData>
+      <VarData index="23">
+        <!-- ItemCount=2 -->
+        <NumShorts value="1"/>
+        <!-- VarRegionCount=3 -->
+        <VarRegionIndex index="0" value="215"/>
+        <VarRegionIndex index="1" value="213"/>
+        <VarRegionIndex index="2" value="214"/>
+        <Item index="0" value="[-154, -57, -67]"/>
+        <Item index="1" value="[-19, -19, 20]"/>
+      </VarData>
+      <VarData index="24">
+        <!-- ItemCount=1 -->
+        <NumShorts value="3"/>
+        <!-- VarRegionCount=3 -->
+        <VarRegionIndex index="0" value="120"/>
+        <VarRegionIndex index="1" value="121"/>
+        <VarRegionIndex index="2" value="122"/>
+        <Item index="0" value="[-1274, 608, -1365]"/>
+      </VarData>
+      <VarData index="25">
+        <!-- ItemCount=4 -->
+        <NumShorts value="2"/>
+        <!-- VarRegionCount=5 -->
+        <VarRegionIndex index="0" value="119"/>
+        <VarRegionIndex index="1" value="124"/>
+        <VarRegionIndex index="2" value="117"/>
+        <VarRegionIndex index="3" value="118"/>
+        <VarRegionIndex index="4" value="123"/>
+        <Item index="0" value="[-158, 0, -56, -59, 0]"/>
+        <Item index="1" value="[-2, 0, -22, 33, 0]"/>
+        <Item index="2" value="[0, -154, 0, 0, -106]"/>
+        <Item index="3" value="[0, -19, 0, 0, 7]"/>
+      </VarData>
+      <VarData index="26">
+        <!-- ItemCount=1 -->
+        <NumShorts value="4"/>
+        <!-- VarRegionCount=4 -->
+        <VarRegionIndex index="0" value="136"/>
+        <VarRegionIndex index="1" value="137"/>
+        <VarRegionIndex index="2" value="138"/>
+        <VarRegionIndex index="3" value="139"/>
+        <Item index="0" value="[455, -1587, 608, -1365]"/>
+      </VarData>
+      <VarData index="27">
+        <!-- ItemCount=1 -->
+        <NumShorts value="4"/>
+        <!-- VarRegionCount=4 -->
+        <VarRegionIndex index="0" value="160"/>
+        <VarRegionIndex index="1" value="161"/>
+        <VarRegionIndex index="2" value="162"/>
+        <VarRegionIndex index="3" value="163"/>
+        <Item index="0" value="[455, -1587, 608, -1365]"/>
+      </VarData>
+      <VarData index="28">
+        <!-- ItemCount=1 -->
+        <NumShorts value="4"/>
+        <!-- VarRegionCount=4 -->
+        <VarRegionIndex index="0" value="171"/>
+        <VarRegionIndex index="1" value="172"/>
+        <VarRegionIndex index="2" value="173"/>
+        <VarRegionIndex index="3" value="174"/>
+        <Item index="0" value="[455, -1587, 608, -1365]"/>
+      </VarData>
+      <VarData index="29">
+        <!-- ItemCount=1 -->
+        <NumShorts value="4"/>
+        <!-- VarRegionCount=4 -->
+        <VarRegionIndex index="0" value="197"/>
+        <VarRegionIndex index="1" value="198"/>
+        <VarRegionIndex index="2" value="199"/>
+        <VarRegionIndex index="3" value="200"/>
+        <Item index="0" value="[455, -1587, 608, -1365]"/>
+      </VarData>
+      <VarData index="30">
+        <!-- ItemCount=1 -->
+        <NumShorts value="4"/>
+        <!-- VarRegionCount=4 -->
+        <VarRegionIndex index="0" value="208"/>
+        <VarRegionIndex index="1" value="209"/>
+        <VarRegionIndex index="2" value="210"/>
+        <VarRegionIndex index="3" value="211"/>
+        <Item index="0" value="[455, -1587, 608, -1365]"/>
+      </VarData>
+      <VarData index="31">
+        <!-- ItemCount=2 -->
+        <NumShorts value="44"/>
+        <!-- VarRegionCount=44 -->
+        <VarRegionIndex index="0" value="13"/>
+        <VarRegionIndex index="1" value="14"/>
+        <VarRegionIndex index="2" value="15"/>
+        <VarRegionIndex index="3" value="16"/>
+        <VarRegionIndex index="4" value="17"/>
+        <VarRegionIndex index="5" value="18"/>
+        <VarRegionIndex index="6" value="19"/>
+        <VarRegionIndex index="7" value="20"/>
+        <VarRegionIndex index="8" value="21"/>
+        <VarRegionIndex index="9" value="22"/>
+        <VarRegionIndex index="10" value="23"/>
+        <VarRegionIndex index="11" value="24"/>
+        <VarRegionIndex index="12" value="25"/>
+        <VarRegionIndex index="13" value="26"/>
+        <VarRegionIndex index="14" value="27"/>
+        <VarRegionIndex index="15" value="28"/>
+        <VarRegionIndex index="16" value="29"/>
+        <VarRegionIndex index="17" value="30"/>
+        <VarRegionIndex index="18" value="31"/>
+        <VarRegionIndex index="19" value="32"/>
+        <VarRegionIndex index="20" value="33"/>
+        <VarRegionIndex index="21" value="34"/>
+        <VarRegionIndex index="22" value="35"/>
+        <VarRegionIndex index="23" value="36"/>
+        <VarRegionIndex index="24" value="37"/>
+        <VarRegionIndex index="25" value="38"/>
+        <VarRegionIndex index="26" value="39"/>
+        <VarRegionIndex index="27" value="40"/>
+        <VarRegionIndex index="28" value="41"/>
+        <VarRegionIndex index="29" value="42"/>
+        <VarRegionIndex index="30" value="43"/>
+        <VarRegionIndex index="31" value="44"/>
+        <VarRegionIndex index="32" value="45"/>
+        <VarRegionIndex index="33" value="46"/>
+        <VarRegionIndex index="34" value="47"/>
+        <VarRegionIndex index="35" value="48"/>
+        <VarRegionIndex index="36" value="49"/>
+        <VarRegionIndex index="37" value="50"/>
+        <VarRegionIndex index="38" value="51"/>
+        <VarRegionIndex index="39" value="52"/>
+        <VarRegionIndex index="40" value="53"/>
+        <VarRegionIndex index="41" value="54"/>
+        <VarRegionIndex index="42" value="55"/>
+        <VarRegionIndex index="43" value="56"/>
+        <Item index="0" value="[-1802, 1760, -655, -1160, 1757, -655, -1164, 1753, -655, -1163, 1749, -655, -1167, 1744, -655, -1166, 1738, -655, -1172, 1731, -655, -1170, 1722, -655, -1179, 1710, -655, -1178, 1694, -655, -1192, 1670, -655, -1194, 1636, -655, -1221, 1572, -655, -1241, 1442, -655, -1365, 901]"/>
+        <Item index="1" value="[0, -655, 639, 0, -655, 638, 0, -655, 637, 0, -655, 635, 0, -655, 633, 0, -655, 631, 0, -655, 628, 0, -655, 625, 0, -655, 620, 0, -655, 613, 0, -655, 603, 0, -655, 588, 0, -655, 559, 0, -655, 491, 0, -655]"/>
+      </VarData>
+      <VarData index="32">
+        <!-- ItemCount=2 -->
+        <NumShorts value="50"/>
+        <!-- VarRegionCount=51 -->
+        <VarRegionIndex index="0" value="56"/>
+        <VarRegionIndex index="1" value="58"/>
+        <VarRegionIndex index="2" value="59"/>
+        <VarRegionIndex index="3" value="60"/>
+        <VarRegionIndex index="4" value="61"/>
+        <VarRegionIndex index="5" value="62"/>
+        <VarRegionIndex index="6" value="63"/>
+        <VarRegionIndex index="7" value="64"/>
+        <VarRegionIndex index="8" value="65"/>
+        <VarRegionIndex index="9" value="66"/>
+        <VarRegionIndex index="10" value="67"/>
+        <VarRegionIndex index="11" value="68"/>
+        <VarRegionIndex index="12" value="69"/>
+        <VarRegionIndex index="13" value="70"/>
+        <VarRegionIndex index="14" value="71"/>
+        <VarRegionIndex index="15" value="72"/>
+        <VarRegionIndex index="16" value="73"/>
+        <VarRegionIndex index="17" value="74"/>
+        <VarRegionIndex index="18" value="75"/>
+        <VarRegionIndex index="19" value="76"/>
+        <VarRegionIndex index="20" value="77"/>
+        <VarRegionIndex index="21" value="78"/>
+        <VarRegionIndex index="22" value="79"/>
+        <VarRegionIndex index="23" value="80"/>
+        <VarRegionIndex index="24" value="81"/>
+        <VarRegionIndex index="25" value="82"/>
+        <VarRegionIndex index="26" value="83"/>
+        <VarRegionIndex index="27" value="84"/>
+        <VarRegionIndex index="28" value="85"/>
+        <VarRegionIndex index="29" value="86"/>
+        <VarRegionIndex index="30" value="87"/>
+        <VarRegionIndex index="31" value="88"/>
+        <VarRegionIndex index="32" value="89"/>
+        <VarRegionIndex index="33" value="91"/>
+        <VarRegionIndex index="34" value="92"/>
+        <VarRegionIndex index="35" value="93"/>
+        <VarRegionIndex index="36" value="94"/>
+        <VarRegionIndex index="37" value="95"/>
+        <VarRegionIndex index="38" value="96"/>
+        <VarRegionIndex index="39" value="97"/>
+        <VarRegionIndex index="40" value="98"/>
+        <VarRegionIndex index="41" value="99"/>
+        <VarRegionIndex index="42" value="100"/>
+        <VarRegionIndex index="43" value="101"/>
+        <VarRegionIndex index="44" value="102"/>
+        <VarRegionIndex index="45" value="103"/>
+        <VarRegionIndex index="46" value="104"/>
+        <VarRegionIndex index="47" value="105"/>
+        <VarRegionIndex index="48" value="106"/>
+        <VarRegionIndex index="49" value="107"/>
+        <VarRegionIndex index="50" value="90"/>
+        <Item index="0" value="[-1475, 0, -1475, 1446, -1475, 1445, -1475, 1443, -1475, 1442, -1475, 1440, -1475, 1439, -1475, 1437, -1475, 1435, -1475, 1432, -1475, 1430, -1475, 1427, -1475, 1423, -1475, 1420, -1475, 1415, -1475, 1410, -1475, 1399, -1475, 1390, -1475, 1379, -1475, 1365, -1475, 1346, -1475, 1318, -1475, 1276, -1475, 1202, -1475, 1041, -86]"/>
+        <Item index="1" value="[819, -1638, 1606, -1638, 1605, -1638, 1604, -1638, 1602, -1638, 1600, -1638, 1599, -1638, 1597, -1638, 1594, -1638, 1592, -1638, 1589, -1638, 1586, -1638, 1583, -1638, 1579, -1638, 1574, -1638, 1569, -1638, 1562, -1638, 1549, -1638, 1538, -1638, 1524, -1638, 1506, -1638, 1481, -1638, 1443, -1638, 1382, -1638, 1266, -1638, 0]"/>
+      </VarData>
+    </VarStore>
+  </COLR>
+
+  <CPAL>
+    <version value="0"/>
+    <numPaletteEntries value="6"/>
+    <palette index="0">
+      <color index="0" value="#FF841DFF"/>
+      <color index="1" value="#FB4226FF"/>
+      <color index="2" value="#F8002FFF"/>
+      <color index="3" value="#190233FF"/>
+      <color index="4" value="#FFFFFFFF"/>
+      <color index="5" value="#0B1833FF"/>
+    </palette>
+  </CPAL>
+
+  <fvar>
+
+    <!-- Frame -->
+    <Axis>
+      <AxisTag>ANIM</AxisTag>
+      <Flags>0x0</Flags>
+      <MinValue>0.0</MinValue>
+      <DefaultValue>0.0</DefaultValue>
+      <MaxValue>263.0</MaxValue>
+      <AxisNameID>256</AxisNameID>
+    </Axis>
+  </fvar>
+
+  <gvar>
+    <version value="1"/>
+    <reserved value="0"/>
+    <glyphVariations glyph="glyph0001">
+      <tuple>
+        <coord axis="ANIM" min="0.0" value="0.1445" max="1.0"/>
+        <delta pt="0" x="0" y="0"/>
+        <delta pt="1" x="0" y="0"/>
+        <delta pt="2" x="0" y="0"/>
+        <delta pt="3" x="0" y="0"/>
+        <delta pt="4" x="0" y="0"/>
+        <delta pt="5" x="0" y="0"/>
+        <delta pt="6" x="0" y="0"/>
+        <delta pt="7" x="0" y="0"/>
+        <delta pt="8" x="0" y="0"/>
+        <delta pt="9" x="0" y="0"/>
+        <delta pt="10" x="0" y="0"/>
+        <delta pt="11" x="0" y="0"/>
+        <delta pt="12" x="0" y="0"/>
+        <delta pt="13" x="0" y="0"/>
+        <delta pt="14" x="0" y="0"/>
+        <delta pt="15" x="0" y="0"/>
+        <delta pt="16" x="0" y="0"/>
+        <delta pt="17" x="0" y="0"/>
+        <delta pt="18" x="0" y="0"/>
+        <delta pt="19" x="0" y="0"/>
+        <delta pt="20" x="0" y="0"/>
+        <delta pt="21" x="0" y="0"/>
+        <delta pt="22" x="0" y="0"/>
+        <delta pt="23" x="0" y="0"/>
+        <delta pt="24" x="0" y="0"/>
+        <delta pt="25" x="0" y="0"/>
+        <delta pt="26" x="0" y="0"/>
+        <delta pt="27" x="0" y="0"/>
+        <delta pt="28" x="0" y="0"/>
+        <delta pt="29" x="0" y="0"/>
+        <delta pt="30" x="0" y="0"/>
+        <delta pt="31" x="0" y="0"/>
+        <delta pt="32" x="0" y="0"/>
+        <delta pt="33" x="0" y="0"/>
+        <delta pt="34" x="0" y="0"/>
+        <delta pt="35" x="0" y="0"/>
+        <delta pt="36" x="0" y="0"/>
+        <delta pt="37" x="0" y="0"/>
+        <delta pt="38" x="0" y="0"/>
+        <delta pt="39" x="0" y="0"/>
+      </tuple>
+      <tuple>
+        <coord axis="ANIM" min="0.1445" value="0.61975" max="1.0"/>
+        <delta pt="0" x="0" y="0"/>
+        <delta pt="1" x="4" y="0"/>
+        <delta pt="2" x="0" y="0"/>
+        <delta pt="3" x="0" y="0"/>
+        <delta pt="4" x="0" y="0"/>
+        <delta pt="5" x="0" y="0"/>
+        <delta pt="6" x="-9" y="-18"/>
+        <delta pt="7" x="-9" y="-19"/>
+        <delta pt="8" x="-12" y="-27"/>
+        <delta pt="9" x="2" y="-29"/>
+        <delta pt="10" x="0" y="-31"/>
+        <delta pt="11" x="-5" y="-35"/>
+        <delta pt="12" x="-2" y="-19"/>
+        <delta pt="13" x="2" y="-17"/>
+        <delta pt="14" x="3" y="-16"/>
+        <delta pt="15" x="0" y="-16"/>
+        <delta pt="16" x="2" y="-17"/>
+        <delta pt="17" x="1" y="-25"/>
+        <delta pt="18" x="-2" y="-51"/>
+        <delta pt="19" x="2" y="-70"/>
+        <delta pt="20" x="13" y="-66"/>
+        <delta pt="21" x="19" y="-67"/>
+        <delta pt="22" x="31" y="-48"/>
+        <delta pt="23" x="32" y="-21"/>
+        <delta pt="24" x="16" y="0"/>
+        <delta pt="25" x="-4" y="0"/>
+        <delta pt="26" x="-19" y="1"/>
+        <delta pt="27" x="-29" y="-19"/>
+        <delta pt="28" x="-26" y="-45"/>
+        <delta pt="29" x="-17" y="-60"/>
+        <delta pt="30" x="-11" y="-57"/>
+        <delta pt="31" x="-4" y="-58"/>
+        <delta pt="32" x="-5" y="-61"/>
+        <delta pt="33" x="-12" y="-61"/>
+        <delta pt="34" x="-17" y="-51"/>
+        <delta pt="35" x="-11" y="-25"/>
+        <delta pt="36" x="0" y="0"/>
+        <delta pt="37" x="0" y="0"/>
+        <delta pt="38" x="0" y="0"/>
+        <delta pt="39" x="0" y="0"/>
+      </tuple>
+      <tuple>
+        <coord axis="ANIM" min="0.61975" value="1.0" max="1.0"/>
+        <delta pt="0" x="0" y="0"/>
+        <delta pt="1" x="0" y="0"/>
+        <delta pt="2" x="0" y="0"/>
+        <delta pt="3" x="0" y="0"/>
+        <delta pt="4" x="0" y="0"/>
+        <delta pt="5" x="0" y="0"/>
+        <delta pt="6" x="0" y="0"/>
+        <delta pt="7" x="0" y="0"/>
+        <delta pt="8" x="0" y="0"/>
+        <delta pt="9" x="0" y="0"/>
+        <delta pt="10" x="0" y="0"/>
+        <delta pt="11" x="0" y="0"/>
+        <delta pt="12" x="0" y="0"/>
+        <delta pt="13" x="0" y="0"/>
+        <delta pt="14" x="0" y="0"/>
+        <delta pt="15" x="0" y="0"/>
+        <delta pt="16" x="0" y="0"/>
+        <delta pt="17" x="0" y="0"/>
+        <delta pt="18" x="0" y="0"/>
+        <delta pt="19" x="0" y="0"/>
+        <delta pt="20" x="0" y="0"/>
+        <delta pt="21" x="0" y="0"/>
+        <delta pt="22" x="0" y="0"/>
+        <delta pt="23" x="0" y="0"/>
+        <delta pt="24" x="0" y="0"/>
+        <delta pt="25" x="0" y="0"/>
+        <delta pt="26" x="0" y="0"/>
+        <delta pt="27" x="0" y="0"/>
+        <delta pt="28" x="0" y="0"/>
+        <delta pt="29" x="0" y="0"/>
+        <delta pt="30" x="0" y="0"/>
+        <delta pt="31" x="0" y="0"/>
+        <delta pt="32" x="0" y="0"/>
+        <delta pt="33" x="0" y="0"/>
+        <delta pt="34" x="0" y="0"/>
+        <delta pt="35" x="0" y="0"/>
+        <delta pt="36" x="0" y="0"/>
+        <delta pt="37" x="0" y="0"/>
+        <delta pt="38" x="0" y="0"/>
+        <delta pt="39" x="0" y="0"/>
+      </tuple>
+    </glyphVariations>
+    <glyphVariations glyph="glyph0003">
+      <tuple>
+        <coord axis="ANIM" min="0.0" value="0.04565" max="0.7186"/>
+        <delta pt="0" x="0" y="10"/>
+        <delta pt="1" x="0" y="10"/>
+        <delta pt="2" x="-5" y="1"/>
+        <delta pt="3" x="-2" y="0"/>
+        <delta pt="4" x="3" y="-9"/>
+        <delta pt="5" x="0" y="-9"/>
+        <delta pt="6" x="-1" y="-9"/>
+        <delta pt="7" x="3" y="-1"/>
+        <delta pt="8" x="5" y="1"/>
+        <delta pt="9" x="0" y="10"/>
+        <delta pt="10" x="0" y="0"/>
+        <delta pt="11" x="0" y="0"/>
+        <delta pt="12" x="0" y="0"/>
+        <delta pt="13" x="0" y="0"/>
+      </tuple>
+      <tuple>
+        <coord axis="ANIM" min="0.04565" value="0.6806" max="0.7186"/>
+        <delta pt="0" x="0" y="9"/>
+        <delta pt="1" x="0" y="9"/>
+        <delta pt="2" x="-5" y="1"/>
+        <delta pt="3" x="-2" y="0"/>
+        <delta pt="4" x="3" y="-8"/>
+        <delta pt="5" x="0" y="-8"/>
+        <delta pt="6" x="-1" y="-8"/>
+        <delta pt="7" x="3" y="-1"/>
+        <delta pt="8" x="5" y="1"/>
+        <delta pt="9" x="0" y="9"/>
+        <delta pt="10" x="0" y="0"/>
+        <delta pt="11" x="0" y="0"/>
+        <delta pt="12" x="0" y="0"/>
+        <delta pt="13" x="0" y="0"/>
+      </tuple>
+      <tuple>
+        <coord axis="ANIM" min="0.6806" value="0.7186" max="0.7186"/>
+        <delta pt="0" x="0" y="0"/>
+        <delta pt="1" x="0" y="0"/>
+        <delta pt="2" x="0" y="0"/>
+        <delta pt="3" x="0" y="0"/>
+        <delta pt="4" x="0" y="0"/>
+        <delta pt="5" x="0" y="0"/>
+        <delta pt="6" x="0" y="0"/>
+        <delta pt="7" x="0" y="0"/>
+        <delta pt="8" x="0" y="0"/>
+        <delta pt="9" x="0" y="0"/>
+        <delta pt="10" x="0" y="0"/>
+        <delta pt="11" x="0" y="0"/>
+        <delta pt="12" x="0" y="0"/>
+        <delta pt="13" x="0" y="0"/>
+      </tuple>
+    </glyphVariations>
+    <glyphVariations glyph="glyph0005">
+      <tuple>
+        <coord axis="ANIM" min="0.0" value="0.27374" max="0.7186"/>
+        <delta pt="0" x="0" y="0"/>
+        <delta pt="1" x="0" y="0"/>
+        <delta pt="2" x="0" y="0"/>
+        <delta pt="3" x="0" y="0"/>
+        <delta pt="4" x="0" y="0"/>
+        <delta pt="5" x="0" y="0"/>
+        <delta pt="6" x="0" y="0"/>
+        <delta pt="7" x="0" y="0"/>
+        <delta pt="8" x="0" y="0"/>
+        <delta pt="9" x="0" y="0"/>
+        <delta pt="10" x="0" y="0"/>
+        <delta pt="11" x="0" y="0"/>
+        <delta pt="12" x="0" y="0"/>
+        <delta pt="13" x="0" y="0"/>
+        <delta pt="14" x="0" y="0"/>
+        <delta pt="15" x="0" y="0"/>
+      </tuple>
+      <tuple>
+        <coord axis="ANIM" min="0.27374" value="0.3612" max="0.7186"/>
+        <delta pt="0" x="-1" y="10"/>
+        <delta pt="1" x="6" y="11"/>
+        <delta pt="2" x="0" y="24"/>
+        <delta pt="3" x="0" y="24"/>
+        <delta pt="4" x="-2" y="25"/>
+        <delta pt="5" x="-5" y="11"/>
+        <delta pt="6" x="0" y="10"/>
+        <delta pt="7" x="4" y="2"/>
+        <delta pt="8" x="0" y="-30"/>
+        <delta pt="9" x="0" y="-30"/>
+        <delta pt="10" x="4" y="-31"/>
+        <delta pt="11" x="-5" y="2"/>
+        <delta pt="12" x="0" y="0"/>
+        <delta pt="13" x="0" y="0"/>
+        <delta pt="14" x="0" y="0"/>
+        <delta pt="15" x="0" y="0"/>
+      </tuple>
+      <tuple>
+        <coord axis="ANIM" min="0.3612" value="0.61975" max="0.7186"/>
+        <delta pt="0" x="-1" y="7"/>
+        <delta pt="1" x="4" y="8"/>
+        <delta pt="2" x="0" y="17"/>
+        <delta pt="3" x="0" y="17"/>
+        <delta pt="4" x="-1" y="18"/>
+        <delta pt="5" x="-4" y="8"/>
+        <delta pt="6" x="0" y="7"/>
+        <delta pt="7" x="3" y="1"/>
+        <delta pt="8" x="0" y="-22"/>
+        <delta pt="9" x="0" y="-22"/>
+        <delta pt="10" x="3" y="-22"/>
+        <delta pt="11" x="-4" y="1"/>
+        <delta pt="12" x="0" y="0"/>
+        <delta pt="13" x="0" y="0"/>
+        <delta pt="14" x="0" y="0"/>
+        <delta pt="15" x="0" y="0"/>
+      </tuple>
+      <tuple>
+        <coord axis="ANIM" min="0.61975" value="0.7186" max="0.7186"/>
+        <delta pt="0" x="0" y="0"/>
+        <delta pt="1" x="0" y="0"/>
+        <delta pt="2" x="0" y="0"/>
+        <delta pt="3" x="0" y="0"/>
+        <delta pt="4" x="0" y="0"/>
+        <delta pt="5" x="0" y="0"/>
+        <delta pt="6" x="0" y="0"/>
+        <delta pt="7" x="0" y="0"/>
+        <delta pt="8" x="0" y="0"/>
+        <delta pt="9" x="0" y="0"/>
+        <delta pt="10" x="0" y="0"/>
+        <delta pt="11" x="0" y="0"/>
+        <delta pt="12" x="0" y="0"/>
+        <delta pt="13" x="0" y="0"/>
+        <delta pt="14" x="0" y="0"/>
+        <delta pt="15" x="0" y="0"/>
+      </tuple>
+    </glyphVariations>
+    <glyphVariations glyph="glyph0023">
+      <tuple>
+        <coord axis="ANIM" min="0.0" value="0.27374" max="0.7186"/>
+        <delta pt="0" x="0" y="0"/>
+        <delta pt="1" x="0" y="0"/>
+        <delta pt="2" x="0" y="0"/>
+        <delta pt="3" x="0" y="0"/>
+        <delta pt="4" x="0" y="0"/>
+        <delta pt="5" x="0" y="0"/>
+        <delta pt="6" x="0" y="0"/>
+        <delta pt="7" x="0" y="0"/>
+        <delta pt="8" x="0" y="0"/>
+        <delta pt="9" x="0" y="0"/>
+        <delta pt="10" x="0" y="0"/>
+        <delta pt="11" x="0" y="0"/>
+        <delta pt="12" x="0" y="0"/>
+        <delta pt="13" x="0" y="0"/>
+        <delta pt="14" x="0" y="0"/>
+        <delta pt="15" x="0" y="0"/>
+      </tuple>
+      <tuple>
+        <coord axis="ANIM" min="0.27374" value="0.3612" max="0.7186"/>
+        <delta pt="0" x="-1" y="10"/>
+        <delta pt="1" x="6" y="11"/>
+        <delta pt="2" x="0" y="24"/>
+        <delta pt="3" x="0" y="24"/>
+        <delta pt="4" x="-2" y="25"/>
+        <delta pt="5" x="-5" y="11"/>
+        <delta pt="6" x="0" y="10"/>
+        <delta pt="7" x="4" y="2"/>
+        <delta pt="8" x="0" y="-30"/>
+        <delta pt="9" x="0" y="-30"/>
+        <delta pt="10" x="4" y="-31"/>
+        <delta pt="11" x="-5" y="2"/>
+        <delta pt="12" x="0" y="0"/>
+        <delta pt="13" x="0" y="0"/>
+        <delta pt="14" x="0" y="0"/>
+        <delta pt="15" x="0" y="0"/>
+      </tuple>
+      <tuple>
+        <coord axis="ANIM" min="0.3612" value="0.61975" max="0.7186"/>
+        <delta pt="0" x="-1" y="7"/>
+        <delta pt="1" x="4" y="8"/>
+        <delta pt="2" x="0" y="17"/>
+        <delta pt="3" x="0" y="17"/>
+        <delta pt="4" x="-1" y="18"/>
+        <delta pt="5" x="-4" y="8"/>
+        <delta pt="6" x="0" y="7"/>
+        <delta pt="7" x="3" y="1"/>
+        <delta pt="8" x="0" y="-22"/>
+        <delta pt="9" x="0" y="-22"/>
+        <delta pt="10" x="3" y="-22"/>
+        <delta pt="11" x="-4" y="1"/>
+        <delta pt="12" x="0" y="0"/>
+        <delta pt="13" x="0" y="0"/>
+        <delta pt="14" x="0" y="0"/>
+        <delta pt="15" x="0" y="0"/>
+      </tuple>
+      <tuple>
+        <coord axis="ANIM" min="0.61975" value="0.7186" max="0.7186"/>
+        <delta pt="0" x="0" y="0"/>
+        <delta pt="1" x="0" y="0"/>
+        <delta pt="2" x="0" y="0"/>
+        <delta pt="3" x="0" y="0"/>
+        <delta pt="4" x="0" y="0"/>
+        <delta pt="5" x="0" y="0"/>
+        <delta pt="6" x="0" y="0"/>
+        <delta pt="7" x="0" y="0"/>
+        <delta pt="8" x="0" y="0"/>
+        <delta pt="9" x="0" y="0"/>
+        <delta pt="10" x="0" y="0"/>
+        <delta pt="11" x="0" y="0"/>
+        <delta pt="12" x="0" y="0"/>
+        <delta pt="13" x="0" y="0"/>
+        <delta pt="14" x="0" y="0"/>
+        <delta pt="15" x="0" y="0"/>
+      </tuple>
+    </glyphVariations>
+  </gvar>
+
+</ttFont>
