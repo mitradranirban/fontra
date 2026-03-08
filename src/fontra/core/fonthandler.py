@@ -254,6 +254,8 @@ class FontHandler:
                 await self.writableBackend.putFeatures(value)
             case "kerning":
                 await self.writableBackend.putKerning(value)
+            case "colorPalettes":
+                await self.backend.getColorPalettes(value)
             case "metaInfo":
                 await self.metaInfoProvider.putMetaInfo(
                     self.projectIdentifier, value, connection.authorizationToken
@@ -297,6 +299,10 @@ class FontHandler:
     @remoteMethod
     async def getCustomData(self, *, connection=None):
         return await self.getData("customData")
+
+    @remoteMethod
+    async def getColorPalettes(self, *, connection=None):
+        return await self.getData("colorPalettes")
 
     @remoteMethod
     async def getMetaInfo(self, *, connection=None):

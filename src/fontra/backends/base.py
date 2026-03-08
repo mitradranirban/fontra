@@ -6,6 +6,7 @@ from ..core.classes import (
     FontSource,
     Kerning,
     OpenTypeFeatures,
+    RGBAColor,
     ShaperFontData,
     VariableGlyph,
 )
@@ -39,6 +40,9 @@ class ReadableBaseBackend:
 
     async def getCustomData(self) -> dict[str, Any]:
         return {}
+
+    async def getColorPalettes(self) -> list[list[RGBAColor]]:
+        return []
 
     async def getUnitsPerEm(self) -> int:
         return 1000

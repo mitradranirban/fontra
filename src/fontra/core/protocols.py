@@ -13,6 +13,7 @@ from .classes import (
     ImageData,
     Kerning,
     OpenTypeFeatures,
+    RGBAColor,
     ShaperFontData,
     VariableGlyph,
 )
@@ -45,6 +46,9 @@ class ReadableFontBackend(Protocol):
         pass
 
     async def getCustomData(self) -> dict[str, Any]:
+        pass
+
+    async def getColorPalettes(self) -> list[list[RGBAColor]]:
         pass
 
     async def getUnitsPerEm(self) -> int:

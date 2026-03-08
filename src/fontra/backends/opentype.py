@@ -5,6 +5,7 @@ from itertools import product
 from os import PathLike
 from typing import Any, Generator
 
+from fontTools.colorLib import unbuilder as colrUnbuilder
 from fontTools.misc.fixedTools import fixedToFloat
 from fontTools.misc.psCharStrings import SimpleT2Decompiler
 from fontTools.pens.pointPen import GuessSmoothPointPen
@@ -25,6 +26,7 @@ from ..core.classes import (
     Layer,
     LineMetric,
     OpenTypeFeatures,
+    RGBAColor,
     ShaperFontData,
     ShaperFontGlyphOrderSorting,
     StaticGlyph,
@@ -86,6 +88,57 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         self.glyphMap = glyphMap
         self.glyphSet = self.font.getGlyphSet()
         self.variationGlyphSets: dict[str, Any] = {}
+        # COLR / CPAL
+        self.colrVersion: int = 0
+        self.colrV0Layers: dict[str, list[tuple[str, int]]] = {}
+        self.colrPaintGraphs: dict[str, Any] = {}
+        self.colrLayerList: list[Any] = []
+        self.colrVarIndexMap: list[Any] = []
+        self.colrVarStore: dict[str, Any] = {}
+        self.colorPalettes: list[list[RGBAColor]] = []
+        self.colrGlyphPaintEntries: dict[str, list[dict]] = {}
+
+        colrTable = self.font.get("COLR")
+        if colrTable is not None:
+            self.colrVersion = colrTable.version
+            if self.colrVersion == 0:
+                for baseGlyph, layerRecords in colrTable.ColorLayers.items():
+                    self.colrV0Layers[baseGlyph] = [
+                        (layer.name, layer.colorID) for layer in layerRecords
+                    ]
+            elif self.colrVersion >= 1:
+                colr = colrTable.table
+                # unbuildColrV1 returns {baseGlyphName: paintDict} for all base glyphs
+                self.colrPaintGraphs = colrUnbuilder.unbuildColrV1(
+                    colr.LayerList, colr.BaseGlyphList
+                )
+                # Build reverse index: component glyph → paint entries referencing it
+                self.colrGlyphPaintEntries: dict[str, list[dict]] = {}
+                for paintGraph in self.colrPaintGraphs.values():
+                    _indexPaintGlyphs(paintGraph, self.colrGlyphPaintEntries)
+                if getattr(colr, "VarIndexMap", None):
+                    self.colrVarIndexMap = list(colr.VarIndexMap.mapping)
+                if getattr(colr, "VarStore", None):
+                    self.colrVarStore = _serializeVarStore(colr.VarStore)
+
+        cpalTable = self.font.get("CPAL")
+        print("CPAL table:", cpalTable)
+        print("CPAL version:", getattr(cpalTable, "version", None))
+        print("CPAL palettes:", getattr(cpalTable, "palettes", None))
+        print("CPAL numPaletteEntries:", getattr(cpalTable, "numPaletteEntries", None))
+        if cpalTable is not None:
+            for palette in cpalTable.palettes:
+                self.colorPalettes.append(
+                    [
+                        RGBAColor(
+                            red=color.red / 255,
+                            green=color.green / 255,
+                            blue=color.blue / 255,
+                            alpha=color.alpha / 255,
+                        )
+                        for color in palette
+                    ]
+                )
 
     async def aclose(self) -> None:
         self.font.close()
@@ -142,6 +195,20 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             checkAndFixCFF2Compatibility(glyphName, layers)
         glyph.layers = layers
         glyph.sources = sources
+        # Attach COLRv0 layer list to customData
+        if glyphName in self.colrV0Layers:
+            glyph.customData["fontra.colrv0.layers"] = self.colrV0Layers[glyphName]
+
+        # Attach COLRv1 paint graph to customData
+        if glyphName in self.colrPaintGraphs:
+            glyph.customData["fontra.colrv1.paintGraph"] = self.colrPaintGraphs[
+                glyphName
+            ]
+        if glyphName in self.colrGlyphPaintEntries:
+            glyph.customData["fontra.colrv1.paintEntries"] = self.colrGlyphPaintEntries[
+                glyphName
+            ]
+
         return glyph
 
     def _getGlyphVariationLocations(self, glyphName: str) -> list[dict[str, float]]:
@@ -226,7 +293,22 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         return OpenTypeFeatures()
 
     async def getCustomData(self) -> dict[str, Any]:
-        return {}
+        data: dict[str, Any] = {}
+        if self.colrV0Layers:
+            data["com.github.googlei18n.ufo2ft.colorLayers"] = self.colrV0Layers
+        if self.colorPalettes:
+            data["com.github.googlei18n.ufo2ft.colorPalettes"] = [
+                [(c.red, c.green, c.blue, c.alpha) for c in palette]
+                for palette in self.colorPalettes
+            ]
+        if self.colrVarIndexMap:
+            data["fontra.colrv1.varIndexMap"] = self.colrVarIndexMap
+        if self.colrVarStore:
+            data["fontra.colrv1.varStore"] = self.colrVarStore
+        return data
+
+    async def getColorPalettes(self) -> list[list[RGBAColor]]:
+        return self.colorPalettes
 
     async def getShaperFontData(self) -> ShaperFontData | None:
         with self._getShaperFont() as font:
@@ -560,6 +642,52 @@ def buildStaticGlyph(glyphSet, glyphName: str) -> StaticGlyph:
     staticGlyph.xAdvance = ttGlyph.width
     # TODO: yAdvance, verticalOrigin
     return staticGlyph
+
+
+def _serializeVarStore(varStore) -> dict:
+    """Serialize a COLR VarStore to a JSON-safe dict for storage in customData."""
+    regions = []
+    for region in varStore.VarRegionList.Region:
+        axes = [
+            {
+                "startCoord": ax.StartCoord,
+                "peakCoord": ax.PeakCoord,
+                "endCoord": ax.EndCoord,
+            }
+            for ax in region.VarRegionAxis
+        ]
+        regions.append(axes)
+
+    varDataList = []
+    for varData in varStore.VarData:
+        varDataList.append(
+            {
+                "numShorts": varData.NumShorts,
+                "varRegionIndex": list(varData.VarRegionIndex),
+                "items": [list(item) for item in varData.Item],
+            }
+        )
+
+    return {"regions": regions, "varData": varDataList}
+
+
+def _indexPaintGlyphs(paint: dict, index: dict[str, list[dict]]) -> None:
+    """Recursively walk an unbuilt paint dict and index all PaintGlyph nodes."""
+    if not isinstance(paint, dict):
+        return
+    if paint.get("Format") == 10:  # PaintGlyph
+        glyphName = paint.get("Glyph")
+        if glyphName:
+            if glyphName not in index:
+                index[glyphName] = []
+            index[glyphName].append(paint)
+    for value in paint.values():
+        if isinstance(value, dict):
+            _indexPaintGlyphs(value, index)
+        elif isinstance(value, list):
+            for item in value:
+                if isinstance(item, dict):
+                    _indexPaintGlyphs(item, index)
 
 
 def locationToString(loc: dict[str, float]) -> str:
