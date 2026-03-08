@@ -34,8 +34,23 @@ export function renderCOLRv1(
   const glyphController = positionedGlyph?.glyph;
   if (!glyphController) return;
 
-  const paint = glyphController.instance?.customData?.[COLRV1_KEY];
+  const instanceCd = glyphController.instance?.customData;
+  const varGlyphCd = positionedGlyph?.varGlyph?.glyph?.customData;
+
+  let paint =
+    instanceCd?.[COLRV1_KEY] ??
+    instanceCd?.["fontra.colrv1.paintGraph"] ??
+    varGlyphCd?.["fontra.colrv1.paintGraph"];
+
   if (!paint) return;
+
+  // Convert raw fontTools format if needed
+  if (paint.Format != null) {
+    paint = _convertPaintGraph(paint);
+  }
+  if (paint.type !== "PaintColrLayers") {
+    paint = { type: "PaintColrLayers", layers: [paint] };
+  }
 
   const palettes = fontController.customData?.[PALETTES_KEY];
   if (!palettes?.length) return;
@@ -496,7 +511,118 @@ function _paletteColor(palette, index, alphaOverride = 1.0) {
     b * 255
   )},${finalAlpha.toFixed(4)})`;
 }
+// ---------------------------------------------------------------------------
+// fontTools raw format → Fontra paint format converter
+// ---------------------------------------------------------------------------
 
+function _convertPaintGraph(paint) {
+  if (!paint || typeof paint !== "object") return paint;
+  const fmt = paint.Format;
+
+  if (fmt === 1)
+    return {
+      type: "PaintColrLayers",
+      layers: (paint.Layers ?? []).map(_convertPaintGraph),
+    };
+  if (fmt === 2)
+    return {
+      type: "PaintSolid",
+      paletteIndex: paint.PaletteIndex ?? 0,
+      alpha: paint.Alpha ?? 1,
+    };
+  if (fmt === 4)
+    return {
+      type: "PaintLinearGradient",
+      colorLine: _convertColorLine(paint.ColorLine),
+      x0: paint.x0,
+      y0: paint.y0,
+      x1: paint.x1,
+      y1: paint.y1,
+      x2: paint.x2,
+      y2: paint.y2,
+    };
+  if (fmt === 6)
+    return {
+      type: "PaintRadialGradient",
+      colorLine: _convertColorLine(paint.ColorLine),
+      x0: paint.x0,
+      y0: paint.y0,
+      r0: paint.r0,
+      x1: paint.x1,
+      y1: paint.y1,
+      r1: paint.r1,
+    };
+  if (fmt === 8)
+    return {
+      type: "PaintSweepGradient",
+      colorLine: _convertColorLine(paint.ColorLine),
+      centerX: paint.centerX,
+      centerY: paint.centerY,
+      startAngle: paint.startAngle,
+      endAngle: paint.endAngle,
+    };
+  if (fmt === 10)
+    return {
+      type: "PaintGlyph",
+      glyphName: paint.Glyph,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 11) return { type: "PaintColrGlyph", glyphName: paint.Glyph };
+  if (fmt === 14)
+    return {
+      type: "PaintTranslate",
+      dx: paint.dx,
+      dy: paint.dy,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 16)
+    return {
+      type: "PaintScale",
+      scaleX: paint.scaleX,
+      scaleY: paint.scaleY,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 24)
+    return {
+      type: "PaintRotate",
+      angle: paint.angle,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 26)
+    return {
+      type: "PaintSkew",
+      xSkewAngle: paint.xSkewAngle,
+      ySkewAngle: paint.ySkewAngle,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 28)
+    return {
+      type: "PaintTransform",
+      transform: paint.Transform,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 32)
+    return {
+      type: "PaintComposite",
+      sourcePaint: _convertPaintGraph(paint.SourcePaint),
+      compositeMode: paint.CompositeMode,
+      backdropPaint: _convertPaintGraph(paint.BackdropPaint),
+    };
+
+  return paint;
+}
+
+function _convertColorLine(colorLine) {
+  if (!colorLine) return { colorStops: [] };
+  return {
+    colorStops: (colorLine.ColorStop ?? []).map((s) => ({
+      paletteIndex: s.PaletteIndex ?? 0,
+      alpha: s.Alpha ?? 1,
+      stopOffset: s.StopOffset ?? 0,
+    })),
+    extend: colorLine.Extend ?? "pad",
+  };
+}
 /**
  * Fill the current clip region with a style.
  * Canvas 2D has no "fill clip region" primitive — we use a large rect.

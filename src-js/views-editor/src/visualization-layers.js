@@ -135,8 +135,10 @@ export const colrv1PaintOverlayDefinition = {
   name: "COLRv1 Paint",
 
   draw(context, positionedGlyph, parameters, model, controller) {
-    const paint = positionedGlyph?.glyph?.instance?.customData?.[COLRV1_KEY];
-    if (!paint) return;
+    const instancePaint = positionedGlyph?.glyph?.instance?.customData?.[COLRV1_KEY];
+    const varGlyphPaint =
+      positionedGlyph?.varGlyph?.glyph?.customData?.["fontra.colrv1.paintGraph"];
+    if (!instancePaint && !varGlyphPaint) return;
 
     renderCOLRv1(context, positionedGlyph, model.fontController, _currentAxisValues, 0);
   },
