@@ -148,6 +148,118 @@ const PAINT_PARAM_SCHEMA = {
 const normalizePaintType = (t) => t?.replace(/^PaintVar/, "Paint") ?? t;
 
 // ---------------------------------------------------------------------------
+// fontTools raw format → Fontra paint format converter
+// ---------------------------------------------------------------------------
+
+function convertPaintGraph(paint) {
+  if (!paint || typeof paint !== "object") return paint;
+  const fmt = paint.Format;
+
+  if (fmt === 1)
+    return {
+      type: "PaintColrLayers",
+      layers: (paint.Layers ?? []).map(convertPaintGraph),
+    };
+  if (fmt === 2)
+    return {
+      type: "PaintSolid",
+      paletteIndex: paint.PaletteIndex ?? 0,
+      alpha: paint.Alpha ?? 1,
+    };
+  if (fmt === 4)
+    return {
+      type: "PaintLinearGradient",
+      colorLine: convertColorLine(paint.ColorLine),
+      x0: paint.x0,
+      y0: paint.y0,
+      x1: paint.x1,
+      y1: paint.y1,
+      x2: paint.x2,
+      y2: paint.y2,
+    };
+  if (fmt === 6)
+    return {
+      type: "PaintRadialGradient",
+      colorLine: convertColorLine(paint.ColorLine),
+      x0: paint.x0,
+      y0: paint.y0,
+      r0: paint.r0,
+      x1: paint.x1,
+      y1: paint.y1,
+      r1: paint.r1,
+    };
+  if (fmt === 8)
+    return {
+      type: "PaintSweepGradient",
+      colorLine: convertColorLine(paint.ColorLine),
+      centerX: paint.centerX,
+      centerY: paint.centerY,
+      startAngle: paint.startAngle,
+      endAngle: paint.endAngle,
+    };
+  if (fmt === 10)
+    return {
+      type: "PaintGlyph",
+      glyphName: paint.Glyph,
+      paint: convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 11) return { type: "PaintColrGlyph", glyphName: paint.Glyph };
+  if (fmt === 12)
+    return {
+      type: "PaintTransform",
+      transform: paint.Transform,
+      paint: convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 14)
+    return {
+      type: "PaintTranslate",
+      dx: paint.dx,
+      dy: paint.dy,
+      paint: convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 16)
+    return {
+      type: "PaintScale",
+      scaleX: paint.scaleX,
+      scaleY: paint.scaleY,
+      paint: convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 24)
+    return {
+      type: "PaintRotate",
+      angle: paint.angle,
+      paint: convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 26)
+    return {
+      type: "PaintSkew",
+      xSkewAngle: paint.xSkewAngle,
+      ySkewAngle: paint.ySkewAngle,
+      paint: convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 28)
+    return {
+      type: "PaintComposite",
+      sourcePaint: convertPaintGraph(paint.SourcePaint),
+      compositeMode: paint.CompositeMode,
+      backdropPaint: convertPaintGraph(paint.BackdropPaint),
+    };
+
+  return paint;
+}
+
+function convertColorLine(colorLine) {
+  if (!colorLine) return { colorStops: [] };
+  return {
+    colorStops: (colorLine.ColorStop ?? []).map((s) => ({
+      paletteIndex: s.PaletteIndex ?? 0,
+      alpha: s.Alpha ?? 1,
+      stopOffset: s.StopOffset ?? 0,
+    })),
+    extend: colorLine.Extend ?? "pad",
+  };
+}
+// ---------------------------------------------------------------------------
 // Module-level pure helpers
 // ---------------------------------------------------------------------------
 
@@ -439,24 +551,18 @@ export default class ColorLayersPanel extends Panel {
       ["selectedGlyphName"],
       () => this.update()
     );
-    this.sceneController.sceneSettingsController.addKeyListener(
-      ["fontLocationSourceMapped"],
-      () => this._onLocationChange()
+    this.sceneController.sceneSettingsController.addKeyListener(["location"], () =>
+      this._onLocationChange()
     );
     this.sceneController.addCurrentGlyphChangeListener(() => this.update());
   }
 
-  _onLocationChange = () => {
-    // Read the fully-mapped source location — this is what drive interpolation
-    const axisValues =
-      this.sceneController.sceneSettings.fontLocationSourceMapped ?? {};
-
+  _onLocationChange() {
     const pg = this.sceneController.sceneModel.getSelectedPositionedGlyph();
     const layerGlyph = pg?.glyph?.instance;
-    if (!layerGlyph?.customData?.[COLRV1KEY]) return;
-
-    this.renderPreview(layerGlyph, axisValues);
-  };
+    if (!layerGlyph?.customData?.[COLRV1_KEY]) return;
+    this.update();
+  }
 
   getContentElement() {
     this.colorLayersForm = new Form();
@@ -652,18 +758,39 @@ export default class ColorLayersPanel extends Panel {
 
     this._currentGlyphName = glyphName;
     const pg = this.sceneController.sceneModel.getSelectedPositionedGlyph();
-    const layerGlyph = pg?.glyph?.instance;
+
     const varGlyphController =
       await this.sceneController.sceneModel.getSelectedVariableGlyphController();
     const varGlyph = varGlyphController?.glyph;
-    const hasV1 = !!layerGlyph?.customData?.[COLRV1_KEY];
+    const instanceGlyph = pg?.glyph?.instance;
+    const defaultSource =
+      varGlyph?.sources?.find((s) => !s.inactive) ?? varGlyph?.sources?.[0];
+    const ttfLayerGlyph = varGlyph?.layers?.[defaultSource?.layerName]?.glyph;
+    const layerGlyph =
+      instanceGlyph?.customData?.[COLRV1_KEY] != null ? instanceGlyph : ttfLayerGlyph;
+
+    // TTF paint lives on varGlyph.customData — synthesize a layerGlyph-like object
+    const ttfPaintRaw = varGlyph?.customData?.["fontra.colrv1.paintGraph"];
+    let ttfPaintGraph = ttfPaintRaw != null ? convertPaintGraph(ttfPaintRaw) : null;
+
+    // ensure root is always PaintColrLayers so _renderV1UI finds .layers
+    if (ttfPaintGraph != null && ttfPaintGraph.type !== "PaintColrLayers") {
+      ttfPaintGraph = { type: "PaintColrLayers", layers: [ttfPaintGraph] };
+    }
+    const effectiveLayerGlyph =
+      layerGlyph?.customData?.[COLRV1_KEY] != null
+        ? layerGlyph
+        : ttfPaintGraph != null
+        ? { customData: { [COLRV1_KEY]: ttfPaintGraph } }
+        : null;
+
+    const hasV1 = !!effectiveLayerGlyph?.customData?.[COLRV1_KEY];
     const hasV0 = !!varGlyph?.customData?.[CUSTOM_DATA_KEY]?.length;
 
-    if (hasV1) this._renderV1UI(layerGlyph, glyphName, palette);
+    if (hasV1) this._renderV1UI(effectiveLayerGlyph, glyphName, palette);
     else if (hasV0) this._renderV0UI(varGlyph, glyphName, palette);
     else this._renderEmptyUI(glyphName, palette);
   }
-
   _renderEmptyUI(glyphName, palette) {
     this.colorLayersForm.setFieldDescriptions([
       { type: "text", value: translate("color-layers.no-layers-yet") },
