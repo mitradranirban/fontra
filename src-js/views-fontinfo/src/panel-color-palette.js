@@ -88,7 +88,8 @@ export class ColorPalettesPanel extends BaseInfoPanel {
 
   async setupUI() {
     const palettes = structuredClone(
-      this.fontController.customData?.[PALETTES_KEY] ?? [[[0, 0, 0, 1.0]]]
+      this.fontController.colorPalettes ??
+        this.fontController.customData?.[PALETTES_KEY] ?? [[[0, 0, 0, 1.0]]]
     );
 
     // Clamp in case palettes were removed
