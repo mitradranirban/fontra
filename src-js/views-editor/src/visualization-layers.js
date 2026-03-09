@@ -2,7 +2,13 @@
 
 import { withSavedState } from "@fontra/core/utils.js";
 import { mulScalar } from "@fontra/core/var-funcs.js";
-import { COLRV1_KEY, renderCOLRv1 } from "./colrv1-canvas-renderer.js";
+import {
+  COLRV1_KEY,
+  getPaintGraph,
+  getTagLocation,
+  renderCOLRv1,
+} from "./colrv1-canvas-renderer.js";
+
 import { equalGlyphSelection } from "./scene-controller.js";
 
 // ---------------------------------------------------------------------------
@@ -117,33 +123,30 @@ export class VisualizationContext {
 // ---------------------------------------------------------------------------
 // COLRv1 inline layer definition
 //
-// This is injected at runtime into any VisualizationLayers instance that
-// uses the standard visualizationLayerDefinitions array (see
-// visualization-layer-definitions.js where this entry is also registered).
-//
-// Having it here as well means it is available to unit tests and to any
-// custom VisualizationLayers instances built outside the editor.
 // ---------------------------------------------------------------------------
-let _currentAxisValues = {};
-
 export function setColrv1AxisValues(axisValues) {
-  _currentAxisValues = axisValues ?? {};
+  /* no-op — now read live in draw() */
 }
-export const visualizationLayerDefinitions = [];
 export const colrv1PaintOverlayDefinition = {
   identifier: "fontra.colrv1.paint",
   name: "COLRv1 Paint",
 
   draw(context, positionedGlyph, parameters, model, controller) {
-    const instancePaint = positionedGlyph?.glyph?.instance?.customData?.[COLRV1_KEY];
-    const varGlyphPaint =
-      positionedGlyph?.varGlyph?.glyph?.customData?.["fontra.colrv1.paintGraph"];
-    if (!instancePaint && !varGlyphPaint) return;
+    // Resolve paint from all possible data paths
+    const instanceCd = positionedGlyph?.glyph?.instance?.customData;
+    const varGlyphCd =
+      positionedGlyph?.varGlyph?.glyph?.customData ?? // VariableGlyphController.glyph.customData
+      positionedGlyph?.varGlyph?.customData ?? // direct customData
+      positionedGlyph?.glyph?.varGlyph?.customData ?? // glyph-side nesting
+      positionedGlyph?.varGlyph?.instance?.customData; // interpolated instance
 
-    renderCOLRv1(context, positionedGlyph, model.fontController, _currentAxisValues, 0);
+    const paint = getPaintGraph(instanceCd) ?? getPaintGraph(varGlyphCd);
+    if (!paint) return;
+
+    const axisValues = getTagLocation(model.fontController, model.sceneSettings);
+    renderCOLRv1(context, positionedGlyph, model.fontController, axisValues, 0);
   },
 };
-
 // ---------------------------------------------------------------------------
 // Private helpers
 // ---------------------------------------------------------------------------
