@@ -14,6 +14,7 @@ from fontra.core.classes import (
     FontAxis,
     FontSource,
     LineMetric,
+    RGBAColor,
     VariableGlyph,
 )
 from fontra.core.fonthandler import FontHandler
@@ -310,3 +311,170 @@ async def test_font_sources_names(fontPath, expectedNames):
     sources = await font.getSources()
     sourceNames = [s.name for s in sources.values()]
     assert sourceNames == expectedNames
+
+
+colrCpalFontsTestData = [
+    # COLRv0 + CPAL: TestColor_Regular.ttf
+    (
+        dataDir / "colorfonts/v0/TestColor_Regular.ttf",
+        "A",  # base glyph with COLRv0 layers
+    ),
+    # v1 VARIABLE - fire.ttf has fvar + COLR v1 → expect VarIndexMap/VarStore
+    (
+        dataDir / "colorfonts/v1/fire.ttf",
+        "glyph0001",  # base glyph with COLRv1 paint graph
+    ),
+]
+
+
+@pytest.mark.parametrize("fontPath, baseGlyphName", colrCpalFontsTestData)
+async def test_colr_parsing_and_color_palettes(fontPath, baseGlyphName):
+    """OTFBackend parses COLR tables (v0/v1), builds paint graphs/indices, exposes CPAL palettes"""
+    font = getFileSystemBackend(fontPath)
+
+    # Verify COLR version detection and data structures
+    customData = await font.getCustomData()
+    if fontPath.name.startswith("TestColor"):  # v0
+        assert "com.github.googlei18n.ufo2ft.colorLayers" in customData
+        colrV0Layers = customData["com.github.googlei18n.ufo2ft.colorLayers"]
+        assert baseGlyphName in colrV0Layers
+        layers = colrV0Layers[baseGlyphName]
+        assert isinstance(layers, list) and len(layers) > 0
+        assert all(isinstance(layer, tuple) and len(layer) == 2 for layer in layers)
+    else:  # v1
+        assert "fontra.colrv1.varIndexMap" not in customData or isinstance(
+            customData.get("fontra.colrv1.varIndexMap"), list
+        )
+
+    glyph = await font.getGlyph(baseGlyphName)
+    assert glyph is not None
+    assert isinstance(glyph.customData, dict)
+
+    # COLRv0 layers on glyph
+    v0Layers = glyph.customData.get("fontra.colrv0.layers")
+    if v0Layers:
+        assert isinstance(v0Layers, list)
+        layerGlyph, colorID = v0Layers[0]
+        assert isinstance(layerGlyph, str) and isinstance(colorID, int)
+
+    # COLRv1 paint graph and glyph paint entries on glyph
+    paintGraph = glyph.customData.get("fontra.colrv1.paintGraph")
+    paintEntries = glyph.customData.get("fontra.colrv1.paintEntries")
+    if paintGraph:
+        assert isinstance(paintGraph, dict)
+        assert paintGraph.get("Format") in (0, 1)  # Root paint record
+    if paintEntries:
+        assert isinstance(paintEntries, list)
+        assert all(
+            "Format" in entry for entry in paintEntries if isinstance(entry, dict)
+        )
+
+    # CPAL palettes (common to both)
+    palettes = await font.getColorPalettes()
+    assert isinstance(palettes, list) and len(palettes) > 0
+    firstColor = palettes[0][0]
+    assert isinstance(firstColor, RGBAColor)
+    assert all(
+        0.0 <= c <= 1.0
+        for c in (firstColor.red, firstColor.green, firstColor.blue, firstColor.alpha)
+    )
+
+    # Round-trip verification in getCustomData()
+    cpalData = customData["com.github.googlei18n.ufo2ft.colorPalettes"]
+    assert isinstance(cpalData, list) and len(cpalData) == len(palettes)
+    firstTuple = cpalData[0][0]
+    assert firstTuple == (
+        firstColor.red,
+        firstColor.green,
+        firstColor.blue,
+        firstColor.alpha,
+    )
+
+    # VarStore serialization (if present in v1)
+    varStore = customData.get("fontra.colrv1.varStore")
+    if varStore:
+        assert (
+            isinstance(varStore, dict)
+            and "regions" in varStore
+            and "varData" in varStore
+        )
+        assert isinstance(varStore["regions"], list)
+        if varStore["regions"]:
+            region = varStore["regions"][0]
+            assert isinstance(region, list) and len(region) > 0
+            axis = region[0]
+            assert set(axis) == {"startCoord", "peakCoord", "endCoord"}
+
+
+@pytest.mark.parametrize(
+    "fontPath, baseGlyphName, isV1",
+    [
+        # v0
+        (dataDir / "colorfonts/v0/TestColor_Regular.ttf", "A", False),
+        # v1: confirmed "baseglyph" from ttx COLR.BaseGlyphList
+        (dataDir / "colorfonts/v1/fire.ttf", "baseglyph", True),
+    ],
+)
+async def test_colr_base_glyph_data(fontPath, baseGlyphName, isV1):
+    """Test COLR data attachment to confirmed BASE glyphs."""
+    font = getFileSystemBackend(fontPath)
+    glyph = await font.getGlyph(baseGlyphName)
+    assert glyph is not None
+
+    customData = glyph.customData
+    assert customData
+
+    if not isV1:
+        # COLRv0 layers
+        layers = customData["fontra.colrv0.layers"]
+        assert isinstance(layers, list) and len(layers) > 0
+    else:
+        # COLRv1: paintGraph with Format 1 (PaintColrLayers)
+        paintGraph = customData["fontra.colrv1.paintGraph"]
+        assert isinstance(paintGraph, dict)
+        assert paintGraph["Format"] == 12  # PaintTransform ✓
+
+        innerPaint = paintGraph["Paint"]
+        assert isinstance(innerPaint, dict)
+        assert innerPaint["Format"] == 1  # PaintColrLayers ✓
+
+        # unbuilder uses "Layers" array, not NumLayers/FirstLayerIndex
+        layers = innerPaint["Layers"]
+        assert (
+            isinstance(layers, list) and len(layers) == 24
+        )  # Matches ttx LayerCount=24 ✓
+
+        # First layer: nested PaintTransform → PaintGlyph('glyph0001') ✓
+        firstLayer = layers[0]
+        assert firstLayer["Format"] == 12
+        glyphPaint = firstLayer["Paint"]["Paint"]  # Deeply nested
+        assert glyphPaint["Format"] == 10  # PaintGlyph
+        assert glyphPaint["Glyph"] == "glyph0001"
+
+        # CPAL always present
+        palettes = await font.getColorPalettes()
+        assert len(palettes) > 0
+
+
+@pytest.mark.parametrize("fontPath", [dataDir / "colorfonts/v1/fire.ttf"])
+async def test_fire_variable_colrv1(fontPath):
+    """Test fire.ttf fvar + COLRv1 variation data serialization."""
+    font = getFileSystemBackend(fontPath)
+
+    # fvar axes
+    axes = await font.getAxes()
+    assert len(axes.axes) > 0  # Variable font
+
+    customData = await font.getCustomData()
+
+    # COLRv1 variable structures
+    assert "fontra.colrv1.varIndexMap" in customData
+    varIdxMap = customData["fontra.colrv1.varIndexMap"]
+    assert isinstance(varIdxMap, list)
+
+    varStore = customData["fontra.colrv1.varStore"]
+    assert isinstance(varStore, dict)
+    regions = varStore["regions"]
+    assert isinstance(regions, list) and len(regions) > 0
+    regionAxes = regions[0][0]  # First region, first axis
+    assert set(regionAxes) == {"startCoord", "peakCoord", "endCoord"}
