@@ -1,29 +1,114 @@
 // src-js/views-editor/src/colrv1-canvas-renderer.js
+// src-js/views-editor/src/colrv1-canvas-renderer.js
 //
 // Renders a COLRv1 paint graph onto a Canvas 2D context.
 // Called from the "colrv1-paint-overlay" visualization layer.
 //
 // Coordinate system note:
-//   Fontra canvas has Y-up (font coordinates), Canvas 2D has Y-down.
-//   The scene transform already flips Y before calling draw(), so we
-//   do NOT negate Y here — we draw in font coordinates directly.
+// Fontra canvas has Y-up (font coordinates), Canvas 2D has Y-down.
+// The scene transform already flips Y before calling draw(), so we
+// do NOT negate Y here — we draw in font coordinates directly.
 
 export const PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes";
 export const COLRV1_KEY = "colorv1";
 
 // ---------------------------------------------------------------------------
+// Tag location builder
+// Build a location dict keyed by BOTH axis.tag AND axis.name so resolveVal
+// matches regardless of whether keyframes store "SHDW" or "shadow".
+// ---------------------------------------------------------------------------
+
+export function getTagLocation(fontController, sceneSettings) {
+  const userLoc = sceneSettings?.fontLocationUser ?? {};
+  const sourceLoc = fontController?.mapUserLocationToSourceLocation
+    ? fontController.mapUserLocationToSourceLocation(userLoc)
+    : userLoc;
+
+  const tagLoc = { ...sourceLoc };
+  for (const axis of fontController?.axes?.axes ?? []) {
+    const val = sourceLoc[axis.name];
+    if (val !== undefined) {
+      tagLoc[axis.tag] = val;
+      tagLoc[axis.name] = val;
+    }
+  }
+  return tagLoc;
+}
+
+// ---------------------------------------------------------------------------
+// Paint graph resolver — handles both .fontra and raw TTF paintEntries
+// ---------------------------------------------------------------------------
+
+export function getPaintGraph(customData) {
+  if (!customData) return null;
+
+  // .fontra source — already in Fontra format (has "type" key)
+  const fontraFormat = customData[COLRV1_KEY];
+  if (fontraFormat) return fontraFormat;
+
+  // Check fontra.colrv1.paintGraph — may be Fontra format OR raw fontTools format
+  const paintGraph = customData["fontra.colrv1.paintGraph"];
+  if (paintGraph) {
+    // Raw fontTools format has numeric "Format" key, Fontra format has "type"
+    if (paintGraph.Format != null) return _convertPaintGraph(paintGraph);
+    return paintGraph; // already Fontra format (.fontra source)
+  }
+
+  // TTF backend — explicit raw paintGraph (alternate storage key)
+  const rawGraph = customData["fontra.colrv1.paintGraph.raw"];
+  if (rawGraph?.Format != null) return _convertPaintGraph(rawGraph);
+
+  // TTF backend — raw paintEntries array → wrap in PaintColrLayers
+  const rawEntries = customData["fontra.colrv1.paintEntries"];
+  if (rawEntries?.length) {
+    return _convertPaintGraph({ Format: 1, Layers: rawEntries });
+  }
+
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Variable value resolution
+// ---------------------------------------------------------------------------
+
+export function resolveVal(val, axisValues) {
+  if (val == null) return 0;
+  if (typeof val === "number") return val;
+  if (typeof val !== "object") return 0;
+
+  const base = val.default ?? 0;
+  if (!val.keyframes?.length) return base;
+
+  // Group keyframes by axis
+  const byAxis = new Map();
+  for (const kf of val.keyframes) {
+    if (!byAxis.has(kf.axis)) byAxis.set(kf.axis, []);
+    byAxis.get(kf.axis).push(kf);
+  }
+
+  // Use first axis (single-axis model)
+  const [axis, kfs] = [...byAxis.entries()][0];
+  const loc = axisValues?.[axis] ?? 0;
+  const sorted = [...kfs].sort((a, b) => a.loc - b.loc);
+
+  if (loc <= sorted[0].loc) return sorted[0].value;
+  if (loc >= sorted[sorted.length - 1].loc) return sorted[sorted.length - 1].value;
+
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const lo = sorted[i],
+      hi = sorted[i + 1];
+    if (loc >= lo.loc && loc <= hi.loc) {
+      const t = (loc - lo.loc) / (hi.loc - lo.loc);
+      return lo.value + t * (hi.value - lo.value);
+    }
+  }
+  return base;
+}
+
+// ---------------------------------------------------------------------------
 // Public entry point
 // ---------------------------------------------------------------------------
 
-/**
- * Render the COLRv1 paint graph for a single positioned glyph.
- *
- * @param {CanvasRenderingContext2D} ctx   - The canvas context (already transformed by scene)
- * @param {object}  positionedGlyph        - Fontra positionedGlyph object
- * @param {object}  fontController         - For palette data + sibling glyph lookup
- * @param {object}  axisValues             - { axisTag: normalizedValue, ... } at current location
- * @param {number}  activePaletteIndex     - Which CPAL palette row to use
- */
 export function renderCOLRv1(
   ctx,
   positionedGlyph,
@@ -35,22 +120,12 @@ export function renderCOLRv1(
   if (!glyphController) return;
 
   const instanceCd = glyphController.instance?.customData;
-  const varGlyphCd = positionedGlyph?.varGlyph?.glyph?.customData;
+  const varGlyphCd =
+    positionedGlyph?.varGlyph?.glyph?.customData ??
+    positionedGlyph?.varGlyph?.customData;
 
-  let paint =
-    instanceCd?.[COLRV1_KEY] ??
-    instanceCd?.["fontra.colrv1.paintGraph"] ??
-    varGlyphCd?.["fontra.colrv1.paintGraph"];
-
+  let paint = getPaintGraph(instanceCd) ?? getPaintGraph(varGlyphCd);
   if (!paint) return;
-
-  // Convert raw fontTools format if needed
-  if (paint.Format != null) {
-    paint = _convertPaintGraph(paint);
-  }
-  if (paint.type !== "PaintColrLayers") {
-    paint = { type: "PaintColrLayers", layers: [paint] };
-  }
 
   const palettes = fontController.customData?.[PALETTES_KEY];
   if (!palettes?.length) return;
@@ -74,54 +149,6 @@ export function renderCOLRv1(
 }
 
 // ---------------------------------------------------------------------------
-// Variable value resolution
-// ---------------------------------------------------------------------------
-
-/**
- * Resolve a value that is either:
- *   - a plain number (static)
- *   - { default: number, keyframes: [{axis, loc, value}, ...] }
- *
- * Keyframes on the same axis are linearly interpolated.
- * Multiple axes are applied additively (delta from default).
- */
-export function resolveVal(val, axisValues) {
-  if (val == null) return 0;
-  if (typeof val === "number") return val;
-  if (typeof val !== "object") return 0;
-
-  const base = val.default ?? 0;
-  if (!val.keyframes?.length) return base;
-
-  // Group keyframes by axis
-  const byAxis = new Map();
-  for (const kf of val.keyframes) {
-    if (!byAxis.has(kf.axis)) byAxis.set(kf.axis, []);
-    byAxis.get(kf.axis).push(kf);
-  }
-
-  // Use first axis (single-axis masterless model)
-  const [axis, kfs] = [...byAxis.entries()][0];
-  const loc = axisValues?.[axis] ?? 0;
-  const sorted = [...kfs].sort((a, b) => a.loc - b.loc);
-
-  // Clamp to endpoints
-  if (loc <= sorted[0].loc) return sorted[0].value;
-  if (loc >= sorted[sorted.length - 1].loc) return sorted[sorted.length - 1].value;
-
-  // Linear interpolation — return ABSOLUTE value, not delta
-  for (let i = 0; i < sorted.length - 1; i++) {
-    const lo = sorted[i],
-      hi = sorted[i + 1];
-    if (loc >= lo.loc && loc <= hi.loc) {
-      const t = (loc - lo.loc) / (hi.loc - lo.loc);
-      return lo.value + t * (hi.value - lo.value); // ← no "- base"
-    }
-  }
-  return base;
-}
-
-// ---------------------------------------------------------------------------
 // Paint graph walker
 // ---------------------------------------------------------------------------
 
@@ -137,7 +164,7 @@ function _renderPaint(
 ) {
   if (!paint) return;
   if (_depth > 32) {
-    console.warn("COLRv1: max depth");
+    console.warn("COLRv1: max recursion depth");
     return;
   }
 
@@ -159,7 +186,10 @@ function _renderPaint(
     }
 
     case "PaintGlyph": {
-      const path2d = positionedGlyph?.glyph?.flattenedPath2d;
+      // Look up named glyph outline — NOT the current positionedGlyph
+      const path2d =
+        _getOutlinePath2D(paint.glyphName, fontController, outlineCache) ??
+        positionedGlyph?.glyph?.flattenedPath2d;
       ctx.save();
       if (path2d) ctx.clip(path2d);
       _renderPaint(
@@ -176,12 +206,32 @@ function _renderPaint(
       break;
     }
 
+    case "PaintColrGlyph": {
+      // Recursively render a glyph that has its own COLR entry
+      const refGlyph = fontController.getCachedGlyph?.(paint.glyphName);
+      const refCd = refGlyph?.customData ?? refGlyph?.instance?.customData;
+      const refPaint = getPaintGraph(refCd);
+      if (refPaint) {
+        _renderPaint(
+          ctx,
+          refPaint,
+          palette,
+          axisValues,
+          fontController,
+          outlineCache,
+          positionedGlyph,
+          _depth + 1
+        );
+      }
+      break;
+    }
+
     case "PaintSolid":
     case "PaintVarSolid": {
       const alpha = resolveVal(paint.alpha, axisValues);
       if (alpha <= 0) break;
       ctx.fillStyle = _paletteColor(palette, paint.paletteIndex, alpha);
-      ctx.fillRect(-100000, -100000, 200000, 200000);
+      _fillBig(ctx);
       break;
     }
 
@@ -195,7 +245,7 @@ function _renderPaint(
       );
       _applyColorLine(grad, paint.colorLine, palette, axisValues);
       ctx.fillStyle = grad;
-      ctx.fillRect(-100000, -100000, 200000, 200000);
+      _fillBig(ctx);
       break;
     }
 
@@ -212,8 +262,10 @@ function _renderPaint(
         );
         _applyColorLine(grad, paint.colorLine, palette, axisValues);
         ctx.fillStyle = grad;
-        ctx.fillRect(-100000, -100000, 200000, 200000);
-      } catch (e) {}
+        _fillBig(ctx);
+      } catch (e) {
+        /* degenerate radii */
+      }
       break;
     }
 
@@ -227,7 +279,7 @@ function _renderPaint(
         );
         _applyColorLine(grad, paint.colorLine, palette, axisValues);
         ctx.fillStyle = grad;
-        ctx.fillRect(-100000, -100000, 200000, 200000);
+        _fillBig(ctx);
       } catch (e) {}
       break;
     }
@@ -268,6 +320,29 @@ function _renderPaint(
       break;
     }
 
+    case "PaintRotateAroundCenter":
+    case "PaintVarRotateAroundCenter": {
+      const cx = resolveVal(paint.centerX, axisValues);
+      const cy = resolveVal(paint.centerY, axisValues);
+      const angle = resolveVal(paint.angle, axisValues) * Math.PI * 2;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+      ctx.translate(-cx, -cy);
+      _renderPaint(
+        ctx,
+        paint.paint,
+        palette,
+        axisValues,
+        fontController,
+        outlineCache,
+        positionedGlyph,
+        _depth + 1
+      );
+      ctx.restore();
+      break;
+    }
+
     case "PaintScale":
     case "PaintVarScale": {
       ctx.save();
@@ -275,6 +350,73 @@ function _renderPaint(
         resolveVal(paint.scaleX ?? paint.scale, axisValues) ?? 1,
         resolveVal(paint.scaleY ?? paint.scale, axisValues) ?? 1
       );
+      _renderPaint(
+        ctx,
+        paint.paint,
+        palette,
+        axisValues,
+        fontController,
+        outlineCache,
+        positionedGlyph,
+        _depth + 1
+      );
+      ctx.restore();
+      break;
+    }
+
+    case "PaintScaleAroundCenter":
+    case "PaintVarScaleAroundCenter": {
+      const cx = resolveVal(paint.centerX, axisValues);
+      const cy = resolveVal(paint.centerY, axisValues);
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(
+        resolveVal(paint.scaleX, axisValues) ?? 1,
+        resolveVal(paint.scaleY, axisValues) ?? 1
+      );
+      ctx.translate(-cx, -cy);
+      _renderPaint(
+        ctx,
+        paint.paint,
+        palette,
+        axisValues,
+        fontController,
+        outlineCache,
+        positionedGlyph,
+        _depth + 1
+      );
+      ctx.restore();
+      break;
+    }
+
+    case "PaintScaleUniform":
+    case "PaintVarScaleUniform": {
+      const s = resolveVal(paint.scale, axisValues) ?? 1;
+      ctx.save();
+      ctx.scale(s, s);
+      _renderPaint(
+        ctx,
+        paint.paint,
+        palette,
+        axisValues,
+        fontController,
+        outlineCache,
+        positionedGlyph,
+        _depth + 1
+      );
+      ctx.restore();
+      break;
+    }
+
+    case "PaintScaleUniformAroundCenter":
+    case "PaintVarScaleUniformAroundCenter": {
+      const cx = resolveVal(paint.centerX, axisValues);
+      const cy = resolveVal(paint.centerY, axisValues);
+      const s = resolveVal(paint.scale, axisValues) ?? 1;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(s, s);
+      ctx.translate(-cx, -cy);
       _renderPaint(
         ctx,
         paint.paint,
@@ -300,6 +442,35 @@ function _renderPaint(
         0,
         0
       );
+      _renderPaint(
+        ctx,
+        paint.paint,
+        palette,
+        axisValues,
+        fontController,
+        outlineCache,
+        positionedGlyph,
+        _depth + 1
+      );
+      ctx.restore();
+      break;
+    }
+
+    case "PaintSkewAroundCenter":
+    case "PaintVarSkewAroundCenter": {
+      const cx = resolveVal(paint.centerX, axisValues);
+      const cy = resolveVal(paint.centerY, axisValues);
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.transform(
+        1,
+        Math.tan(resolveVal(paint.ySkewAngle, axisValues) * Math.PI * 2),
+        Math.tan(resolveVal(paint.xSkewAngle, axisValues) * Math.PI * 2),
+        1,
+        0,
+        0
+      );
+      ctx.translate(-cx, -cy);
       _renderPaint(
         ctx,
         paint.paint,
@@ -352,7 +523,7 @@ function _renderPaint(
         positionedGlyph,
         _depth + 1
       );
-      ctx.globalCompositeOperation = paint.compositeMode ?? "source-over";
+      ctx.globalCompositeOperation = _compositeMode(paint.compositeMode);
       _renderPaint(
         ctx,
         paint.sourcePaint,
@@ -376,111 +547,11 @@ function _renderPaint(
 // Helpers
 // ---------------------------------------------------------------------------
 
-/**
- * Get a Path2D for a named glyph outline, cached.
- * Uses getCachedGlyph from fontController if available.
- */
-function _getOutlinePath2D(glyphName, fontController, cache) {
-  if (!glyphName) return null;
-  if (cache.has(glyphName)) return cache.get(glyphName);
-
-  // Try getCachedGlyph first (synchronous, already loaded)
-  const glyph = fontController.getCachedGlyph?.(glyphName);
-  const path = glyph?.path ?? glyph?.instance?.path;
-  if (!path) {
-    cache.set(glyphName, null);
-    return null;
-  }
-
-  const path2d = _varPackedPathToPath2D(path);
-  cache.set(glyphName, path2d);
-  return path2d;
+const BIG = 100_000;
+function _fillBig(ctx) {
+  ctx.fillRect(-BIG, -BIG, BIG * 2, BIG * 2);
 }
 
-/**
- * Convert a Fontra VarPackedPath or plain path object to Path2D.
- * Handles both {contours:[{points:[...], isClosed}]} and
- * VarPackedPath with .iterContours() / .pointTypes / .coordinates.
- */
-function _varPackedPathToPath2D(path) {
-  const p = new Path2D();
-  if (!path) return p;
-
-  // Plain contour format: { contours: [{points:[{x,y,type}], isClosed}] }
-  if (Array.isArray(path.contours)) {
-    for (const contour of path.contours) {
-      _drawPlainContour(p, contour.points, contour.isClosed);
-    }
-    return p;
-  }
-
-  // VarPackedPath with iterContours
-  if (typeof path.iterContours === "function") {
-    for (const contour of path.iterContours()) {
-      const pts = [];
-      for (const pt of contour.iterPoints()) pts.push(pt);
-      _drawPlainContour(p, pts, contour.isClosed);
-    }
-    return p;
-  }
-
-  // VarPackedPath with pointTypes / coordinates arrays
-  if (path.pointTypes && path.coordinates) {
-    _drawPackedPath(p, path);
-    return p;
-  }
-
-  return p;
-}
-
-const ON_CURVE = 0x01;
-const CUBIC_OFF = 0x02;
-const QUAD_OFF = 0x00; // implicit: not on-curve and not cubic
-
-function _drawPlainContour(p2d, points, isClosed) {
-  if (!points?.length) return;
-  p2d.moveTo(points[0].x, points[0].y);
-  for (let i = 1; i < points.length; i++) {
-    const pt = points[i];
-    if (
-      pt.type === "line" ||
-      pt.type === "move" ||
-      (pt.smooth != null && pt.type == null)
-    ) {
-      p2d.lineTo(pt.x, pt.y);
-    } else {
-      // Bezier — simplified: just lineTo for now
-      // Full cubic/quad handling can be added if needed
-      p2d.lineTo(pt.x, pt.y);
-    }
-  }
-  if (isClosed) p2d.closePath();
-}
-
-function _drawPackedPath(p2d, path) {
-  const coords = path.coordinates;
-  const types = path.pointTypes;
-  let ci = 0;
-  let contourStart = 0;
-
-  for (let i = 0; i < types.length; i++) {
-    const x = coords[ci++],
-      y = coords[ci++];
-    const isOnCurve = !!(types[i] & ON_CURVE);
-    if (i === contourStart) {
-      p2d.moveTo(x, y);
-    } else if (isOnCurve) {
-      p2d.lineTo(x, y);
-    } else {
-      p2d.lineTo(x, y); // simplified
-    }
-    // Check for contour end (VarPackedPath stores contourInfo separately)
-  }
-}
-
-/**
- * Apply colorLine stops to a CanvasGradient.
- */
 function _applyColorLine(gradient, colorLine, palette, axisValues) {
   if (!colorLine?.colorStops?.length) return;
   const stops = [...colorLine.colorStops].sort(
@@ -499,9 +570,6 @@ function _applyColorLine(gradient, colorLine, palette, axisValues) {
   }
 }
 
-/**
- * Convert a palette entry [r, g, b, a] + alpha override to CSS rgba string.
- */
 function _paletteColor(palette, index, alphaOverride = 1.0) {
   const entry = palette?.[index];
   if (!entry) return `rgba(0,0,0,${alphaOverride})`;
@@ -511,9 +579,150 @@ function _paletteColor(palette, index, alphaOverride = 1.0) {
     b * 255
   )},${finalAlpha.toFixed(4)})`;
 }
+
+// Map COLRv1 composite mode names to Canvas 2D globalCompositeOperation values
+function _compositeMode(mode) {
+  const map = {
+    src_over: "source-over",
+    src: "copy",
+    dest: "destination-over",
+    dest_over: "destination-over",
+    src_in: "source-in",
+    dest_in: "destination-in",
+    src_out: "source-out",
+    dest_out: "destination-out",
+    src_atop: "source-atop",
+    dest_atop: "destination-atop",
+    xor: "xor",
+    plus: "lighter",
+    screen: "screen",
+    overlay: "overlay",
+    darken: "darken",
+    lighten: "lighten",
+    color_dodge: "color-dodge",
+    color_burn: "color-burn",
+    hard_light: "hard-light",
+    soft_light: "soft-light",
+    difference: "difference",
+    exclusion: "exclusion",
+    multiply: "multiply",
+    hsl_hue: "hue",
+    hsl_saturation: "saturation",
+    hsl_color: "color",
+    hsl_luminosity: "luminosity",
+  };
+  return map[mode] ?? "source-over";
+}
+
+function _getOutlinePath2D(glyphName, fontController, cache) {
+  if (!glyphName) return null;
+  if (cache.has(glyphName)) return cache.get(glyphName);
+
+  const glyph = fontController.getCachedGlyph?.(glyphName);
+  const path = glyph?.path ?? glyph?.instance?.path;
+  if (!path) {
+    cache.set(glyphName, null);
+    return null;
+  }
+
+  const path2d = _varPackedPathToPath2D(path);
+  cache.set(glyphName, path2d);
+  return path2d;
+}
+
+function _varPackedPathToPath2D(path) {
+  const p = new Path2D();
+  if (!path) return p;
+
+  if (Array.isArray(path.contours)) {
+    for (const contour of path.contours) {
+      _drawPlainContour(p, contour.points, contour.isClosed);
+    }
+    return p;
+  }
+  if (typeof path.iterContours === "function") {
+    for (const contour of path.iterContours()) {
+      const pts = [];
+      for (const pt of contour.iterPoints()) pts.push(pt);
+      _drawPlainContour(p, pts, contour.isClosed);
+    }
+    return p;
+  }
+  if (path.pointTypes && path.coordinates) {
+    _drawPackedPath(p, path);
+    return p;
+  }
+  return p;
+}
+
+function _drawPlainContour(p2d, points, isClosed) {
+  if (!points?.length) return;
+  p2d.moveTo(points[0].x, points[0].y);
+  let i = 1;
+  while (i < points.length) {
+    const pt = points[i];
+    const type = pt.type;
+    if (type === "line" || type === "move" || type == null) {
+      p2d.lineTo(pt.x, pt.y);
+      i++;
+    } else if (type === "cubic") {
+      const c1 = pt,
+        c2 = points[i + 1],
+        on = points[i + 2];
+      if (c2 && on) {
+        p2d.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, on.x, on.y);
+        i += 3;
+      } else {
+        p2d.lineTo(pt.x, pt.y);
+        i++;
+      }
+    } else if (type === "quad") {
+      const c = pt,
+        on = points[i + 1];
+      if (on) {
+        p2d.quadraticCurveTo(c.x, c.y, on.x, on.y);
+        i += 2;
+      } else {
+        p2d.lineTo(pt.x, pt.y);
+        i++;
+      }
+    } else {
+      p2d.lineTo(pt.x, pt.y);
+      i++;
+    }
+  }
+  if (isClosed) p2d.closePath();
+}
+
+function _drawPackedPath(p2d, path) {
+  const coords = path.coordinates;
+  const types = path.pointTypes;
+  let ci = 0;
+  for (let i = 0; i < types.length; i++) {
+    const x = coords[ci++],
+      y = coords[ci++];
+    const isOnCurve = !!(types[i] & 0x01);
+    if (i === 0) p2d.moveTo(x, y);
+    else if (isOnCurve) p2d.lineTo(x, y);
+    else p2d.lineTo(x, y); // simplified — full cubic/quad needs contourInfo
+  }
+}
+
 // ---------------------------------------------------------------------------
 // fontTools raw format → Fontra paint format converter
 // ---------------------------------------------------------------------------
+
+function _convertColorLine(colorLine) {
+  if (!colorLine) return null;
+  return {
+    extend: colorLine.Extend ?? "pad",
+    colorStops: (colorLine.ColorStop ?? []).map((stop) => ({
+      stopOffset: stop.StopOffset ?? 0,
+      paletteIndex: stop.Color?.PaletteIndex ?? 0,
+      alpha: stop.Color?.Alpha ?? 1,
+    })),
+  };
+}
 
 function _convertPaintGraph(paint) {
   if (!paint || typeof paint !== "object") return paint;
@@ -530,36 +739,73 @@ function _convertPaintGraph(paint) {
       paletteIndex: paint.PaletteIndex ?? 0,
       alpha: paint.Alpha ?? 1,
     };
+  if (fmt === 3)
+    return {
+      type: "PaintVarSolid",
+      paletteIndex: paint.PaletteIndex ?? 0,
+      alpha: paint.Alpha ?? 1,
+    };
   if (fmt === 4)
     return {
       type: "PaintLinearGradient",
       colorLine: _convertColorLine(paint.ColorLine),
-      x0: paint.x0,
-      y0: paint.y0,
-      x1: paint.x1,
-      y1: paint.y1,
-      x2: paint.x2,
-      y2: paint.y2,
+      x0: paint.x0 ?? 0,
+      y0: paint.y0 ?? 0,
+      x1: paint.x1 ?? 0,
+      y1: paint.y1 ?? 0,
+      x2: paint.x2 ?? 0,
+      y2: paint.y2 ?? 0,
+    };
+  if (fmt === 5)
+    return {
+      type: "PaintVarLinearGradient",
+      colorLine: _convertColorLine(paint.ColorLine),
+      x0: paint.x0 ?? 0,
+      y0: paint.y0 ?? 0,
+      x1: paint.x1 ?? 0,
+      y1: paint.y1 ?? 0,
+      x2: paint.x2 ?? 0,
+      y2: paint.y2 ?? 0,
     };
   if (fmt === 6)
     return {
       type: "PaintRadialGradient",
       colorLine: _convertColorLine(paint.ColorLine),
-      x0: paint.x0,
-      y0: paint.y0,
-      r0: paint.r0,
-      x1: paint.x1,
-      y1: paint.y1,
-      r1: paint.r1,
+      x0: paint.x0 ?? 0,
+      y0: paint.y0 ?? 0,
+      r0: paint.r0 ?? 0,
+      x1: paint.x1 ?? 0,
+      y1: paint.y1 ?? 0,
+      r1: paint.r1 ?? 0,
+    };
+  if (fmt === 7)
+    return {
+      type: "PaintVarRadialGradient",
+      colorLine: _convertColorLine(paint.ColorLine),
+      x0: paint.x0 ?? 0,
+      y0: paint.y0 ?? 0,
+      r0: paint.r0 ?? 0,
+      x1: paint.x1 ?? 0,
+      y1: paint.y1 ?? 0,
+      r1: paint.r1 ?? 0,
     };
   if (fmt === 8)
     return {
       type: "PaintSweepGradient",
       colorLine: _convertColorLine(paint.ColorLine),
-      centerX: paint.centerX,
-      centerY: paint.centerY,
-      startAngle: paint.startAngle,
-      endAngle: paint.endAngle,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      startAngle: (paint.startAngle ?? 0) / 360,
+      endAngle: (paint.endAngle ?? 0) / 360,
+    };
+  if (fmt === 9)
+    return {
+      type: "PaintVarSweepGradient",
+      colorLine: _convertColorLine(paint.ColorLine),
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      startAngle: (paint.startAngle ?? 0) / 360,
+      endAngle: (paint.endAngle ?? 0) / 360,
     };
   if (fmt === 10)
     return {
@@ -568,69 +814,160 @@ function _convertPaintGraph(paint) {
       paint: _convertPaintGraph(paint.Paint),
     };
   if (fmt === 11) return { type: "PaintColrGlyph", glyphName: paint.Glyph };
+  if (fmt === 12)
+    return {
+      type: "PaintTransform",
+      transform: paint.Transform,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 13)
+    return {
+      type: "PaintVarTransform",
+      transform: paint.Transform,
+      paint: _convertPaintGraph(paint.Paint),
+    };
   if (fmt === 14)
     return {
       type: "PaintTranslate",
-      dx: paint.dx,
-      dy: paint.dy,
+      dx: paint.dx ?? 0,
+      dy: paint.dy ?? 0,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 15)
+    return {
+      type: "PaintVarTranslate",
+      dx: paint.dx ?? 0,
+      dy: paint.dy ?? 0,
       paint: _convertPaintGraph(paint.Paint),
     };
   if (fmt === 16)
     return {
       type: "PaintScale",
-      scaleX: paint.scaleX,
-      scaleY: paint.scaleY,
+      scaleX: paint.scaleX ?? 1,
+      scaleY: paint.scaleY ?? 1,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 17)
+    return {
+      type: "PaintVarScale",
+      scaleX: paint.scaleX ?? 1,
+      scaleY: paint.scaleY ?? 1,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 18)
+    return {
+      type: "PaintScaleAroundCenter",
+      scaleX: paint.scaleX ?? 1,
+      scaleY: paint.scaleY ?? 1,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 19)
+    return {
+      type: "PaintVarScaleAroundCenter",
+      scaleX: paint.scaleX ?? 1,
+      scaleY: paint.scaleY ?? 1,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 20)
+    return {
+      type: "PaintScaleUniform",
+      scale: paint.scale ?? 1,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 21)
+    return {
+      type: "PaintVarScaleUniform",
+      scale: paint.scale ?? 1,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 22)
+    return {
+      type: "PaintScaleUniformAroundCenter",
+      scale: paint.scale ?? 1,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 23)
+    return {
+      type: "PaintVarScaleUniformAroundCenter",
+      scale: paint.scale ?? 1,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
       paint: _convertPaintGraph(paint.Paint),
     };
   if (fmt === 24)
     return {
       type: "PaintRotate",
-      angle: paint.angle,
+      angle: (paint.angle ?? 0) / 360,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 25)
+    return {
+      type: "PaintVarRotate",
+      angle: (paint.angle ?? 0) / 360,
       paint: _convertPaintGraph(paint.Paint),
     };
   if (fmt === 26)
     return {
-      type: "PaintSkew",
-      xSkewAngle: paint.xSkewAngle,
-      ySkewAngle: paint.ySkewAngle,
+      type: "PaintRotateAroundCenter",
+      angle: (paint.angle ?? 0) / 360,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 27)
+    return {
+      type: "PaintVarRotateAroundCenter",
+      angle: (paint.angle ?? 0) / 360,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
       paint: _convertPaintGraph(paint.Paint),
     };
   if (fmt === 28)
     return {
-      type: "PaintTransform",
-      transform: paint.Transform,
+      type: "PaintSkew",
+      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
+      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 29)
+    return {
+      type: "PaintVarSkew",
+      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
+      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 30)
+    return {
+      type: "PaintSkewAroundCenter",
+      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
+      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      paint: _convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 31)
+    return {
+      type: "PaintVarSkewAroundCenter",
+      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
+      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
       paint: _convertPaintGraph(paint.Paint),
     };
   if (fmt === 32)
     return {
       type: "PaintComposite",
       sourcePaint: _convertPaintGraph(paint.SourcePaint),
-      compositeMode: paint.CompositeMode,
+      compositeMode: paint.CompositeMode ?? "src_over",
       backdropPaint: _convertPaintGraph(paint.BackdropPaint),
     };
 
+  console.warn(`_convertPaintGraph: unknown Format ${fmt}`, paint);
   return paint;
-}
-
-function _convertColorLine(colorLine) {
-  if (!colorLine) return { colorStops: [] };
-  return {
-    colorStops: (colorLine.ColorStop ?? []).map((s) => ({
-      paletteIndex: s.PaletteIndex ?? 0,
-      alpha: s.Alpha ?? 1,
-      stopOffset: s.StopOffset ?? 0,
-    })),
-    extend: colorLine.Extend ?? "pad",
-  };
-}
-/**
- * Fill the current clip region with a style.
- * Canvas 2D has no "fill clip region" primitive — we use a large rect.
- * The scene transform is already set so 1 unit = 1 font unit.
- * We use a generous 100 000 UPM rect as the "infinite" fill.
- */
-const BIG = 100_000;
-function _fillClipRect(ctx, style) {
-  ctx.fillStyle = style;
-  ctx.fillRect(-BIG, -BIG, BIG * 2, BIG * 2);
 }

@@ -151,114 +151,309 @@ const normalizePaintType = (t) => t?.replace(/^PaintVar/, "Paint") ?? t;
 // fontTools raw format → Fontra paint format converter
 // ---------------------------------------------------------------------------
 
+function convertColorLine(colorLine) {
+  if (!colorLine) return null;
+  return {
+    extend: colorLine.Extend ?? "pad",
+    colorStops: (colorLine.ColorStop ?? []).map((stop) => ({
+      stopOffset: stop.StopOffset ?? 0,
+      paletteIndex: stop.Color?.PaletteIndex ?? 0,
+      alpha: stop.Color?.Alpha ?? 1,
+    })),
+  };
+}
+
 function convertPaintGraph(paint) {
   if (!paint || typeof paint !== "object") return paint;
   const fmt = paint.Format;
 
+  // PaintColrLayers (fmt 1)
   if (fmt === 1)
     return {
       type: "PaintColrLayers",
       layers: (paint.Layers ?? []).map(convertPaintGraph),
     };
+
+  // PaintSolid / PaintVarSolid (fmt 2–3)
   if (fmt === 2)
     return {
       type: "PaintSolid",
       paletteIndex: paint.PaletteIndex ?? 0,
       alpha: paint.Alpha ?? 1,
     };
+  if (fmt === 3)
+    return {
+      type: "PaintVarSolid",
+      paletteIndex: paint.PaletteIndex ?? 0,
+      alpha: paint.Alpha ?? 1,
+    };
+
+  // PaintLinearGradient / PaintVarLinearGradient (fmt 4–5)
   if (fmt === 4)
     return {
       type: "PaintLinearGradient",
       colorLine: convertColorLine(paint.ColorLine),
-      x0: paint.x0,
-      y0: paint.y0,
-      x1: paint.x1,
-      y1: paint.y1,
-      x2: paint.x2,
-      y2: paint.y2,
+      x0: paint.x0 ?? 0,
+      y0: paint.y0 ?? 0,
+      x1: paint.x1 ?? 0,
+      y1: paint.y1 ?? 0,
+      x2: paint.x2 ?? 0,
+      y2: paint.y2 ?? 0,
     };
+  if (fmt === 5)
+    return {
+      type: "PaintVarLinearGradient",
+      colorLine: convertColorLine(paint.ColorLine),
+      x0: paint.x0 ?? 0,
+      y0: paint.y0 ?? 0,
+      x1: paint.x1 ?? 0,
+      y1: paint.y1 ?? 0,
+      x2: paint.x2 ?? 0,
+      y2: paint.y2 ?? 0,
+    };
+
+  // PaintRadialGradient / PaintVarRadialGradient (fmt 6–7)
   if (fmt === 6)
     return {
       type: "PaintRadialGradient",
       colorLine: convertColorLine(paint.ColorLine),
-      x0: paint.x0,
-      y0: paint.y0,
-      r0: paint.r0,
-      x1: paint.x1,
-      y1: paint.y1,
-      r1: paint.r1,
+      x0: paint.x0 ?? 0,
+      y0: paint.y0 ?? 0,
+      r0: paint.r0 ?? 0,
+      x1: paint.x1 ?? 0,
+      y1: paint.y1 ?? 0,
+      r1: paint.r1 ?? 0,
     };
+  if (fmt === 7)
+    return {
+      type: "PaintVarRadialGradient",
+      colorLine: convertColorLine(paint.ColorLine),
+      x0: paint.x0 ?? 0,
+      y0: paint.y0 ?? 0,
+      r0: paint.r0 ?? 0,
+      x1: paint.x1 ?? 0,
+      y1: paint.y1 ?? 0,
+      r1: paint.r1 ?? 0,
+    };
+
+  // PaintSweepGradient / PaintVarSweepGradient (fmt 8–9)
+  // fontTools gives angles in degrees; OpenType spec / canvas uses turns (0.0–1.0)
   if (fmt === 8)
     return {
       type: "PaintSweepGradient",
       colorLine: convertColorLine(paint.ColorLine),
-      centerX: paint.centerX,
-      centerY: paint.centerY,
-      startAngle: paint.startAngle,
-      endAngle: paint.endAngle,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      startAngle: (paint.startAngle ?? 0) / 360,
+      endAngle: (paint.endAngle ?? 0) / 360,
     };
+  if (fmt === 9)
+    return {
+      type: "PaintVarSweepGradient",
+      colorLine: convertColorLine(paint.ColorLine),
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      startAngle: (paint.startAngle ?? 0) / 360,
+      endAngle: (paint.endAngle ?? 0) / 360,
+    };
+
+  // PaintGlyph (fmt 10)
   if (fmt === 10)
     return {
       type: "PaintGlyph",
       glyphName: paint.Glyph,
       paint: convertPaintGraph(paint.Paint),
     };
-  if (fmt === 11) return { type: "PaintColrGlyph", glyphName: paint.Glyph };
+
+  // PaintColrGlyph (fmt 11)
+  if (fmt === 11)
+    return {
+      type: "PaintColrGlyph",
+      glyphName: paint.Glyph,
+    };
+
+  // PaintTransform / PaintVarTransform (fmt 12–13)
   if (fmt === 12)
     return {
       type: "PaintTransform",
       transform: paint.Transform,
       paint: convertPaintGraph(paint.Paint),
     };
+  if (fmt === 13)
+    return {
+      type: "PaintVarTransform",
+      transform: paint.Transform,
+      paint: convertPaintGraph(paint.Paint),
+    };
+
+  // PaintTranslate / PaintVarTranslate (fmt 14–15)
   if (fmt === 14)
     return {
       type: "PaintTranslate",
-      dx: paint.dx,
-      dy: paint.dy,
+      dx: paint.dx ?? 0,
+      dy: paint.dy ?? 0,
       paint: convertPaintGraph(paint.Paint),
     };
+  if (fmt === 15)
+    return {
+      type: "PaintVarTranslate",
+      dx: paint.dx ?? 0,
+      dy: paint.dy ?? 0,
+      paint: convertPaintGraph(paint.Paint),
+    };
+
+  // PaintScale / PaintVarScale (fmt 16–17)
   if (fmt === 16)
     return {
       type: "PaintScale",
-      scaleX: paint.scaleX,
-      scaleY: paint.scaleY,
+      scaleX: paint.scaleX ?? 1,
+      scaleY: paint.scaleY ?? 1,
       paint: convertPaintGraph(paint.Paint),
     };
+  if (fmt === 17)
+    return {
+      type: "PaintVarScale",
+      scaleX: paint.scaleX ?? 1,
+      scaleY: paint.scaleY ?? 1,
+      paint: convertPaintGraph(paint.Paint),
+    };
+
+  // PaintScaleAroundCenter / PaintVarScaleAroundCenter (fmt 18–19)
+  if (fmt === 18)
+    return {
+      type: "PaintScaleAroundCenter",
+      scaleX: paint.scaleX ?? 1,
+      scaleY: paint.scaleY ?? 1,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      paint: convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 19)
+    return {
+      type: "PaintVarScaleAroundCenter",
+      scaleX: paint.scaleX ?? 1,
+      scaleY: paint.scaleY ?? 1,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      paint: convertPaintGraph(paint.Paint),
+    };
+
+  // PaintScaleUniform / PaintVarScaleUniform (fmt 20–21)
+  if (fmt === 20)
+    return {
+      type: "PaintScaleUniform",
+      scale: paint.scale ?? 1,
+      paint: convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 21)
+    return {
+      type: "PaintVarScaleUniform",
+      scale: paint.scale ?? 1,
+      paint: convertPaintGraph(paint.Paint),
+    };
+
+  // PaintScaleUniformAroundCenter / PaintVarScaleUniformAroundCenter (fmt 22–23)
+  if (fmt === 22)
+    return {
+      type: "PaintScaleUniformAroundCenter",
+      scale: paint.scale ?? 1,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      paint: convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 23)
+    return {
+      type: "PaintVarScaleUniformAroundCenter",
+      scale: paint.scale ?? 1,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      paint: convertPaintGraph(paint.Paint),
+    };
+
+  // PaintRotate / PaintVarRotate (fmt 24–25)
+  // fontTools gives angle in degrees; convert to turns
   if (fmt === 24)
     return {
       type: "PaintRotate",
-      angle: paint.angle,
+      angle: (paint.angle ?? 0) / 360,
       paint: convertPaintGraph(paint.Paint),
     };
+  if (fmt === 25)
+    return {
+      type: "PaintVarRotate",
+      angle: (paint.angle ?? 0) / 360,
+      paint: convertPaintGraph(paint.Paint),
+    };
+
+  // PaintRotateAroundCenter / PaintVarRotateAroundCenter (fmt 26–27)
   if (fmt === 26)
     return {
-      type: "PaintSkew",
-      xSkewAngle: paint.xSkewAngle,
-      ySkewAngle: paint.ySkewAngle,
+      type: "PaintRotateAroundCenter",
+      angle: (paint.angle ?? 0) / 360,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
       paint: convertPaintGraph(paint.Paint),
     };
+  if (fmt === 27)
+    return {
+      type: "PaintVarRotateAroundCenter",
+      angle: (paint.angle ?? 0) / 360,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      paint: convertPaintGraph(paint.Paint),
+    };
+
+  // PaintSkew / PaintVarSkew (fmt 28–29)
+  // fontTools gives skew angles in degrees; convert to turns
   if (fmt === 28)
+    return {
+      type: "PaintSkew",
+      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
+      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
+      paint: convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 29)
+    return {
+      type: "PaintVarSkew",
+      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
+      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
+      paint: convertPaintGraph(paint.Paint),
+    };
+
+  // PaintSkewAroundCenter / PaintVarSkewAroundCenter (fmt 30–31)
+  if (fmt === 30)
+    return {
+      type: "PaintSkewAroundCenter",
+      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
+      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      paint: convertPaintGraph(paint.Paint),
+    };
+  if (fmt === 31)
+    return {
+      type: "PaintVarSkewAroundCenter",
+      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
+      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
+      centerX: paint.centerX ?? 0,
+      centerY: paint.centerY ?? 0,
+      paint: convertPaintGraph(paint.Paint),
+    };
+
+  // PaintComposite (fmt 32)
+  if (fmt === 32)
     return {
       type: "PaintComposite",
       sourcePaint: convertPaintGraph(paint.SourcePaint),
-      compositeMode: paint.CompositeMode,
+      compositeMode: paint.CompositeMode ?? "src_over",
       backdropPaint: convertPaintGraph(paint.BackdropPaint),
     };
 
+  // Unknown format — pass through as-is for forward compatibility
+  console.warn(`convertPaintGraph: unknown paint Format ${fmt}`, paint);
   return paint;
 }
 
-function convertColorLine(colorLine) {
-  if (!colorLine) return { colorStops: [] };
-  return {
-    colorStops: (colorLine.ColorStop ?? []).map((s) => ({
-      paletteIndex: s.PaletteIndex ?? 0,
-      alpha: s.Alpha ?? 1,
-      stopOffset: s.StopOffset ?? 0,
-    })),
-    extend: colorLine.Extend ?? "pad",
-  };
-}
 // ---------------------------------------------------------------------------
 // Module-level pure helpers
 // ---------------------------------------------------------------------------
