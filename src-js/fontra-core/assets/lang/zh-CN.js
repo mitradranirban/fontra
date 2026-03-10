@@ -110,6 +110,7 @@ export const strings = {
   "color-layers.add-layer": "Add Color Layer",
   "color-layers.add-stop": "Add Stop",
   "color-layers.alpha": "Alpha",
+  "color-layers.angle-turns": "Angle (turns)",
   "color-layers.centerX": "centerX",
   "color-layers.centerY": "centerY",
   "color-layers.color-index": "Color Index",
@@ -119,6 +120,7 @@ export const strings = {
   "color-layers.edit-colrv1-paint": "Edit COLRv1 Paint",
   "color-layers.edit-description": "Edit color layer mapping",
   "color-layers.end-angle": "End °",
+  "color-layers.fill-paint-type": "Fill Paint Type",
   "color-layers.glyph": "Glyph",
   "color-layers.no-glyph-selected": "Select a glyph to assign color layers",
   "color-layers.no-layers-yet": "No color layers defined yet",
@@ -130,6 +132,8 @@ export const strings = {
   "color-layers.remove-layer": "Remove",
   "color-layers.remove-stop": "Remove Stop",
   "color-layers.start-angle": "Start °",
+  "color-layers.start-v0": "Start COLRv0",
+  "color-layers.start-v1": "Start COLRv1",
   "color-layers.stop": "Stop",
   "color-layers.stop-offset": "Stop Offset",
   "color-layers.title": "Color Layers",
@@ -153,7 +157,7 @@ export const strings = {
   "color-panel.make-variable-short": "⬦",
   "color-panel.remove-keyframe": "Remove this keyframe",
   "color-panel.remove-keyframe-short": "×",
-  "color-panel.remove-variable": " revert to static value",
+  "color-panel.remove-variable": "Remove variation revert to static value",
   "color-panel.remove-variable-short": "⬧",
   "cross-axis-mapping.axis-participates": "选中后，该参数轴参与映射",
   "cross-axis-mapping.delete": "删除跨轴映射",
@@ -287,7 +291,10 @@ export const strings = {
   "message.edit-has-been-reverted": "编辑已被还原。",
   "message.glyph-could-not-be-saved": "该字形无法被保存。",
   "opentype-feature-code.title": "OpenType 特性",
+<<<<<<< HEAD
   "panel-color-layers.title": "Color Layers",
+=======
+>>>>>>> 516a3e507 (Add missing translations)
   "plugin-manager.add-plugin-dialog.label.path": "插件路径：",
   "plugin-manager.add-plugin-dialog.title": "添加插件",
   "plugin-manager.add-plugin-dialog.warning.title": "错误",
@@ -311,9 +318,13 @@ export const strings = {
   "sidebar.characters-glyphs": "输入字符及输出字形",
   "sidebar.characters-glyphs.input-characters": "输入字符",
   "sidebar.characters-glyphs.output-glyphs": "输出字形",
+<<<<<<< HEAD
   "sidebar.characters-glyphs": "Input characters and output glyphs",
   "sidebar.characters-glyphs.input-characters": "Input characters",
   "sidebar.characters-glyphs.output-glyphs": "Output glyphs",
+=======
+  "sidebar.color-layers": "Color Layers",
+>>>>>>> 516a3e507 (Add missing translations)
   "sidebar.color-layers.title": "Color Layers",
   "sidebar.designspace-navigation": "Designspace 导航",
   "sidebar.designspace-navigation.dialog.add-source.label.layer": "图层：",

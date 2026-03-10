@@ -265,6 +265,19 @@
 "colorLine": {
 "colorStops": [
 {
+"alpha": 0.5,
+"paletteIndex": 1,
+"stopOffset": 0
+},
+{
+"alpha": 1,
+"paletteIndex": 3,
+"stopOffset": 1
+}
+]
+},
+"colorStops": [
+{
 "alpha": 1,
 "paletteIndex": 0,
 "stopOffset": 0
@@ -273,9 +286,13 @@
 "alpha": 1,
 "paletteIndex": 1,
 "stopOffset": 1
-}
-]
 },
+{
+"alpha": 1,
+"paletteIndex": 0,
+"stopOffset": 0
+}
+],
 "endAngle": 1,
 "startAngle": 0,
 "type": "PaintSweepGradient"
