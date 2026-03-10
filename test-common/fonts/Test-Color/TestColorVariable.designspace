@@ -42,15 +42,15 @@
       <array>
         <array>
           <array>
-            <real>0.8941176470588236</real>
-            <real>0.12941176470588237</real>
-            <real>0.3568627450980392</real>
+            <real>0.4196078431372549</real>
+            <real>0.2</real>
+            <real>0.26666666666666666</real>
             <integer>1</integer>
           </array>
           <array>
-            <real>0.37254901960784315</real>
-            <real>0.3254901960784314</real>
-            <real>0.3254901960784314</real>
+            <real>0.9058823529411765</real>
+            <real>0.01568627450980392</real>
+            <real>0.01568627450980392</real>
             <integer>1</integer>
           </array>
         </array>

@@ -26,7 +26,7 @@
 ,color-layers.add-stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop
 ,color-layers.remove-stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop
 ,color-layers.no-stops-yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet
-,color-layers.stop-offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,
+,color-layers.stop-offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset
 ,color-layers.x0,x0,x0,x0,x0,x0,x0,x0,x0,x0,x0
 ,color-layers.y0,y0,y0,y0,y0,y0,y0,y0,y0,y0,y0
 ,color-layers.x1,x1,x1,x1,x1,x1,x1,x1,x1,x1,x1
@@ -39,12 +39,16 @@
 ,color-layers.centerY,centerY,centerY,centerY,centerY,centerY,centerY,centerY,centerY,centerY,centerY
 ,color-layers.start-angle,Start °,Start °,Start °,Start °,Start °,Start °,Start °,Start °,Start °,Start °
 ,color-layers.end-angle,End °,End °,End °,End °,End °,End °,End °,End °,End °,End °
-,color-layers.stop-offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset
-,color-panel.make-variable,Make variable on axis,,,,,,,,,
+,color-panel.make-variable,Make variable on axis,Make variable on axis,Make variable on axis,Make variable on axis,Make variable on axis,Make variable on axis,Make variable on axis,Make variable on axis,Make variable on axis,Make variable on axis
 ,color-panel.make-variable-short,⬦,⬦,⬦,⬦,⬦,⬦,⬦,⬦,⬦,⬦
-,color-panel.remove-variable,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value,Remove variation, revert to static value
+,color-panel.remove-variable,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value
 ,color-panel.remove-variable-short,⬧,⬧,⬧,⬧,⬧,⬧,⬧,⬧,⬧,⬧
-,color-panel.remove-keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,
+,color-panel.remove-keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe
 ,color-panel.remove-keyframe-short,×,×,×,×,×,×,×,×,×,×
 ,color-panel.add-keyframe,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location
 ,color-panel.add-keyframe-short,+,+,+,+,+,+,+,+,+,+
+,color-layers.angle-turns,Angle (turns),Angle (turns),Angle (turns),Angle (turns),Angle (turns),Angle (turns),Angle (turns),Angle (turns),Angle (turns),Angle (turns)
+,color-layers.fill-paint-type,Fill Paint Type,Fill Paint Type,Fill Paint Type,Fill Paint Type,Fill Paint Type,Fill Paint Type,Fill Paint Type,Fill Paint Type,Fill Paint Type,Fill Paint Type
+,color-layers.start-v0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0
+,color-layers.start-v1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1
+,sidebar.color-layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers
