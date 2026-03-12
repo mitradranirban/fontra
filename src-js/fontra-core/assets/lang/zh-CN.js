@@ -291,10 +291,7 @@ export const strings = {
   "message.edit-has-been-reverted": "编辑已被还原。",
   "message.glyph-could-not-be-saved": "该字形无法被保存。",
   "opentype-feature-code.title": "OpenType 特性",
-<<<<<<< HEAD
   "panel-color-layers.title": "Color Layers",
-=======
->>>>>>> 516a3e507 (Add missing translations)
   "plugin-manager.add-plugin-dialog.label.path": "插件路径：",
   "plugin-manager.add-plugin-dialog.title": "添加插件",
   "plugin-manager.add-plugin-dialog.warning.title": "错误",
@@ -318,13 +315,10 @@ export const strings = {
   "sidebar.characters-glyphs": "输入字符及输出字形",
   "sidebar.characters-glyphs.input-characters": "输入字符",
   "sidebar.characters-glyphs.output-glyphs": "输出字形",
-<<<<<<< HEAD
   "sidebar.characters-glyphs": "Input characters and output glyphs",
   "sidebar.characters-glyphs.input-characters": "Input characters",
   "sidebar.characters-glyphs.output-glyphs": "Output glyphs",
-=======
   "sidebar.color-layers": "Color Layers",
->>>>>>> 516a3e507 (Add missing translations)
   "sidebar.color-layers.title": "Color Layers",
   "sidebar.designspace-navigation": "Designspace 导航",
   "sidebar.designspace-navigation.dialog.add-source.label.layer": "图层：",
