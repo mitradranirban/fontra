@@ -1226,18 +1226,8 @@ export default class ColorLayersPanel extends Panel {
         });
         j += 2;
       } else {
-        formContents.push({
-          type: "edit-number",
-          key: JSON.stringify(["v1Param", layerIdx, fd.key]),
-          label: translate(fd.label),
-          value: displayVal,
-          integer: fd.integer ?? false,
-          minValue: fd.min ?? (isIndex ? 0 : undefined),
-          maxValue: isIndex ? palette.length - 1 : fd.max ?? undefined,
-          auxiliaryElement: makeVaryToggle(rawVal, layerIdx, fd.key, this),
-        });
-
         if (isVariable(rawVal)) {
+          // Render existing Keyframes
           for (let ki = 0; ki < rawVal.keyframes.length; ki++) {
             const kf = rawVal.keyframes[ki];
             formContents.push({
@@ -1273,12 +1263,54 @@ export default class ColorLayersPanel extends Panel {
               ),
             });
           }
+
+          // Add New Keyframe Button (at the end of the KF list)
+          formContents.push({
+            type: "button",
+            label: "",
+            title: translate("color-layers.add-kf-at-current-location"),
+            text: translate("color-layers.add-kf"),
+            onclick: () =>
+              this._addKeyframeAtCurrent(
+                this._currentGlyphName,
+                this._currentPaint,
+                layerIdx,
+                fd.key
+              ),
+          });
+        } else {
+          // Static field logic
+          formContents.push({
+            type: "edit-number",
+            key: JSON.stringify(["v1Param", layerIdx, fd.key]),
+            label: translate(fd.label),
+            value: displayVal,
+            integer: fd.integer ?? false,
+            minValue: fd.min ?? (isIndex ? 0 : undefined),
+            maxValue: isIndex ? palette.length - 1 : fd.max ?? undefined,
+            auxiliaryElement: html.div({ style: "display:flex; gap:4px;" }, [
+              makeVaryToggle(rawVal, layerIdx, fd.key, this),
+              html.button(
+                {
+                  title: translate("color-layers.convert-to-variable"),
+                  style: "padding: 0 4px;",
+                  onclick: () =>
+                    this._addKeyframeAtCurrent(
+                      this._currentGlyphName,
+                      this._currentPaint,
+                      layerIdx,
+                      fd.key
+                    ),
+                },
+                [translate("color-layers.add-kf-short")]
+              ),
+            ]),
+          });
         }
         j++;
       }
 
-      // safety: should never be needed, but prevents infinite loop if fd
-      // somehow matches none of the above branches
+      // Safety: prevents infinite loop
       if (j === 0) {
         j = schema.length;
         break;
@@ -1531,10 +1563,25 @@ export default class ColorLayersPanel extends Panel {
   async _setV1ArrayField(glyphName, paint, layerIndex, arrayKey, newArray) {
     const layers = (paint.layers ?? []).map((layer, i) => {
       if (i !== layerIndex) return layer;
+      const fillPaint = layer.paint ?? layer;
+
+      // Handle nested colorLine
+      if (fillPaint.colorLine && arrayKey === "colorStops") {
+        const newFill = {
+          ...fillPaint,
+          colorLine: { ...fillPaint.colorLine, colorStops: newArray },
+        };
+        return layer.paint != null
+          ? { ...layer, paint: newFill }
+          : { ...layer, ...newFill };
+      }
+
+      // Default fallback for flat arrays
       return layer.paint != null
         ? { ...layer, paint: { ...layer.paint, [arrayKey]: newArray } }
         : { ...layer, [arrayKey]: newArray };
     });
+
     await this._writeV1Paint({ ...paint, layers });
   }
 
@@ -1617,6 +1664,54 @@ export default class ColorLayersPanel extends Panel {
       delete varGlyph.customData[CUSTOM_DATA_KEY];
       return translate("color-layers.convert-v0-to-v1");
     });
+  }
+  _getCurrentDesignSpaceTarget() {
+    const location = this.sceneController.sceneSettings.location || {};
+    const axes = this.fontController.globalAxes ?? [];
+
+    // Check for any axis that is NOT at its default value
+    for (const axis of axes) {
+      const currentVal = location[axis.tag];
+      const defaultVal = axis.defaultValue ?? 0;
+
+      if (currentVal !== undefined && currentVal !== defaultVal) {
+        return { tag: axis.tag, loc: currentVal };
+      }
+    }
+
+    // Fallback: If all sliders are at default, use the first available axis
+    if (axes.length > 0) {
+      const firstTag = axes[0].tag;
+      return {
+        tag: firstTag,
+        loc: location[firstTag] ?? axes[0].defaultValue ?? 0,
+      };
+    }
+
+    return { tag: "wght", loc: 0 };
+  }
+
+  async _addKeyframeAtCurrent(glyphName, paint, layerIdx, field) {
+    const layer = (paint.layers ?? [])[layerIdx];
+    const target = layer.paint ?? layer;
+    const val = target[field];
+
+    const { tag, loc } = this._getCurrentDesignSpaceTarget();
+
+    // Determine the value to pin (interpolated if already variable, scalar if not)
+    const currentValue = isVariable(val) ? resolveAtLocation(val, { [tag]: loc }) : val;
+
+    let newKfs = [];
+    if (isVariable(val)) {
+      newKfs = [...val.keyframes, { axis: tag, loc, value: currentValue }];
+    } else {
+      newKfs = [{ axis: tag, loc, value: val }];
+    }
+
+    // Keep keyframes sorted by location for the resolver
+    newKfs.sort((a, b) => a.loc - b.loc);
+
+    await this._setV1FieldKeyframes(glyphName, paint, layerIdx, field, newKfs);
   }
 }
 
