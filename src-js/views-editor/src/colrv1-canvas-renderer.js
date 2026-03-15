@@ -718,8 +718,8 @@ function _convertColorLine(colorLine) {
     extend: colorLine.Extend ?? "pad",
     colorStops: (colorLine.ColorStop ?? []).map((stop) => ({
       stopOffset: stop.StopOffset ?? 0,
-      paletteIndex: stop.Color?.PaletteIndex ?? 0,
-      alpha: stop.Color?.Alpha ?? 1,
+      paletteIndex: stop.Color?.PaletteIndex ?? stop.PaletteIndex ?? 0,
+      alpha: stop.Color?.Alpha ?? stop.Alpha ?? 1,
     })),
   };
 }
