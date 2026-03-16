@@ -201,7 +201,8 @@
     "backgroundImage": {
       "type": "BackgroundImage",
       "optional": true
-    }
+    },
+    "customData": { "type": "dict", "subtype": "Any" }
   },
   "PackedPath": {
     "coordinates": {
