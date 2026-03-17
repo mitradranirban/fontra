@@ -131,6 +131,7 @@ export class ColorPalettesPanel extends BaseInfoPanel {
       html.span({ class: "palette-label" }, [
         translate("color-palettes.palette-label", activePi),
       ]),
+      document.createTextNode(" - "),
       html.span({ class: "palette-entry-count" }, [
         `${activePalette.length} ${activePalette.length === 1 ? "entry" : "entries"}`,
       ]),
