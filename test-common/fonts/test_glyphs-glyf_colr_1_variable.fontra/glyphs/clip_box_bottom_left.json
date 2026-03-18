@@ -1,0 +1,221 @@
+{
+"name": "clip_box_bottom_left",
+"sources": [
+{
+"name": "",
+"layerName": "74a9e45b",
+"locationBase": "74a9e45b"
+},
+{
+"name": "CLXI=-500",
+"layerName": "CLXI=-500",
+"location": {
+"APH1": 0,
+"APH2": 0,
+"APH3": 0,
+"CLIO": 0,
+"CLXA": 0,
+"CLXI": -500,
+"CLYA": 0,
+"CLYI": 0,
+"COL1": 0,
+"COL2": 0,
+"COL3": 0,
+"GRR0": 0,
+"GRR1": 0,
+"GRX0": 0,
+"GRX1": 0,
+"GRX2": 0,
+"GRY0": 0,
+"GRY1": 0,
+"GRY2": 0,
+"ROTA": 0,
+"ROTX": 0,
+"ROTY": 0,
+"SCOX": 0,
+"SCOY": 0,
+"SCSX": 0,
+"SCSY": 0,
+"SKCX": 0,
+"SKCY": 0,
+"SKXA": 0,
+"SKYA": 0,
+"SWC1": 0,
+"SWC2": 0,
+"SWC3": 0,
+"SWC4": 0,
+"SWPE": 0,
+"SWPS": 0,
+"TLDX": 0,
+"TLDY": 0,
+"TRDX": 0,
+"TRDY": 0,
+"TRXX": 0,
+"TRXY": 0,
+"TRYX": 0,
+"TRYY": 0
+}
+},
+{
+"name": "CLXI=500",
+"layerName": "CLXI=500",
+"location": {
+"APH1": 0,
+"APH2": 0,
+"APH3": 0,
+"CLIO": 0,
+"CLXA": 0,
+"CLXI": 500,
+"CLYA": 0,
+"CLYI": 0,
+"COL1": 0,
+"COL2": 0,
+"COL3": 0,
+"GRR0": 0,
+"GRR1": 0,
+"GRX0": 0,
+"GRX1": 0,
+"GRX2": 0,
+"GRY0": 0,
+"GRY1": 0,
+"GRY2": 0,
+"ROTA": 0,
+"ROTX": 0,
+"ROTY": 0,
+"SCOX": 0,
+"SCOY": 0,
+"SCSX": 0,
+"SCSY": 0,
+"SKCX": 0,
+"SKCY": 0,
+"SKXA": 0,
+"SKYA": 0,
+"SWC1": 0,
+"SWC2": 0,
+"SWC3": 0,
+"SWC4": 0,
+"SWPE": 0,
+"SWPS": 0,
+"TLDX": 0,
+"TLDY": 0,
+"TRDX": 0,
+"TRDY": 0,
+"TRXX": 0,
+"TRXY": 0,
+"TRYX": 0,
+"TRYY": 0
+}
+}
+],
+"layers": {
+"74a9e45b": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 0,
+"y": 0
+},
+{
+"x": 0,
+"y": 1000
+},
+{
+"x": 1000,
+"y": 1000
+},
+{
+"x": 1000,
+"y": 0
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+},
+"CLXI=-500": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": -500,
+"y": 0
+},
+{
+"x": -500,
+"y": 1000
+},
+{
+"x": 500,
+"y": 1000
+},
+{
+"x": 500,
+"y": 0
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+},
+"CLXI=500": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 500,
+"y": 0
+},
+{
+"x": 500,
+"y": 1000
+},
+{
+"x": 1500,
+"y": 1000
+},
+{
+"x": 1500,
+"y": 0
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+}
+},
+"customData": {
+"fontra.colrv1.paintGraph": {
+"BackdropPaint": {
+"Format": 11,
+"Glyph": "inset_clipped_radial_reflect"
+},
+"CompositeMode": "src_over",
+"Format": 32,
+"SourcePaint": {
+"Format": 10,
+"Glyph": "clip_shade_bottom_left",
+"Paint": {
+"Alpha": 0.4000244140625,
+"Format": 2,
+"PaletteIndex": 13
+}
+}
+}
+}
+}

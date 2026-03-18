@@ -41,7 +41,7 @@ export function makeFontraMenuBar(menuItemKeys, viewController) {
 
 function getFontraMenu() {
   return {
-    title: "Fontra",
+    title: "ColrPak",
     bold: true,
     getItems: () => {
       const menuItems = [

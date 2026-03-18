@@ -1,0 +1,142 @@
+{
+"name": "circle_r100",
+"sources": [
+{
+"name": "",
+"layerName": "74a9e45b",
+"locationBase": "74a9e45b"
+}
+],
+"layers": {
+"74a9e45b": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 600,
+"y": 600
+},
+{
+"x": 600,
+"y": 559,
+"type": "quad"
+},
+{
+"x": 541,
+"y": 500,
+"type": "quad"
+},
+{
+"x": 500,
+"y": 500
+},
+{
+"x": 500,
+"y": 600
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 400,
+"y": 600
+},
+{
+"x": 400,
+"y": 559,
+"type": "quad"
+},
+{
+"x": 459,
+"y": 500,
+"type": "quad"
+},
+{
+"x": 500,
+"y": 500
+},
+{
+"x": 500,
+"y": 600
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 400,
+"y": 600
+},
+{
+"x": 400,
+"y": 641,
+"type": "quad"
+},
+{
+"x": 459,
+"y": 700,
+"type": "quad"
+},
+{
+"x": 500,
+"y": 700
+},
+{
+"x": 500,
+"y": 600
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 600,
+"y": 600
+},
+{
+"x": 600,
+"y": 641,
+"type": "quad"
+},
+{
+"x": 541,
+"y": 700,
+"type": "quad"
+},
+{
+"x": 500,
+"y": 700
+},
+{
+"x": 500,
+"y": 600
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+}
+},
+"customData": {
+"fontra.colrv1.paintEntries": [
+{
+"Format": 10,
+"Glyph": "circle_r100",
+"Paint": {
+"Alpha": 1,
+"Format": 2,
+"PaletteIndex": 5
+}
+}
+]
+}
+}

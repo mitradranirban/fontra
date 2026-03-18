@@ -1,0 +1,67 @@
+{
+"name": "one",
+"sources": [
+{
+"name": "",
+"layerName": "74a9e45b",
+"locationBase": "74a9e45b"
+}
+],
+"layers": {
+"74a9e45b": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 296,
+"y": 543
+},
+{
+"x": 296,
+"y": 250
+},
+{
+"x": 259,
+"y": 250
+},
+{
+"x": 259,
+"y": 497
+},
+{
+"x": 184,
+"y": 466
+},
+{
+"x": 184,
+"y": 503
+},
+{
+"x": 290,
+"y": 543
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+}
+},
+"customData": {
+"fontra.colrv1.paintEntries": [
+{
+"Format": 10,
+"Glyph": "one",
+"Paint": {
+"Alpha": 1,
+"Format": 2,
+"PaletteIndex": 10
+}
+}
+]
+}
+}

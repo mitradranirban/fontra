@@ -1,0 +1,78 @@
+{
+"name": "transform_matrix_1_0_0_1_125_125",
+"sources": [
+{
+"name": "",
+"layerName": "74a9e45b",
+"locationBase": "74a9e45b"
+}
+],
+"layers": {
+"74a9e45b": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 0,
+"y": 0
+},
+{
+"x": 0,
+"y": 1000
+},
+{
+"x": 1000,
+"y": 1000
+},
+{
+"x": 1000,
+"y": 0
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+}
+},
+"customData": {
+"fontra.colrv1.paintGraph": {
+"BackdropPaint": {
+"Format": 10,
+"Glyph": "cross_glyph",
+"Paint": {
+"Alpha": 0.5,
+"Format": 2,
+"PaletteIndex": 4
+}
+},
+"CompositeMode": "dest_over",
+"Format": 32,
+"SourcePaint": {
+"Format": 13,
+"Paint": {
+"Format": 10,
+"Glyph": "cross_glyph",
+"Paint": {
+"Alpha": 0.70001220703125,
+"Format": 2,
+"PaletteIndex": 1
+}
+},
+"Transform": {
+"VarIndexBase": 51,
+"dx": 125,
+"dy": 125,
+"xx": 1,
+"xy": 0,
+"yx": 0,
+"yy": 1
+}
+}
+}
+}
+}

@@ -1,0 +1,85 @@
+{
+"name": "sweep_0_360_pad_wide",
+"sources": [
+{
+"name": "",
+"layerName": "74a9e45b",
+"locationBase": "74a9e45b"
+}
+],
+"layers": {
+"74a9e45b": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 0,
+"y": 0
+},
+{
+"x": 0,
+"y": 1000
+},
+{
+"x": 1000,
+"y": 1000
+},
+{
+"x": 1000,
+"y": 0
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+}
+},
+"customData": {
+"fontra.colrv1.paintGraph": {
+"Format": 10,
+"Glyph": "circle_r350",
+"Paint": {
+"ColorLine": {
+"ColorStop": [
+{
+"Alpha": 1,
+"PaletteIndex": 7,
+"StopOffset": -0.25,
+"VarIndexBase": 0
+},
+{
+"Alpha": 1,
+"PaletteIndex": 4,
+"StopOffset": 0.5,
+"VarIndexBase": 2
+},
+{
+"Alpha": 1,
+"PaletteIndex": 0,
+"StopOffset": 1,
+"VarIndexBase": 4
+},
+{
+"Alpha": 1,
+"PaletteIndex": 8,
+"StopOffset": 1.25,
+"VarIndexBase": 6
+}
+],
+"Extend": "pad"
+},
+"Format": 9,
+"VarIndexBase": 7,
+"centerX": 500,
+"centerY": 600,
+"endAngle": 360,
+"startAngle": 0
+}
+}
+}
+}

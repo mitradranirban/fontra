@@ -8,12 +8,12 @@
 ,color-layers.edit-description,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping
 ,color-layers.no-palette,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font
 ,color-palettes.add-palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette
-,color-palettes.color-index-tooltip,"Color index %0","Color index %0","Color index %0","Color index %0","Color index %0","Color index %0","Color index %0","Color index %0","Color index %0","Color index %0"
+,color-palettes.color-index-tooltip,Color index %0,Color index %0,Color index %0,Color index %0,Color index %0,Color index %0,Color index %0,Color index %0,Color index %0,Color index %0
 ,color-palettes.edit-description,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes
-,color-palettes.palette-label,"Palette %0","Palette %0","Palette %0","Palette %0","Palette %0","Palette %0","Palette %0","Palette %0","Palette %0","Palette %0"
+,color-palettes.palette-label,Palette %0,Palette %0,Palette %0,Palette %0,Palette %0,Palette %0,Palette %0,Palette %0,Palette %0,Palette %0
 ,color-palettes.add-color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color
 ,color-palettes.remove-palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette
-,color-palettes.palette-entry-count,"%0 entries","%0 entries","%0 entries","%0 entries","%0 entries","%0 entries","%0 entries","%0 entries","%0 entries","%0 entries"
+,color-palettes.palette-entry-count,%0 entries,%0 entries,%0 entries,%0 entries,%0 entries,%0 entries,%0 entries,%0 entries,%0 entries,%0 entries
 ,color-layers.color-index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index
 ,color-layers.alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha
 ,color-layers.paint-type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type
@@ -52,3 +52,4 @@
 ,color-layers.start-v0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0
 ,color-layers.start-v1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1
 ,sidebar.color-layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers
+,editor.paint-tool-unified,Paint Tool,Paint Tool,Paint Tool,Paint Tool,Paint Tool,Paint Tool,Paint Tool,Paint Tool,Paint Tool,Paint Tool

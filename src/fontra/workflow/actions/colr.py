@@ -2,8 +2,8 @@ import paintcompiler
 from fontTools.ttLib import TTFont
 
 from fontra.backends.fontra import loadFontraProject  # Native fontra-compile equiv
+from fontra.core.colrv1builder import build_all_glyph_paints
 
-from ..core.colrv1builder import build_all_glyph_paints
 from .base import FilterActionProtocol
 
 
