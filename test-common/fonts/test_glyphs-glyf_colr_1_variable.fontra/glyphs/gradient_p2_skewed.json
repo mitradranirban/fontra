@@ -1,0 +1,112 @@
+{
+"name": "gradient_p2_skewed",
+"sources": [
+{
+"name": "",
+"layerName": "74a9e45b",
+"locationBase": "74a9e45b"
+}
+],
+"layers": {
+"74a9e45b": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 100,
+"y": 250
+},
+{
+"x": 100,
+"y": 950
+},
+{
+"x": 1200,
+"y": 950
+},
+{
+"x": 1200,
+"y": 250
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1250
+}
+}
+},
+"customData": {
+"fontra.colrv1.paintEntries": [
+{
+"Format": 10,
+"Glyph": "gradient_p2_skewed",
+"Paint": {
+"ColorLine": {
+"ColorStop": [
+{
+"Alpha": 1,
+"PaletteIndex": 0,
+"StopOffset": 0
+},
+{
+"Alpha": 1,
+"PaletteIndex": 4,
+"StopOffset": 0.5
+},
+{
+"Alpha": 1,
+"PaletteIndex": 2,
+"StopOffset": 1
+}
+],
+"Extend": "pad"
+},
+"Format": 4,
+"x0": 100,
+"x1": 2300,
+"x2": -1000,
+"y0": 950,
+"y1": 950,
+"y2": 250
+}
+}
+],
+"fontra.colrv1.paintGraph": {
+"Format": 10,
+"Glyph": "gradient_p2_skewed",
+"Paint": {
+"ColorLine": {
+"ColorStop": [
+{
+"Alpha": 1,
+"PaletteIndex": 0,
+"StopOffset": 0
+},
+{
+"Alpha": 1,
+"PaletteIndex": 4,
+"StopOffset": 0.5
+},
+{
+"Alpha": 1,
+"PaletteIndex": 2,
+"StopOffset": 1
+}
+],
+"Extend": "pad"
+},
+"Format": 4,
+"x0": 100,
+"x1": 2300,
+"x2": -1000,
+"y0": 950,
+"y1": 950,
+"y2": 250
+}
+}
+}
+}

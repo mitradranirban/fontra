@@ -1,0 +1,112 @@
+{
+"name": "foreground_color_radial_alpha_0.3",
+"sources": [
+{
+"name": "",
+"layerName": "74a9e45b",
+"locationBase": "74a9e45b"
+}
+],
+"layers": {
+"74a9e45b": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 100,
+"y": 0
+},
+{
+"x": 100,
+"y": 1000
+},
+{
+"x": 1100,
+"y": 1000
+},
+{
+"x": 1100,
+"y": 0
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+}
+},
+"customData": {
+"fontra.colrv1.paintEntries": [
+{
+"Format": 10,
+"Glyph": "foreground_color_radial_alpha_0.3",
+"Paint": {
+"ColorLine": {
+"ColorStop": [
+{
+"Alpha": 1,
+"PaletteIndex": 1,
+"StopOffset": 0
+},
+{
+"Alpha": 0.29998779296875,
+"PaletteIndex": 65535,
+"StopOffset": 0.5
+},
+{
+"Alpha": 1,
+"PaletteIndex": 1,
+"StopOffset": 1
+}
+],
+"Extend": "pad"
+},
+"Format": 6,
+"r0": 50,
+"r1": 450,
+"x0": 500,
+"x1": 500,
+"y0": 600,
+"y1": 600
+}
+}
+],
+"fontra.colrv1.paintGraph": {
+"Format": 10,
+"Glyph": "foreground_color_radial_alpha_0.3",
+"Paint": {
+"ColorLine": {
+"ColorStop": [
+{
+"Alpha": 1,
+"PaletteIndex": 1,
+"StopOffset": 0
+},
+{
+"Alpha": 0.29998779296875,
+"PaletteIndex": 65535,
+"StopOffset": 0.5
+},
+{
+"Alpha": 1,
+"PaletteIndex": 1,
+"StopOffset": 1
+}
+],
+"Extend": "pad"
+},
+"Format": 6,
+"r0": 50,
+"r1": 450,
+"x0": 500,
+"x1": 500,
+"y0": 600,
+"y1": 600
+}
+}
+}
+}

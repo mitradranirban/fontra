@@ -1,0 +1,64 @@
+{
+"name": "foreground_color_solid_alpha_1",
+"sources": [
+{
+"name": "",
+"layerName": "74a9e45b",
+"locationBase": "74a9e45b"
+}
+],
+"layers": {
+"74a9e45b": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 100,
+"y": 0
+},
+{
+"x": 100,
+"y": 1000
+},
+{
+"x": 1100,
+"y": 1000
+},
+{
+"x": 1100,
+"y": 0
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+}
+},
+"customData": {
+"fontra.colrv1.paintEntries": [
+{
+"Format": 10,
+"Glyph": "foreground_color_solid_alpha_1",
+"Paint": {
+"Alpha": 1,
+"Format": 2,
+"PaletteIndex": 65535
+}
+}
+],
+"fontra.colrv1.paintGraph": {
+"Format": 10,
+"Glyph": "foreground_color_solid_alpha_1",
+"Paint": {
+"Alpha": 1,
+"Format": 2,
+"PaletteIndex": 65535
+}
+}
+}
+}

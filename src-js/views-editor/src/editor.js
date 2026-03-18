@@ -68,6 +68,7 @@ import { CJKDesignFrame } from "./cjk-design-frame.js";
 import { HandTool } from "./edit-tools-hand.js";
 import { KnifeTool } from "./edit-tools-knife.js";
 import { MetricsTool } from "./edit-tools-metrics.js";
+import { PaintTool } from "./edit-tools-paint.js";
 import { PenTool } from "./edit-tools-pen.js";
 import { PointerTools } from "./edit-tools-pointer.js";
 import { PowerRulerTool } from "./edit-tools-power-ruler.js";
@@ -905,6 +906,7 @@ export class EditorController extends ViewController {
       PenTool,
       KnifeTool,
       ShapeTool,
+      PaintTool,
       MetricsTool,
       PowerRulerTool,
       HandTool,

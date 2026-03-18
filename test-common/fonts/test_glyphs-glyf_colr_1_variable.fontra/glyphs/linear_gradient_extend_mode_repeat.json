@@ -1,0 +1,81 @@
+{
+"name": "linear_gradient_extend_mode_repeat",
+"sources": [
+{
+"name": "",
+"layerName": "74a9e45b",
+"locationBase": "74a9e45b"
+}
+],
+"layers": {
+"74a9e45b": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 0,
+"y": 0
+},
+{
+"x": 0,
+"y": 1000
+},
+{
+"x": 1000,
+"y": 1000
+},
+{
+"x": 1000,
+"y": 0
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+}
+},
+"customData": {
+"fontra.colrv1.paintGraph": {
+"Format": 10,
+"Glyph": "upem_box_glyph",
+"Paint": {
+"ColorLine": {
+"ColorStop": [
+{
+"Alpha": 1,
+"PaletteIndex": 3,
+"StopOffset": 0,
+"VarIndexBase": 22
+},
+{
+"Alpha": 1,
+"PaletteIndex": 9,
+"StopOffset": 0.5,
+"VarIndexBase": 24
+},
+{
+"Alpha": 1,
+"PaletteIndex": 0,
+"StopOffset": 1,
+"VarIndexBase": 26
+}
+],
+"Extend": "repeat"
+},
+"Format": 5,
+"VarIndexBase": 28,
+"x0": 0,
+"x1": 307,
+"x2": 0,
+"y0": 1024,
+"y1": 1024,
+"y2": 717
+}
+}
+}
+}

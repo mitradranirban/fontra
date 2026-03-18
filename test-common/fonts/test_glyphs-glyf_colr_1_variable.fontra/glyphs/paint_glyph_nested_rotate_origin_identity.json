@@ -1,0 +1,85 @@
+{
+"name": "paint_glyph_nested_rotate_origin_identity",
+"sources": [
+{
+"name": "",
+"layerName": "74a9e45b",
+"locationBase": "74a9e45b"
+}
+],
+"layers": {
+"74a9e45b": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 0,
+"y": 0
+},
+{
+"x": 0,
+"y": 1000
+},
+{
+"x": 1000,
+"y": 1000
+},
+{
+"x": 1000,
+"y": 0
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+}
+},
+"customData": {
+"fontra.colrv1.paintGraph": {
+"Format": 10,
+"Glyph": "negative_cross",
+"Paint": {
+"Format": 24,
+"Paint": {
+"Format": 10,
+"Glyph": "triangle",
+"Paint": {
+"Format": 14,
+"Paint": {
+"ColorLine": {
+"ColorStop": [
+{
+"Alpha": 1,
+"PaletteIndex": 0,
+"StopOffset": 0
+},
+{
+"Alpha": 1,
+"PaletteIndex": 4,
+"StopOffset": 1
+}
+],
+"Extend": "repeat"
+},
+"Format": 4,
+"x0": 650,
+"x1": 200,
+"x2": 800,
+"y0": 510,
+"y1": 250,
+"y2": 250
+},
+"dx": 0,
+"dy": 0
+}
+},
+"angle": 9.99755859375
+}
+}
+}
+}

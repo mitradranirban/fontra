@@ -90,7 +90,7 @@
 ]
 },
 "type": "PaintLinearGradient",
-"x0": 130,
+"x0": 286,
 "x1": {
 "default": 630,
 "keyframes": [
@@ -106,10 +106,10 @@
 }
 ]
 },
-"x2": 26,
-"y0": 370,
+"x2": 99,
+"y0": 313,
 "y1": 249,
-"y2": 392
+"y2": 60
 },
 "type": "PaintGlyph"
 }

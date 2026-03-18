@@ -76,7 +76,7 @@
 "glyph": "A.solid",
 "paint": {
 "alpha": 0.5,
-"paletteIndex": 4,
+"paletteIndex": 0,
 "type": "PaintSolid"
 },
 "type": "PaintGlyph"

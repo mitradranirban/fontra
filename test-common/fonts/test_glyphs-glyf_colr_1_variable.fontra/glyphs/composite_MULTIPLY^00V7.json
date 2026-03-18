@@ -1,0 +1,92 @@
+{
+"name": "composite_MULTIPLY",
+"sources": [
+{
+"name": "",
+"layerName": "74a9e45b",
+"locationBase": "74a9e45b"
+}
+],
+"layers": {
+"74a9e45b": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 0,
+"y": 0
+},
+{
+"x": 0,
+"y": 1000
+},
+{
+"x": 1000,
+"y": 1000
+},
+{
+"x": 1000,
+"y": 0
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000
+}
+}
+},
+"customData": {
+"fontra.colrv1.paintGraph": {
+"Format": 1,
+"Layers": [
+{
+"Format": 10,
+"Glyph": "cross_glyph",
+"Paint": {
+"Alpha": 1,
+"Format": 2,
+"PaletteIndex": 10
+}
+},
+{
+"BackdropPaint": {
+"Format": 22,
+"Paint": {
+"Format": 10,
+"Glyph": "upem_box_glyph",
+"Paint": {
+"Alpha": 1,
+"Format": 2,
+"PaletteIndex": 12
+}
+},
+"centerX": 333,
+"centerY": 667,
+"scale": 0.5
+},
+"CompositeMode": "multiply",
+"Format": 32,
+"SourcePaint": {
+"Format": 22,
+"Paint": {
+"Format": 10,
+"Glyph": "upem_box_glyph",
+"Paint": {
+"Alpha": 1,
+"Format": 2,
+"PaletteIndex": 11
+}
+},
+"centerX": 667,
+"centerY": 333,
+"scale": 0.5
+}
+}
+]
+}
+}
+}

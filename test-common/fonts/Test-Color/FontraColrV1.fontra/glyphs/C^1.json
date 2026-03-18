@@ -1,0 +1,367 @@
+{
+"name": "C",
+"sources": [
+{
+"name": "",
+"layerName": "28e6e158",
+"locationBase": "28e6e158"
+},
+{
+"name": "shadow=1",
+"layerName": "shadow=1",
+"location": {
+"shadow": 1
+}
+}
+],
+"layers": {
+"28e6e158": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 407,
+"y": 125
+},
+{
+"x": 441,
+"y": 98
+},
+{
+"x": 404,
+"y": 36,
+"type": "cubic"
+},
+{
+"x": 345,
+"y": -4,
+"type": "cubic"
+},
+{
+"x": 278,
+"y": -4,
+"smooth": true
+},
+{
+"x": 166.4384805404,
+"y": -4,
+"type": "cubic"
+},
+{
+"x": 76,
+"y": 107.92881255,
+"type": "cubic"
+},
+{
+"x": 76,
+"y": 246,
+"smooth": true
+},
+{
+"x": 76,
+"y": 384.07118745,
+"type": "cubic"
+},
+{
+"x": 166.4384805404,
+"y": 496,
+"type": "cubic"
+},
+{
+"x": 278,
+"y": 496,
+"smooth": true
+},
+{
+"x": 341,
+"y": 496,
+"type": "cubic"
+},
+{
+"x": 397,
+"y": 460,
+"type": "cubic"
+},
+{
+"x": 434,
+"y": 404
+},
+{
+"x": 403,
+"y": 373
+},
+{
+"x": 373,
+"y": 418,
+"type": "cubic"
+},
+{
+"x": 328,
+"y": 446,
+"type": "cubic"
+},
+{
+"x": 278,
+"y": 446,
+"smooth": true
+},
+{
+"x": 189,
+"y": 446,
+"type": "cubic"
+},
+{
+"x": 116,
+"y": 356,
+"type": "cubic"
+},
+{
+"x": 116,
+"y": 246,
+"smooth": true
+},
+{
+"x": 116,
+"y": 136,
+"type": "cubic"
+},
+{
+"x": 189,
+"y": 46,
+"type": "cubic"
+},
+{
+"x": 278,
+"y": 46,
+"smooth": true
+},
+{
+"x": 330,
+"y": 46,
+"type": "cubic"
+},
+{
+"x": 377,
+"y": 77,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 500,
+"customData": {
+"colorv1": {
+"layers": [
+{
+"glyph": "C",
+"paint": {
+"colorLine": {
+"colorStops": [
+{
+"alpha": 1,
+"paletteIndex": 3,
+"stopOffset": 0
+},
+{
+"alpha": 1,
+"paletteIndex": 1,
+"stopOffset": 1
+}
+]
+},
+"type": "PaintLinearGradient",
+"x0": 0,
+"x1": 500,
+"x2": 500,
+"y0": 0,
+"y1": 0,
+"y2": 500
+},
+"type": "PaintGlyph"
+}
+],
+"type": "PaintColrLayers"
+}
+}
+}
+},
+"shadow=1": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 407,
+"y": 125
+},
+{
+"x": 441,
+"y": 98
+},
+{
+"x": 404,
+"y": 36,
+"type": "cubic"
+},
+{
+"x": 345,
+"y": -4,
+"type": "cubic"
+},
+{
+"x": 278,
+"y": -4,
+"smooth": true
+},
+{
+"x": 166,
+"y": -4,
+"type": "cubic"
+},
+{
+"x": 76,
+"y": 108,
+"type": "cubic"
+},
+{
+"x": 76,
+"y": 246,
+"smooth": true
+},
+{
+"x": 76,
+"y": 384,
+"type": "cubic"
+},
+{
+"x": 166,
+"y": 496,
+"type": "cubic"
+},
+{
+"x": 278,
+"y": 496,
+"smooth": true
+},
+{
+"x": 341,
+"y": 496,
+"type": "cubic"
+},
+{
+"x": 397,
+"y": 460,
+"type": "cubic"
+},
+{
+"x": 434,
+"y": 404
+},
+{
+"x": 403,
+"y": 373
+},
+{
+"x": 373,
+"y": 418,
+"type": "cubic"
+},
+{
+"x": 328,
+"y": 446,
+"type": "cubic"
+},
+{
+"x": 278,
+"y": 446,
+"smooth": true
+},
+{
+"x": 189,
+"y": 446,
+"type": "cubic"
+},
+{
+"x": 116,
+"y": 356,
+"type": "cubic"
+},
+{
+"x": 116,
+"y": 246,
+"smooth": true
+},
+{
+"x": 116,
+"y": 136,
+"type": "cubic"
+},
+{
+"x": 189,
+"y": 46,
+"type": "cubic"
+},
+{
+"x": 278,
+"y": 46,
+"smooth": true
+},
+{
+"x": 330,
+"y": 46,
+"type": "cubic"
+},
+{
+"x": 377,
+"y": 77,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 500,
+"customData": {
+"colorv1": {
+"layers": [
+{
+"glyph": "C",
+"paint": {
+"colorLine": {
+"colorStops": [
+{
+"alpha": 1,
+"paletteIndex": 3,
+"stopOffset": 0
+},
+{
+"alpha": 1,
+"paletteIndex": 1,
+"stopOffset": 1
+}
+]
+},
+"type": "PaintLinearGradient",
+"x0": 243,
+"x1": 404,
+"x2": 44,
+"y0": 513,
+"y1": 202,
+"y2": 236
+},
+"type": "PaintGlyph"
+}
+],
+"type": "PaintColrLayers"
+}
+}
+}
+}
+}
+}
