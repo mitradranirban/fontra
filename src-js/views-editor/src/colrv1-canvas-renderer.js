@@ -237,12 +237,42 @@ function _renderPaint(
 
     case "PaintLinearGradient":
     case "PaintVarLinearGradient": {
-      const grad = ctx.createLinearGradient(
-        resolveVal(paint.x0, axisValues),
-        resolveVal(paint.y0, axisValues),
-        resolveVal(paint.x1, axisValues),
-        resolveVal(paint.y1, axisValues)
-      );
+      const x0 = resolveVal(paint.x0, axisValues);
+      const y0 = resolveVal(paint.y0, axisValues);
+      const x1 = resolveVal(paint.x1, axisValues);
+      const y1 = resolveVal(paint.y1, axisValues);
+      const x2 = resolveVal(paint.x2, axisValues);
+      const y2 = resolveVal(paint.y2, axisValues);
+
+      // COLRv1 spec (OpenType §COLR.PaintLinearGradient):
+      // The gradient axis is NOT simply P0→P1. P2 acts as a rotation anchor:
+      // the effective end point is the projection of P1 onto the line through
+      // P0 that is perpendicular to (P2 - P0).
+      //
+      // Derivation:
+      //   perp = rotate(P2 - P0, -90°) = (-dy2, dx2)
+      //   scale = dot(P1 - P0, perp) / dot(perp, perp)
+      //   P1eff = P0 + scale * perp
+      //
+      // When P2 == P0 (degenerate), fall back to using P1 directly.
+      const dx2 = x2 - x0;
+      const dy2 = y2 - y0;
+      const len2sq = dx2 * dx2 + dy2 * dy2;
+
+      let ex1, ey1;
+      if (len2sq < 1e-10) {
+        // Degenerate: P2 coincides with P0 — fall back to P0→P1 axis
+        ex1 = x1;
+        ey1 = y1;
+      } else {
+        // Perpendicular to (P2-P0) is (-dy2, dx2)
+        const dot = (x1 - x0) * -dy2 + (y1 - y0) * dx2;
+        const scale = dot / len2sq;
+        ex1 = x0 + scale * -dy2;
+        ey1 = y0 + scale * dx2;
+      }
+
+      const grad = ctx.createLinearGradient(x0, y0, ex1, ey1);
       _applyColorLine(grad, paint.colorLine, palette, axisValues);
       ctx.fillStyle = grad;
       _fillBig(ctx);
@@ -251,6 +281,22 @@ function _renderPaint(
 
     case "PaintRadialGradient":
     case "PaintVarRadialGradient": {
+      ctx.save();
+      // COLRv1 radial gradients may carry an affine transform that skews or
+      // rotates the cone (e.g. to produce elliptical gradients). Canvas 2D
+      // createRadialGradient always produces a symmetric axis-aligned cone, so
+      // we apply the transform to the context instead.
+      if (paint.transform) {
+        const t = paint.transform;
+        ctx.transform(
+          resolveVal(t.xx, axisValues) ?? 1,
+          resolveVal(t.yx, axisValues) ?? 0,
+          resolveVal(t.xy, axisValues) ?? 0,
+          resolveVal(t.yy, axisValues) ?? 1,
+          resolveVal(t.dx, axisValues) ?? 0,
+          resolveVal(t.dy, axisValues) ?? 0
+        );
+      }
       try {
         const grad = ctx.createRadialGradient(
           resolveVal(paint.x0, axisValues),
@@ -266,18 +312,43 @@ function _renderPaint(
       } catch (e) {
         /* degenerate radii */
       }
+      ctx.restore();
       break;
     }
 
     case "PaintSweepGradient":
     case "PaintVarSweepGradient": {
       try {
+        const startAngle = resolveVal(paint.startAngle, axisValues) * Math.PI * 2;
+        const endAngle = resolveVal(paint.endAngle, axisValues) * Math.PI * 2;
+
+        // COLRv1 sweep angles are counter-clockwise (font Y-up). Canvas 2D
+        // createConicGradient is clockwise (Y-down). The scene transform has
+        // already flipped Y, so we negate the start angle to correct direction.
         const grad = ctx.createConicGradient(
-          resolveVal(paint.startAngle, axisValues) * Math.PI * 2,
+          -startAngle,
           resolveVal(paint.centerX, axisValues),
           resolveVal(paint.centerY, axisValues)
         );
-        _applyColorLine(grad, paint.colorLine, palette, axisValues);
+
+        // createConicGradient always spans a full 360°. COLRv1 sweep gradients
+        // only fill the [startAngle, endAngle] arc, so remap color stop offsets
+        // from that arc onto the [0, 1] range the conic gradient expects.
+        const arcSpan = endAngle - startAngle;
+        if (Math.abs(arcSpan) > 1e-10 && paint.colorLine?.colorStops?.length) {
+          const scale = arcSpan / (Math.PI * 2);
+          const remapped = {
+            ...paint.colorLine,
+            colorStops: paint.colorLine.colorStops.map((stop) => ({
+              ...stop,
+              stopOffset: resolveVal(stop.stopOffset, axisValues) * scale,
+            })),
+          };
+          _applyColorLine(grad, remapped, palette, axisValues);
+        } else {
+          _applyColorLine(grad, paint.colorLine, palette, axisValues);
+        }
+
         ctx.fillStyle = grad;
         _fillBig(ctx);
       } catch (e) {}
