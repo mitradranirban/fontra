@@ -79,11 +79,26 @@ function collectHandles(paint) {
       handles.push({ layerIdx: i, role: "center0", x: p.x0 ?? 0, y: p.y0 ?? 0 });
       handles.push({ layerIdx: i, role: "center1", x: p.x1 ?? 0, y: p.y1 ?? 0 });
     } else if (t === "PaintSweepGradient") {
+      const cx = p.centerX ?? 0;
+      const cy = p.centerY ?? 0;
+      handles.push({ layerIdx: i, role: "sweepCenter", x: cx, y: cy });
+
+      // Add angle handles (display radius; does not affect gradient)
+      const SWEEP_HANDLE_RADIUS = 100;
+      const startRad = (p.startAngle ?? 0) * 180 * (Math.PI / 180);
+      const endRad = (p.endAngle ?? 0.5) * 180 * (Math.PI / 180);
+
       handles.push({
         layerIdx: i,
-        role: "sweepCenter",
-        x: p.centerX ?? 0,
-        y: p.centerY ?? 0,
+        role: "sweepStart",
+        x: cx + SWEEP_HANDLE_RADIUS * Math.cos(startRad),
+        y: cy + SWEEP_HANDLE_RADIUS * Math.sin(startRad),
+      });
+      handles.push({
+        layerIdx: i,
+        role: "sweepEnd",
+        x: cx + SWEEP_HANDLE_RADIUS * Math.cos(endRad),
+        y: cy + SWEEP_HANDLE_RADIUS * Math.sin(endRad),
       });
     } else if (t === "PaintSolid") {
       handles.push({ layerIdx: i, role: "solid", x: 0, y: 0 });
@@ -101,8 +116,11 @@ const ROLE_KEY_MAP = {
   center0: { xKey: "x0", yKey: "y0" },
   center1: { xKey: "x1", yKey: "y1" },
   sweepCenter: { xKey: "centerX", yKey: "centerY" },
+  sweepStart: { angleKey: "startAngle" },
+  sweepEnd: { angleKey: "endAngle" },
+  r0: { xKey: "x0", yKey: "y0" }, // r0 handle at (x0 + r0, y0)
+  r1: { xKey: "x1", yKey: "y1" }, // r1 handle at (x1 + r1, y1)
 };
-
 // ─── Unified paint tool ────────────────────────────────────────────────────────
 
 export class UnifiedPaintTool extends BaseTool {
@@ -163,7 +181,7 @@ export class UnifiedPaintTool extends BaseTool {
     }
 
     // Gradient / sweep handle drag
-    await this._dragHandle(hit, eventStream, initialEvent);
+    await this.dragHandle(hit, eventStream, initialEvent);
   }
 
   // ── Lifecycle ────────────────────────────────────────────────────────────────
@@ -209,7 +227,9 @@ export class UnifiedPaintTool extends BaseTool {
     }
     return best;
   }
-
+  glyphPoint(event) {
+    return this.sceneController.selectedGlyphPoint(event);
+  }
   _updateHighlight(event) {
     const hit = this._hitTest(event);
     this.sceneModel.paintToolHighlight = hit;
@@ -218,8 +238,8 @@ export class UnifiedPaintTool extends BaseTool {
     this.canvasController.requestUpdate();
   }
 
-  async _dragHandle(hit, eventStream, initialEvent) {
-    const initialPt = this._glyphPoint(initialEvent);
+  async dragHandle(hit, eventStream, initialEvent) {
+    const initialPt = this.glyphPoint(initialEvent);
     if (!(await shouldInitiateDrag(eventStream, initialEvent))) return;
 
     const paint = getV1Paint(this.sceneController);
@@ -227,55 +247,73 @@ export class UnifiedPaintTool extends BaseTool {
 
     const layer = paint.layers[hit.layerIdx];
     const fillPaint = layer.paint ?? layer;
-    const keys = ROLE_KEY_MAP[hit.role];
+    const keys = ROLE_KEY_MAP[hit.role]; // Note: your underscore naming
     if (!keys) return;
 
-    const startX = fillPaint[keys.xKey] ?? 0;
-    const startY = fillPaint[keys.yKey] ?? 0;
+    // For angle handles: preview relative to ORIGINAL handle position
+    let previewBaseX = hit.x;
+    let previewBaseY = hit.y;
+
+    if (keys.xKey && keys.yKey) {
+      // Direct position handles (p0/p1/etc)
+      previewBaseX = fillPaint[keys.xKey] ?? 0;
+      previewBaseY = fillPaint[keys.yKey] ?? 0;
+    }
 
     for await (const event of eventStream) {
-      const pt = this._glyphPoint(event);
+      const pt = this.glyphPoint(event);
       if (pt.x === undefined) continue;
 
       this.sceneModel.paintToolDragPreview = {
         layerIdx: hit.layerIdx,
         role: hit.role,
-        x: startX + (pt.x - initialPt.x),
-        y: startY + (pt.y - initialPt.y),
+        x: previewBaseX + (pt.x - initialPt.x),
+        y: previewBaseY + (pt.y - initialPt.y),
       };
       this.canvasController.requestUpdate();
     }
 
-    // Commit on mouse-up
+    // Commit final position
     const preview = this.sceneModel.paintToolDragPreview;
     if (preview) {
-      await this._commitHandleDrag(hit, preview.x, preview.y, paint);
+      await this.commitHandleDrag(hit, preview.x, preview.y, paint);
+      delete this.sceneModel.paintToolDragPreview;
     }
-    delete this.sceneModel.paintToolDragPreview;
     this.canvasController.requestUpdate();
   }
-
-  async _commitHandleDrag(hit, newX, newY, paint) {
+  async commitHandleDrag(hit, newX, newY, paint) {
     const keys = ROLE_KEY_MAP[hit.role];
-    if (!keys) return;
+    if (!keys) return console.warn("No keys for role:", hit.role);
 
     const layers = paint.layers.map((layer, i) => {
       if (i !== hit.layerIdx) return layer;
-      if (layer.paint != null) {
-        return {
-          ...layer,
-          paint: {
-            ...layer.paint,
-            [keys.xKey]: Math.round(newX),
-            [keys.yKey]: Math.round(newY),
-          },
+      const fillPaint = layer.paint ?? layer;
+
+      if (keys.angleKey) {
+        // COMPUTE ANGLE FROM VECTOR TO CENTER
+        const cx = fillPaint.centerX ?? 0;
+        const cy = fillPaint.centerY ?? 0;
+        const angleRad = Math.atan2(newY - cy, newX - cx);
+        // COLRv1 format: (radians → degrees → /180)
+        const angleColr = (angleRad * 180) / Math.PI / 180;
+
+        const newFillPaint = { ...fillPaint, [keys.angleKey]: angleColr };
+        return layer.paint ? { ...layer, paint: newFillPaint } : newFillPaint;
+      } else if (keys.xKey && keys.yKey) {
+        // EXISTING: Direct position/radius handles
+        const newFillPaint = {
+          ...fillPaint,
+          [keys.xKey]: Math.round(newX),
+          [keys.yKey]: Math.round(newY),
         };
+        return layer.paint ? { ...layer, paint: newFillPaint } : newFillPaint;
       }
-      return { ...layer, [keys.xKey]: Math.round(newX), [keys.yKey]: Math.round(newY) };
+
+      console.warn("Unhandled handle type:", hit.role);
+      return layer;
     });
 
     await writeV1Paint(this.sceneController, { ...paint, layers });
-    this.sceneController._dispatchEvent(new CustomEvent("glyphChanged"));
   }
 
   async _cyclePaletteIndex(layerIdx, delta) {
