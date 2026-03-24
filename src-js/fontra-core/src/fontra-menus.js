@@ -79,28 +79,30 @@ function getHelpMenu() {
           title: translate("menubar.help.homepage"),
           enabled: () => true,
           callback: () => {
-            window.open("https://fontra.xyz/");
+            window.open("https://mitradranirban.github.io/colr-pak/");
           },
         },
         {
           title: translate("menubar.help.documentation"),
           enabled: () => true,
           callback: () => {
-            window.open("https://docs.fontra.xyz");
+            window.open("https://fonts.atipra.in/colrpak.html");
           },
         },
         {
           title: translate("menubar.help.changelog"),
           enabled: () => true,
           callback: () => {
-            window.open("https://fontra.xyz/changelog.html");
+            window.open(
+              "https://github.com/mitradranirban/colr-pak/blob/main/CHANGELOG.md"
+            );
           },
         },
         {
           title: "GitHub",
           enabled: () => true,
           callback: () => {
-            window.open("https://github.com/fontra/fontra");
+            window.open("https://github.com/mitradranirban/colr-pak");
           },
         },
       ];

@@ -9,7 +9,7 @@ import { getRemoteProxy } from "./remote.js";
 
 export class ViewController {
   static titlePattern(displayName) {
-    return `Fontra — ${displayName}`;
+    return `ColrPak — ${displayName}`;
   }
 
   static async fromBackend() {
