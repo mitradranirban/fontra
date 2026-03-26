@@ -221,6 +221,7 @@ async def test_getShaperFontData_ttf():
         "GlyphOrder",
         "fvar",
         "head",
+        "maxp",
         "name",
         "post",
     ]
@@ -240,6 +241,7 @@ async def test_getShaperFontData_ttx():
         "GlyphOrder",
         "fvar",
         "head",
+        "maxp",
         "name",
         "post",
     ]
