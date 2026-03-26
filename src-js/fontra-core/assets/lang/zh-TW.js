@@ -316,6 +316,10 @@ export const strings = {
   "sidebar.characters-glyphs.input-characters": "輸入字元",
   "sidebar.characters-glyphs.output-glyphs": "輸出字形",
   "sidebar.characters-glyphs.shaping-debugger": "Shaping debugger",
+  "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
+    "Shaping debugger options",
+  "sidebar.characters-glyphs.shaping-debugger.show-ineffective-items":
+    "Show ineffective items",
   "sidebar.color-layers": "Color Layers",
   "sidebar.color-layers.title": "Color Layers",
   "sidebar.designspace-navigation": "Designspace 導覽",

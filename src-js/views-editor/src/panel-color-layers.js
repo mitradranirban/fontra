@@ -1403,7 +1403,7 @@ export default class ColorLayersPanel extends Panel {
         formContents.push({
           type: "edit-number",
           key: JSON.stringify(["colorIndex", i]),
-          label: translate("sidebar.selection-info.color-index"),
+          label: translate("color-layers.color-index"),
           value: colorIndex,
           integer: true,
           minValue: 0,

@@ -330,6 +330,10 @@ export const strings = {
   "sidebar.characters-glyphs.input-characters": "Input characters",
   "sidebar.characters-glyphs.output-glyphs": "Output glyphs",
   "sidebar.characters-glyphs.shaping-debugger": "Shaping debugger",
+  "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip":
+    "Shaping debugger options",
+  "sidebar.characters-glyphs.shaping-debugger.show-ineffective-items":
+    "Show ineffective items",
   "sidebar.color-layers": "Color Layers",
   "sidebar.color-layers.title": "Color Layers",
   "sidebar.designspace-navigation": "Designspaceナビゲーション",
