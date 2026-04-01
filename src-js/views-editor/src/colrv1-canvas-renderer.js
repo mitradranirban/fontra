@@ -1,5 +1,4 @@
 // src-js/views-editor/src/colrv1-canvas-renderer.js
-// src-js/views-editor/src/colrv1-canvas-renderer.js
 //
 // Renders a COLRv1 paint graph onto a Canvas 2D context.
 // Called from the "colrv1-paint-overlay" visualization layer.
@@ -41,27 +40,16 @@ export function getTagLocation(fontController, sceneSettings) {
 
 export function getPaintGraph(customData) {
   if (!customData) return null;
-
   // .fontra source — already in Fontra format (has "type" key)
   const fontraFormat = customData[COLRV1_KEY];
   if (fontraFormat) return fontraFormat;
 
-  // Check fontra.colrv1.paintGraph — may be Fontra format OR raw fontTools format
+  // TTF/OTF backend via opentype.py — stored as "fontra.colrv1.paintGraph"
+  // May be raw fontTools format (has numeric "Format" key) or already Fontra format
   const paintGraph = customData["fontra.colrv1.paintGraph"];
   if (paintGraph) {
-    // Raw fontTools format has numeric "Format" key, Fontra format has "type"
     if (paintGraph.Format != null) return _convertPaintGraph(paintGraph);
-    return paintGraph; // already Fontra format (.fontra source)
-  }
-
-  // TTF backend — explicit raw paintGraph (alternate storage key)
-  const rawGraph = customData["fontra.colrv1.paintGraph.raw"];
-  if (rawGraph?.Format != null) return _convertPaintGraph(rawGraph);
-
-  // TTF backend — raw paintEntries array → wrap in PaintColrLayers
-  const rawEntries = customData["fontra.colrv1.paintEntries"];
-  if (rawEntries?.length) {
-    return _convertPaintGraph({ Format: 1, Layers: rawEntries });
+    return paintGraph;
   }
 
   return null;
@@ -114,7 +102,9 @@ export function renderCOLRv1(
   positionedGlyph,
   fontController,
   axisValues,
-  activePaletteIndex = 0
+  activePaletteIndex = 0,
+  controller = null,
+  cache
 ) {
   const glyphController = positionedGlyph?.glyph;
   if (!glyphController) return;
@@ -124,8 +114,8 @@ export function renderCOLRv1(
     positionedGlyph?.varGlyph?.glyph?.customData ??
     positionedGlyph?.varGlyph?.customData;
 
-  let paint = getPaintGraph(instanceCd) ?? getPaintGraph(varGlyphCd);
-  if (!paint) return;
+  const resolvedPaint = getPaintGraph(instanceCd) ?? getPaintGraph(varGlyphCd);
+  if (!resolvedPaint) return;
 
   const palettes = fontController.customData?.[PALETTES_KEY];
   if (!palettes?.length) return;
@@ -134,16 +124,34 @@ export function renderCOLRv1(
   const palette = palettes[pi];
 
   const outlineCache = new Map();
+  const pathCache = cache instanceof Map ? cache : new Map();
+  const referencedGlyphs =
+    instanceCd?.["fontra.colrv1.referencedGlyphs"] ??
+    varGlyphCd?.["fontra.colrv1.referencedGlyphs"] ??
+    [];
+  for (const name of referencedGlyphs) {
+    // 1. Correct the argument order to match your helper's definition
+    // 2. Remove 'outlineCache' from the call (use pathCache instead)
+    const p = _getOutlinePath2D(name, fontController, controller, pathCache);
 
+    // 3. If the path isn't ready yet, we can't draw this layer.
+    // Return to avoid errors in _renderPaint
+    if (!p) {
+      console.log(`Waiting for ${name}...`);
+      continue;
+    }
+  }
   ctx.save();
   _renderPaint(
     ctx,
-    paint,
+    resolvedPaint,
     palette,
     axisValues,
     fontController,
     outlineCache,
-    positionedGlyph
+    positionedGlyph,
+    0,
+    controller
   );
   ctx.restore();
 }
@@ -160,7 +168,8 @@ function _renderPaint(
   fontController,
   outlineCache,
   positionedGlyph,
-  _depth = 0
+  _depth = 0,
+  controller
 ) {
   if (!paint) return;
   if (_depth > 32) {
@@ -179,35 +188,36 @@ function _renderPaint(
           fontController,
           outlineCache,
           positionedGlyph,
-          _depth + 1
+          _depth + 1,
+          controller
         );
       }
       break;
     }
 
     case "PaintGlyph": {
-      // Look up named glyph outline — NOT the current positionedGlyph
+      const glyphName = paint.glyphName ?? paint.Glyph ?? paint.glyph ?? "";
       const path2d =
-        _getOutlinePath2D(paint.glyphName, fontController, outlineCache) ??
+        _getOutlinePath2D(glyphName, fontController, outlineCache, controller) ??
         positionedGlyph?.glyph?.flattenedPath2d;
       ctx.save();
       if (path2d) ctx.clip(path2d);
       _renderPaint(
         ctx,
-        paint.paint,
+        paint.paint ?? paint.Paint,
         palette,
         axisValues,
         fontController,
         outlineCache,
         positionedGlyph,
-        _depth + 1
+        _depth + 1,
+        controller
       );
       ctx.restore();
       break;
     }
 
     case "PaintColrGlyph": {
-      // Recursively render a glyph that has its own COLR entry
       const refGlyph = fontController.getCachedGlyph?.(paint.glyphName);
       const refCd = refGlyph?.customData ?? refGlyph?.instance?.customData;
       const refPaint = getPaintGraph(refCd);
@@ -220,7 +230,8 @@ function _renderPaint(
           fontController,
           outlineCache,
           positionedGlyph,
-          _depth + 1
+          _depth + 1,
+          controller
         );
       }
       break;
@@ -244,28 +255,15 @@ function _renderPaint(
       const x2 = resolveVal(paint.x2, axisValues);
       const y2 = resolveVal(paint.y2, axisValues);
 
-      // COLRv1 spec (OpenType §COLR.PaintLinearGradient):
-      // The gradient axis is NOT simply P0→P1. P2 acts as a rotation anchor:
-      // the effective end point is the projection of P1 onto the line through
-      // P0 that is perpendicular to (P2 - P0).
-      //
-      // Derivation:
-      //   perp = rotate(P2 - P0, -90°) = (-dy2, dx2)
-      //   scale = dot(P1 - P0, perp) / dot(perp, perp)
-      //   P1eff = P0 + scale * perp
-      //
-      // When P2 == P0 (degenerate), fall back to using P1 directly.
       const dx2 = x2 - x0;
       const dy2 = y2 - y0;
       const len2sq = dx2 * dx2 + dy2 * dy2;
 
       let ex1, ey1;
       if (len2sq < 1e-10) {
-        // Degenerate: P2 coincides with P0 — fall back to P0→P1 axis
         ex1 = x1;
         ey1 = y1;
       } else {
-        // Perpendicular to (P2-P0) is (-dy2, dx2)
         const dot = (x1 - x0) * -dy2 + (y1 - y0) * dx2;
         const scale = dot / len2sq;
         ex1 = x0 + scale * -dy2;
@@ -282,10 +280,6 @@ function _renderPaint(
     case "PaintRadialGradient":
     case "PaintVarRadialGradient": {
       ctx.save();
-      // COLRv1 radial gradients may carry an affine transform that skews or
-      // rotates the cone (e.g. to produce elliptical gradients). Canvas 2D
-      // createRadialGradient always produces a symmetric axis-aligned cone, so
-      // we apply the transform to the context instead.
       if (paint.transform) {
         const t = paint.transform;
         ctx.transform(
@@ -321,19 +315,11 @@ function _renderPaint(
       try {
         const startAngle = resolveVal(paint.startAngle, axisValues) * Math.PI * 2;
         const endAngle = resolveVal(paint.endAngle, axisValues) * Math.PI * 2;
-
-        // COLRv1 sweep angles are counter-clockwise (font Y-up). Canvas 2D
-        // createConicGradient is clockwise (Y-down). The scene transform has
-        // already flipped Y, so we negate the start angle to correct direction.
         const grad = ctx.createConicGradient(
           -startAngle,
           resolveVal(paint.centerX, axisValues),
           resolveVal(paint.centerY, axisValues)
         );
-
-        // createConicGradient always spans a full 360°. COLRv1 sweep gradients
-        // only fill the [startAngle, endAngle] arc, so remap color stop offsets
-        // from that arc onto the [0, 1] range the conic gradient expects.
         const arcSpan = endAngle - startAngle;
         if (Math.abs(arcSpan) > 1e-10 && paint.colorLine?.colorStops?.length) {
           const scale = arcSpan / (Math.PI * 2);
@@ -348,7 +334,6 @@ function _renderPaint(
         } else {
           _applyColorLine(grad, paint.colorLine, palette, axisValues);
         }
-
         ctx.fillStyle = grad;
         _fillBig(ctx);
       } catch (e) {}
@@ -367,7 +352,8 @@ function _renderPaint(
         fontController,
         outlineCache,
         positionedGlyph,
-        _depth + 1
+        _depth + 1,
+        controller
       );
       ctx.restore();
       break;
@@ -385,7 +371,8 @@ function _renderPaint(
         fontController,
         outlineCache,
         positionedGlyph,
-        _depth + 1
+        _depth + 1,
+        controller
       );
       ctx.restore();
       break;
@@ -408,7 +395,8 @@ function _renderPaint(
         fontController,
         outlineCache,
         positionedGlyph,
-        _depth + 1
+        _depth + 1,
+        controller
       );
       ctx.restore();
       break;
@@ -429,7 +417,8 @@ function _renderPaint(
         fontController,
         outlineCache,
         positionedGlyph,
-        _depth + 1
+        _depth + 1,
+        controller
       );
       ctx.restore();
       break;
@@ -454,7 +443,8 @@ function _renderPaint(
         fontController,
         outlineCache,
         positionedGlyph,
-        _depth + 1
+        _depth + 1,
+        controller
       );
       ctx.restore();
       break;
@@ -473,7 +463,8 @@ function _renderPaint(
         fontController,
         outlineCache,
         positionedGlyph,
-        _depth + 1
+        _depth + 1,
+        controller
       );
       ctx.restore();
       break;
@@ -496,7 +487,8 @@ function _renderPaint(
         fontController,
         outlineCache,
         positionedGlyph,
-        _depth + 1
+        _depth + 1,
+        controller
       );
       ctx.restore();
       break;
@@ -521,7 +513,8 @@ function _renderPaint(
         fontController,
         outlineCache,
         positionedGlyph,
-        _depth + 1
+        _depth + 1,
+        controller
       );
       ctx.restore();
       break;
@@ -550,7 +543,8 @@ function _renderPaint(
         fontController,
         outlineCache,
         positionedGlyph,
-        _depth + 1
+        _depth + 1,
+        controller
       );
       ctx.restore();
       break;
@@ -576,7 +570,8 @@ function _renderPaint(
         fontController,
         outlineCache,
         positionedGlyph,
-        _depth + 1
+        _depth + 1,
+        controller
       );
       ctx.restore();
       break;
@@ -592,7 +587,8 @@ function _renderPaint(
         fontController,
         outlineCache,
         positionedGlyph,
-        _depth + 1
+        _depth + 1,
+        controller
       );
       ctx.globalCompositeOperation = _compositeMode(paint.compositeMode);
       _renderPaint(
@@ -603,7 +599,8 @@ function _renderPaint(
         fontController,
         outlineCache,
         positionedGlyph,
-        _depth + 1
+        _depth + 1,
+        controller
       );
       ctx.restore();
       break;
@@ -651,7 +648,6 @@ function _paletteColor(palette, index, alphaOverride = 1.0) {
   )},${finalAlpha.toFixed(4)})`;
 }
 
-// Map COLRv1 composite mode names to Canvas 2D globalCompositeOperation values
 function _compositeMode(mode) {
   const map = {
     src_over: "source-over",
@@ -685,100 +681,72 @@ function _compositeMode(mode) {
   return map[mode] ?? "source-over";
 }
 
-function _getOutlinePath2D(glyphName, fontController, cache) {
-  if (!glyphName) return null;
+function _getOutlinePath2D(glyphName, fontController, controller, cache) {
+  // 1. Immediate Return if Cached
   if (cache.has(glyphName)) return cache.get(glyphName);
 
-  const glyph = fontController.getCachedGlyph?.(glyphName);
-  const path = glyph?.path ?? glyph?.instance?.path;
-  if (!path) {
-    cache.set(glyphName, null);
-    return null;
+  // 2. Check active UI controllers (Live edits)
+  const gc =
+    controller?.glyphControllers?.get(glyphName) ||
+    controller?.sceneModel?.getGlyphController?.(glyphName);
+
+  let path = gc?.flattenedPath2d || gc?.instance?.path2d;
+
+  // 3. Synchronous check of the Font Data
+  if (!path && fontController) {
+    const glyph = fontController.getGlyph?.(glyphName);
+    path = glyph?.path2d || glyph?.layers?.[0]?.path2d;
+
+    // 4. THE TRIGGER: If data is missing, ask the fontController to load it
+    // We don't 'await' here because we must return to the Canvas loop immediately.
+    if (!glyph && fontController.getCachedGlyph) {
+      // This call is async and will populate the internal cache once finished
+      fontController.getCachedGlyph(glyphName).then(() => {
+        controller.requestUpdate();
+      });
+    }
   }
 
-  const path2d = _varPackedPathToPath2D(path);
-  cache.set(glyphName, path2d);
-  return path2d;
+  if (path) {
+    cache.set(glyphName, path);
+    return path;
+  }
+
+  // Still waiting... will try again next frame
+  return null;
+}
+function _isEmptyPath(path) {
+  if (!path) return true;
+  return !(
+    (path.contours && path.contours.length > 0) ||
+    (path.pointTypes && path.coordinates && path.coordinates.length > 0) ||
+    (path.commands && path.commands.length > 0)
+  );
 }
 
-function _varPackedPathToPath2D(path) {
-  const p = new Path2D();
-  if (!path) return p;
+function getPath2D(pathData) {
+  if (!pathData) return new Path2D();
+  if (pathData instanceof Path2D) return pathData; // Already converted
 
-  if (Array.isArray(path.contours)) {
-    for (const contour of path.contours) {
-      _drawPlainContour(p, contour.points, contour.isClosed);
-    }
-    return p;
+  const p = new Path2D();
+  // If it's Fontra's standard contours format
+  if (Array.isArray(pathData.contours)) {
+    pathData.contours.forEach((c) => {
+      if (!c.points?.length) return;
+      p.moveTo(c.points[0].x, c.points[0].y);
+      // ... (keep curve logic if your font has curves)
+    });
   }
-  if (typeof path.iterContours === "function") {
-    for (const contour of path.iterContours()) {
-      const pts = [];
-      for (const pt of contour.iterPoints()) pts.push(pt);
-      _drawPlainContour(p, pts, contour.isClosed);
+  // If it's the efficient "Packed" format
+  else if (pathData.pointTypes && pathData.coordinates) {
+    const coords = pathData.coordinates;
+    for (let i = 0; i < coords.length; i += 2) {
+      if (i === 0) p.moveTo(coords[i], coords[i + 1]);
+      else p.lineTo(coords[i], coords[i + 1]);
     }
-    return p;
-  }
-  if (path.pointTypes && path.coordinates) {
-    _drawPackedPath(p, path);
-    return p;
   }
   return p;
 }
-
-function _drawPlainContour(p2d, points, isClosed) {
-  if (!points?.length) return;
-  p2d.moveTo(points[0].x, points[0].y);
-  let i = 1;
-  while (i < points.length) {
-    const pt = points[i];
-    const type = pt.type;
-    if (type === "line" || type === "move" || type == null) {
-      p2d.lineTo(pt.x, pt.y);
-      i++;
-    } else if (type === "cubic") {
-      const c1 = pt,
-        c2 = points[i + 1],
-        on = points[i + 2];
-      if (c2 && on) {
-        p2d.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, on.x, on.y);
-        i += 3;
-      } else {
-        p2d.lineTo(pt.x, pt.y);
-        i++;
-      }
-    } else if (type === "quad") {
-      const c = pt,
-        on = points[i + 1];
-      if (on) {
-        p2d.quadraticCurveTo(c.x, c.y, on.x, on.y);
-        i += 2;
-      } else {
-        p2d.lineTo(pt.x, pt.y);
-        i++;
-      }
-    } else {
-      p2d.lineTo(pt.x, pt.y);
-      i++;
-    }
-  }
-  if (isClosed) p2d.closePath();
-}
-
-function _drawPackedPath(p2d, path) {
-  const coords = path.coordinates;
-  const types = path.pointTypes;
-  let ci = 0;
-  for (let i = 0; i < types.length; i++) {
-    const x = coords[ci++],
-      y = coords[ci++];
-    const isOnCurve = !!(types[i] & 0x01);
-    if (i === 0) p2d.moveTo(x, y);
-    else if (isOnCurve) p2d.lineTo(x, y);
-    else p2d.lineTo(x, y); // simplified — full cubic/quad needs contourInfo
-  }
-}
-
 // ---------------------------------------------------------------------------
 // fontTools raw format → Fontra paint format converter
 // ---------------------------------------------------------------------------
@@ -881,10 +849,14 @@ function _convertPaintGraph(paint) {
   if (fmt === 10)
     return {
       type: "PaintGlyph",
-      glyphName: paint.Glyph,
+      glyphName: paint.Glyph ?? paint.glyph ?? paint.glyphName ?? "",
       paint: _convertPaintGraph(paint.Paint),
     };
-  if (fmt === 11) return { type: "PaintColrGlyph", glyphName: paint.Glyph };
+  if (fmt === 11)
+    return {
+      type: "PaintColrGlyph",
+      glyphName: paint.Glyph ?? paint.glyph ?? paint.glyphName ?? "",
+    };
   if (fmt === 12)
     return {
       type: "PaintTransform",

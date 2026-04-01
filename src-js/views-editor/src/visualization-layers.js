@@ -127,6 +127,7 @@ export class VisualizationContext {
 export function setColrv1AxisValues(axisValues) {
   /* no-op — now read live in draw() */
 }
+const colrPathCache = new Map();
 export const colrv1PaintOverlayDefinition = {
   identifier: "fontra.colrv1.paint",
   name: "COLRv1 Paint",
@@ -144,7 +145,15 @@ export const colrv1PaintOverlayDefinition = {
     if (!paint) return;
 
     const axisValues = getTagLocation(model.fontController, model.sceneSettings);
-    renderCOLRv1(context, positionedGlyph, model.fontController, axisValues, 0);
+    renderCOLRv1(
+      context,
+      positionedGlyph,
+      model.fontController,
+      axisValues,
+      0,
+      controller,
+      colrPathCache
+    );
   },
 };
 // ---------------------------------------------------------------------------

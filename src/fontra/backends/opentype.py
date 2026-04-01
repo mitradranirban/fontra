@@ -53,6 +53,154 @@ shaperFontTables = {
 }
 
 
+def _convertPaintGraphToFontra(paint: dict) -> dict:
+    """
+    Recursively convert a fontTools COLRv1 paint graph (PascalCase keys, Format integers)
+    into Fontra format (camelCase keys, type strings).
+    """
+    if not isinstance(paint, dict):
+        return paint
+
+    fmt = paint.get("Format")
+
+    # ── PaintColrLayers (fmt 1) ──────────────────────────────────────────
+    if fmt == 1:
+        return {
+            "type": "PaintColrLayers",
+            "layers": [
+                _convertPaintGraphToFontra(layer) for layer in paint.get("Layers", [])
+            ],
+        }
+
+    # ── PaintSolid (fmt 2) ──────────────────────────────────────────────
+    if fmt == 2:
+        return {
+            "type": "PaintSolid",
+            "colorIndex": paint.get("Color", {}).get("PaletteIndex", 0),
+            "alpha": paint.get("Color", {}).get("Alpha", 1.0),
+        }
+
+    # ── PaintLinearGradient (fmt 4) ─────────────────────────────────────
+    if fmt == 4:
+        return {
+            "type": "PaintLinearGradient",
+            "colorLine": _convertColorLine(paint.get("ColorLine", {})),
+            "x0": paint.get("x0", 0),
+            "y0": paint.get("y0", 0),
+            "x1": paint.get("x1", 0),
+            "y1": paint.get("y1", 0),
+            "x2": paint.get("x2", 0),
+            "y2": paint.get("y2", 0),
+        }
+
+    # ── PaintRadialGradient (fmt 6) ─────────────────────────────────────
+    if fmt == 6:
+        return {
+            "type": "PaintRadialGradient",
+            "colorLine": _convertColorLine(paint.get("ColorLine", {})),
+            "x0": paint.get("x0", 0),
+            "y0": paint.get("y0", 0),
+            "r0": paint.get("r0", 0),
+            "x1": paint.get("x1", 0),
+            "y1": paint.get("y1", 0),
+            "r1": paint.get("r1", 0),
+        }
+
+    # ── PaintSweepGradient (fmt 8) ──────────────────────────────────────
+    if fmt == 8:
+        return {
+            "type": "PaintSweepGradient",
+            "colorLine": _convertColorLine(paint.get("ColorLine", {})),
+            "centerX": paint.get("centerX", 0),
+            "centerY": paint.get("centerY", 0),
+            "startAngle": paint.get("startAngle", 0) / 360,
+            "endAngle": paint.get("endAngle", 0) / 360,
+        }
+
+    # ── PaintGlyph (fmt 10) ─────────────────────────────────────────────
+    if fmt == 10:
+        return {
+            "type": "PaintGlyph",
+            "glyph": paint.get("Glyph", ""),  # ← Fontra uses "glyph"
+            "paint": _convertPaintGraphToFontra(paint.get("Paint", {})),
+        }
+
+    # ── PaintColrGlyph (fmt 11) ─────────────────────────────────────────
+    if fmt == 11:
+        return {
+            "type": "PaintColrGlyph",
+            "glyph": paint.get("Glyph", ""),
+        }
+
+    # ── PaintTransform (fmt 12) ─────────────────────────────────────────
+    if fmt == 12:
+        t = paint.get("Transform", {})
+        return {
+            "type": "PaintTransform",
+            "paint": _convertPaintGraphToFontra(paint.get("Paint", {})),
+            "transform": {
+                "xx": t.get("xx", 1),
+                "yx": t.get("yx", 0),
+                "xy": t.get("xy", 0),
+                "yy": t.get("yy", 1),
+                "dx": t.get("dx", 0),
+                "dy": t.get("dy", 0),
+            },
+        }
+
+    # ── PaintTranslate (fmt 14) ─────────────────────────────────────────
+    if fmt == 14:
+        return {
+            "type": "PaintTranslate",
+            "paint": _convertPaintGraphToFontra(paint.get("Paint", {})),
+            "dx": paint.get("dx", 0),
+            "dy": paint.get("dy", 0),
+        }
+
+    # ── PaintComposite (fmt 32) ─────────────────────────────────────────
+    if fmt == 32:
+        return {
+            "type": "PaintComposite",
+            "mode": paint.get("CompositeMode", "src_over"),
+            "sourcePaint": _convertPaintGraphToFontra(paint.get("SourcePaint", {})),
+            "backdropPaint": _convertPaintGraphToFontra(paint.get("BackdropPaint", {})),
+        }
+
+    # ── Unknown / passthrough ────────────────────────────────────────────
+    return paint
+
+
+def _convertColorLine(colorLine: dict) -> dict:
+    return {
+        "extend": colorLine.get("Extend", "pad"),
+        "colorStops": [
+            {
+                "offset": s.get("StopOffset", 0),
+                "colorIndex": s.get("Color", {}).get("PaletteIndex", 0),
+                "alpha": s.get("Color", {}).get("Alpha", 1.0),
+            }
+            for s in colorLine.get("ColorStop", [])
+        ],
+    }
+
+
+def _collectPaintGlyphNames(paint: dict, result: list) -> None:
+    """Recursively collect glyph names from Fontra-format paint graph."""
+    if not isinstance(paint, dict):
+        return
+    if paint.get("type") == "PaintGlyph":
+        name = paint.get("glyph", "")
+        if name and name not in result:
+            result.append(name)
+    for value in paint.values():
+        if isinstance(value, dict):
+            _collectPaintGlyphNames(value, result)
+        elif isinstance(value, list):
+            for item in value:
+                if isinstance(item, dict):
+                    _collectPaintGlyphNames(item, result)
+
+
 class OTFBackend(WatchableBackend, ReadableBaseBackend):
     @classmethod
     def fromPath(cls, path: PathLike) -> ReadableFontBackend:
@@ -209,15 +357,27 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         if glyphName in self.colrV0Layers:
             glyph.customData["fontra.colrv0.layers"] = self.colrV0Layers[glyphName]
 
-        # Attach COLRv1 paint graph to customData
+        # Attach COLRv1 paint graph to customData (converted to Fontra format)
         if glyphName in self.colrPaintGraphs:
-            glyph.customData["fontra.colrv1.paintGraph"] = self.colrPaintGraphs[
-                glyphName
-            ]
-        if glyphName in self.colrGlyphPaintEntries:
-            glyph.customData["fontra.colrv1.paintEntries"] = self.colrGlyphPaintEntries[
-                glyphName
-            ]
+            fontraPaint = _convertPaintGraphToFontra(self.colrPaintGraphs[glyphName])
+            glyph.customData["fontra.colrv1.paintGraph"] = fontraPaint
+
+            referencedGlyphs = []
+            _collectPaintGlyphNames(fontraPaint, referencedGlyphs)
+            if referencedGlyphs:
+                glyph.customData["fontra.colrv1.referencedGlyphs"] = referencedGlyphs
+        elif (
+            hasattr(self, "colrGlyphPaintEntries")
+            and glyphName in self.colrGlyphPaintEntries
+        ):
+            entries = self.colrGlyphPaintEntries[glyphName]
+            # Wrap entries in PaintColrLayers if multiple, or use directly if single
+            if len(entries) == 1:
+                rawPaint = entries[0]
+            else:
+                rawPaint = {"Format": 1, "Layers": entries}
+            fontraPaint = _convertPaintGraphToFontra(rawPaint)
+            glyph.customData["fontra.colrv1.paintGraph"] = fontraPaint
 
         return glyph
 

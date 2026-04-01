@@ -164,8 +164,17 @@ function convertColorLine(colorLine) {
 }
 
 function convertPaintGraph(paint) {
-  if (!paint || typeof paint !== "object") return paint;
+  if (!paint) return null;
+
+  // Already in Fontra format (has "type" string) — pass through unchanged
+  if (paint.type) return paint;
+
+  // fontTools raw format (has numeric "Format") — convert
   const fmt = paint.Format;
+  if (fmt === undefined) {
+    console.warn("convertPaintGraph: unknown paint Format", fmt, paint);
+    return paint;
+  }
 
   // PaintColrLayers (fmt 1)
   if (fmt === 1)
