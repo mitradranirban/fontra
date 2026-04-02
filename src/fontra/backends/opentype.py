@@ -56,7 +56,9 @@ shaperFontTables = {
 def _convertPaintGraphToFontra(paint: dict) -> dict:
     """
     Recursively convert a fontTools COLRv1 paint graph (PascalCase keys, Format integers)
-    into Fontra format (camelCase keys, type strings).
+    into Fontra native format (camelCase keys, type strings).
+
+    This produces the same format that .fontra files use, stored in customData["colorv1"].
     """
     if not isinstance(paint, dict):
         return paint
@@ -72,18 +74,18 @@ def _convertPaintGraphToFontra(paint: dict) -> dict:
             ],
         }
 
-    # ── PaintSolid (fmt 2) ──────────────────────────────────────────────
-    if fmt == 2:
+    # ── PaintSolid (fmt 2) and PaintVarSolid (fmt 3) ────────────────────
+    if fmt == 2 or fmt == 3:
         return {
-            "type": "PaintSolid",
-            "colorIndex": paint.get("Color", {}).get("PaletteIndex", 0),
-            "alpha": paint.get("Color", {}).get("Alpha", 1.0),
+            "type": "PaintSolid" if fmt == 2 else "PaintVarSolid",
+            "paletteIndex": paint.get("PaletteIndex", 0),
+            "alpha": paint.get("Alpha", 1.0),
         }
 
-    # ── PaintLinearGradient (fmt 4) ─────────────────────────────────────
-    if fmt == 4:
+    # ── PaintLinearGradient (fmt 4) and PaintVarLinearGradient (fmt 5) ──
+    if fmt == 4 or fmt == 5:
         return {
-            "type": "PaintLinearGradient",
+            "type": "PaintLinearGradient" if fmt == 4 else "PaintVarLinearGradient",
             "colorLine": _convertColorLine(paint.get("ColorLine", {})),
             "x0": paint.get("x0", 0),
             "y0": paint.get("y0", 0),
@@ -93,10 +95,10 @@ def _convertPaintGraphToFontra(paint: dict) -> dict:
             "y2": paint.get("y2", 0),
         }
 
-    # ── PaintRadialGradient (fmt 6) ─────────────────────────────────────
-    if fmt == 6:
+    # ── PaintRadialGradient (fmt 6) and PaintVarRadialGradient (fmt 7) ──
+    if fmt == 6 or fmt == 7:
         return {
-            "type": "PaintRadialGradient",
+            "type": "PaintRadialGradient" if fmt == 6 else "PaintVarRadialGradient",
             "colorLine": _convertColorLine(paint.get("ColorLine", {})),
             "x0": paint.get("x0", 0),
             "y0": paint.get("y0", 0),
@@ -106,22 +108,23 @@ def _convertPaintGraphToFontra(paint: dict) -> dict:
             "r1": paint.get("r1", 0),
         }
 
-    # ── PaintSweepGradient (fmt 8) ──────────────────────────────────────
-    if fmt == 8:
+    # ── PaintSweepGradient (fmt 8) and PaintVarSweepGradient (fmt 9) ────
+    if fmt == 8 or fmt == 9:
+        # Convert degrees to turns (0.0 to 1.0 range)
         return {
-            "type": "PaintSweepGradient",
+            "type": "PaintSweepGradient" if fmt == 8 else "PaintVarSweepGradient",
             "colorLine": _convertColorLine(paint.get("ColorLine", {})),
             "centerX": paint.get("centerX", 0),
             "centerY": paint.get("centerY", 0),
-            "startAngle": paint.get("startAngle", 0) / 360,
-            "endAngle": paint.get("endAngle", 0) / 360,
+            "startAngle": paint.get("startAngle", 0) / 360.0,
+            "endAngle": paint.get("endAngle", 0) / 360.0,
         }
 
     # ── PaintGlyph (fmt 10) ─────────────────────────────────────────────
     if fmt == 10:
         return {
             "type": "PaintGlyph",
-            "glyph": paint.get("Glyph", ""),  # ← Fontra uses "glyph"
+            "glyph": paint.get("Glyph", ""),
             "paint": _convertPaintGraphToFontra(paint.get("Paint", {})),
         }
 
@@ -132,55 +135,154 @@ def _convertPaintGraphToFontra(paint: dict) -> dict:
             "glyph": paint.get("Glyph", ""),
         }
 
-    # ── PaintTransform (fmt 12) ─────────────────────────────────────────
-    if fmt == 12:
+    # ── PaintTransform (fmt 12) and PaintVarTransform (fmt 13) ──────────
+    if fmt == 12 or fmt == 13:
         t = paint.get("Transform", {})
         return {
-            "type": "PaintTransform",
+            "type": "PaintTransform" if fmt == 12 else "PaintVarTransform",
             "paint": _convertPaintGraphToFontra(paint.get("Paint", {})),
             "transform": {
-                "xx": t.get("xx", 1),
-                "yx": t.get("yx", 0),
-                "xy": t.get("xy", 0),
-                "yy": t.get("yy", 1),
-                "dx": t.get("dx", 0),
-                "dy": t.get("dy", 0),
+                "xx": t.get("xx", 1.0),
+                "yx": t.get("yx", 0.0),
+                "xy": t.get("xy", 0.0),
+                "yy": t.get("yy", 1.0),
+                "dx": t.get("dx", 0.0),
+                "dy": t.get("dy", 0.0),
             },
         }
 
-    # ── PaintTranslate (fmt 14) ─────────────────────────────────────────
-    if fmt == 14:
+    # ── PaintTranslate (fmt 14) and PaintVarTranslate (fmt 15) ──────────
+    if fmt == 14 or fmt == 15:
         return {
-            "type": "PaintTranslate",
+            "type": "PaintTranslate" if fmt == 14 else "PaintVarTranslate",
             "paint": _convertPaintGraphToFontra(paint.get("Paint", {})),
-            "dx": paint.get("dx", 0),
-            "dy": paint.get("dy", 0),
+            "dx": paint.get("dx", 0.0),
+            "dy": paint.get("dy", 0.0),
+        }
+
+    # ── PaintScale (fmt 16) and PaintVarScale (fmt 17) ──────────────────
+    if fmt == 16 or fmt == 17:
+        return {
+            "type": "PaintScale" if fmt == 16 else "PaintVarScale",
+            "paint": _convertPaintGraphToFontra(paint.get("Paint", {})),
+            "scaleX": paint.get("scaleX", 1.0),
+            "scaleY": paint.get("scaleY", 1.0),
+        }
+
+    # ── PaintScaleAroundCenter (fmt 18) and PaintVarScaleAroundCenter (fmt 19) ──
+    if fmt == 18 or fmt == 19:
+        return {
+            "type": (
+                "PaintScaleAroundCenter" if fmt == 18 else "PaintVarScaleAroundCenter"
+            ),
+            "paint": _convertPaintGraphToFontra(paint.get("Paint", {})),
+            "scaleX": paint.get("scaleX", 1.0),
+            "scaleY": paint.get("scaleY", 1.0),
+            "centerX": paint.get("centerX", 0.0),
+            "centerY": paint.get("centerY", 0.0),
+        }
+
+    # ── PaintScaleUniform (fmt 20) and PaintVarScaleUniform (fmt 21) ────
+    if fmt == 20 or fmt == 21:
+        return {
+            "type": "PaintScaleUniform" if fmt == 20 else "PaintVarScaleUniform",
+            "paint": _convertPaintGraphToFontra(paint.get("Paint", {})),
+            "scale": paint.get("scale", 1.0),
+        }
+
+    # ── PaintScaleUniformAroundCenter (fmt 22) and PaintVarScaleUniformAroundCenter (fmt 23) ──
+    if fmt == 22 or fmt == 23:
+        return {
+            "type": (
+                "PaintScaleUniformAroundCenter"
+                if fmt == 22
+                else "PaintVarScaleUniformAroundCenter"
+            ),
+            "paint": _convertPaintGraphToFontra(paint.get("Paint", {})),
+            "scale": paint.get("scale", 1.0),
+            "centerX": paint.get("centerX", 0.0),
+            "centerY": paint.get("centerY", 0.0),
+        }
+
+    # ── PaintRotate (fmt 24) and PaintVarRotate (fmt 25) ────────────────
+    if fmt == 24 or fmt == 25:
+        # Convert degrees to turns
+        return {
+            "type": "PaintRotate" if fmt == 24 else "PaintVarRotate",
+            "paint": _convertPaintGraphToFontra(paint.get("Paint", {})),
+            "angle": paint.get("angle", 0.0) / 360.0,
+        }
+
+    # ── PaintRotateAroundCenter (fmt 26) and PaintVarRotateAroundCenter (fmt 27) ──
+    if fmt == 26 or fmt == 27:
+        # Convert degrees to turns
+        return {
+            "type": (
+                "PaintRotateAroundCenter" if fmt == 26 else "PaintVarRotateAroundCenter"
+            ),
+            "paint": _convertPaintGraphToFontra(paint.get("Paint", {})),
+            "angle": paint.get("angle", 0.0) / 360.0,
+            "centerX": paint.get("centerX", 0.0),
+            "centerY": paint.get("centerY", 0.0),
+        }
+
+    # ── PaintSkew (fmt 28) and PaintVarSkew (fmt 29) ────────────────────
+    if fmt == 28 or fmt == 29:
+        # Convert degrees to turns
+        return {
+            "type": "PaintSkew" if fmt == 28 else "PaintVarSkew",
+            "paint": _convertPaintGraphToFontra(paint.get("Paint", {})),
+            "xSkewAngle": paint.get("xSkewAngle", 0.0) / 360.0,
+            "ySkewAngle": paint.get("ySkewAngle", 0.0) / 360.0,
+        }
+
+    # ── PaintSkewAroundCenter (fmt 30) and PaintVarSkewAroundCenter (fmt 31) ──
+    if fmt == 30 or fmt == 31:
+        # Convert degrees to turns
+        return {
+            "type": (
+                "PaintSkewAroundCenter" if fmt == 30 else "PaintVarSkewAroundCenter"
+            ),
+            "paint": _convertPaintGraphToFontra(paint.get("Paint", {})),
+            "xSkewAngle": paint.get("xSkewAngle", 0.0) / 360.0,
+            "ySkewAngle": paint.get("ySkewAngle", 0.0) / 360.0,
+            "centerX": paint.get("centerX", 0.0),
+            "centerY": paint.get("centerY", 0.0),
         }
 
     # ── PaintComposite (fmt 32) ─────────────────────────────────────────
     if fmt == 32:
         return {
             "type": "PaintComposite",
-            "mode": paint.get("CompositeMode", "src_over"),
             "sourcePaint": _convertPaintGraphToFontra(paint.get("SourcePaint", {})),
+            "compositeMode": paint.get("CompositeMode", "src_over"),
             "backdropPaint": _convertPaintGraphToFontra(paint.get("BackdropPaint", {})),
         }
 
-    # ── Unknown / passthrough ────────────────────────────────────────────
+    # ── Unknown format — pass through as-is for forward compatibility ────
+    print(f"Warning: Unknown COLRv1 paint format {fmt}, keeping as-is")
     return paint
 
 
 def _convertColorLine(colorLine: dict) -> dict:
+    """Convert fontTools ColorLine to Fontra native format."""
+    if not colorLine:
+        return {"extend": "pad", "colorStops": []}
+
+    color_stops = []
+    for stop in colorLine.get("ColorStop", []):
+        # PaletteIndex and Alpha are at root level in fontTools ColorStop
+        color_stops.append(
+            {
+                "stopOffset": stop.get("StopOffset", 0.0),
+                "paletteIndex": stop.get("PaletteIndex", 0),
+                "alpha": stop.get("Alpha", 1.0),
+            }
+        )
+
     return {
         "extend": colorLine.get("Extend", "pad"),
-        "colorStops": [
-            {
-                "offset": s.get("StopOffset", 0),
-                "colorIndex": s.get("Color", {}).get("PaletteIndex", 0),
-                "alpha": s.get("Color", {}).get("Alpha", 1.0),
-            }
-            for s in colorLine.get("ColorStop", [])
-        ],
+        "colorStops": color_stops,
     }
 
 
@@ -246,6 +348,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         self.glyphMap = glyphMap
         self.glyphSet = self.font.getGlyphSet()
         self.variationGlyphSets: dict[str, Any] = {}
+
         # COLR / CPAL
         self.colrVersion: int = 0
         self.colrV0Layers: dict[str, list[tuple[str, int]]] = {}
@@ -266,11 +369,9 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                     ]
             elif self.colrVersion >= 1:
                 colr = colrTable.table
-                # unbuildColrV1 returns {baseGlyphName: paintDict} for all base glyphs
                 self.colrPaintGraphs = colrUnbuilder.unbuildColrV1(
                     colr.LayerList, colr.BaseGlyphList
                 )
-                # Build reverse index: component glyph → paint entries referencing it
                 self.colrGlyphPaintEntries: dict[str, list[dict]] = {}
                 for paintGraph in self.colrPaintGraphs.values():
                     _indexPaintGlyphs(paintGraph, self.colrGlyphPaintEntries)
@@ -280,10 +381,6 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                     self.colrVarStore = _serializeVarStore(colr.VarStore)
 
         cpalTable = self.font.get("CPAL")
-        print("CPAL table:", cpalTable)
-        print("CPAL version:", getattr(cpalTable, "version", None))
-        print("CPAL palettes:", getattr(cpalTable, "palettes", None))
-        print("CPAL numPaletteEntries:", getattr(cpalTable, "numPaletteEntries", None))
         if cpalTable is not None:
             for palette in cpalTable.palettes:
                 self.colorPalettes.append(
@@ -360,8 +457,10 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         # Attach COLRv1 paint graph to customData (converted to Fontra format)
         if glyphName in self.colrPaintGraphs:
             fontraPaint = _convertPaintGraphToFontra(self.colrPaintGraphs[glyphName])
-            glyph.customData["fontra.colrv1.paintGraph"] = fontraPaint
+            # Store directly in "colorv1" key (same as .fontra format)
+            glyph.customData["colorv1"] = fontraPaint
 
+            # Keep referencedGlyphs for pre-fetching
             referencedGlyphs = []
             _collectPaintGlyphNames(fontraPaint, referencedGlyphs)
             if referencedGlyphs:
@@ -377,7 +476,8 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             else:
                 rawPaint = {"Format": 1, "Layers": entries}
             fontraPaint = _convertPaintGraphToFontra(rawPaint)
-            glyph.customData["fontra.colrv1.paintGraph"] = fontraPaint
+            # Store directly in "colorv1" key
+            glyph.customData["colorv1"] = fontraPaint
 
         return glyph
 

@@ -10,7 +10,7 @@ const CUSTOM_DATA_KEY = "colorLayerMapping";
 const COLRV1_KEY = "colorv1";
 
 // ---------------------------------------------------------------------------
-// COLRv1 parameter schema
+// COLRv1 parameter schema (unchanged)
 // ---------------------------------------------------------------------------
 const PAINT_PARAM_SCHEMA = {
   PaintSolid: [
@@ -138,7 +138,7 @@ const PAINT_PARAM_SCHEMA = {
   PaintTransform: [
     { key: "xx", label: "xx", pairWith: "yx" },
     { key: "yx", label: "yx", paired: true },
-    { key: "xy", label: "xy", pairWith: "yy" }, // ← was missing
+    { key: "xy", label: "xy", pairWith: "yy" },
     { key: "yy", label: "yy", paired: true },
     { key: "dx", label: "dx", pairWith: "dy" },
     { key: "dy", label: "dy", paired: true },
@@ -146,322 +146,6 @@ const PAINT_PARAM_SCHEMA = {
 };
 
 const normalizePaintType = (t) => t?.replace(/^PaintVar/, "Paint") ?? t;
-
-// ---------------------------------------------------------------------------
-// fontTools raw format → Fontra paint format converter
-// ---------------------------------------------------------------------------
-
-function convertColorLine(colorLine) {
-  if (!colorLine) return null;
-  return {
-    extend: colorLine.Extend ?? "pad",
-    colorStops: (colorLine.ColorStop ?? []).map((stop) => ({
-      stopOffset: stop.StopOffset ?? 0,
-      paletteIndex: stop.Color?.PaletteIndex ?? 0,
-      alpha: stop.Color?.Alpha ?? 1,
-    })),
-  };
-}
-
-function convertPaintGraph(paint) {
-  if (!paint) return null;
-
-  // Already in Fontra format (has "type" string) — pass through unchanged
-  if (paint.type) return paint;
-
-  // fontTools raw format (has numeric "Format") — convert
-  const fmt = paint.Format;
-  if (fmt === undefined) {
-    console.warn("convertPaintGraph: unknown paint Format", fmt, paint);
-    return paint;
-  }
-
-  // PaintColrLayers (fmt 1)
-  if (fmt === 1)
-    return {
-      type: "PaintColrLayers",
-      layers: (paint.Layers ?? []).map(convertPaintGraph),
-    };
-
-  // PaintSolid / PaintVarSolid (fmt 2–3)
-  if (fmt === 2)
-    return {
-      type: "PaintSolid",
-      paletteIndex: paint.PaletteIndex ?? 0,
-      alpha: paint.Alpha ?? 1,
-    };
-  if (fmt === 3)
-    return {
-      type: "PaintVarSolid",
-      paletteIndex: paint.PaletteIndex ?? 0,
-      alpha: paint.Alpha ?? 1,
-    };
-
-  // PaintLinearGradient / PaintVarLinearGradient (fmt 4–5)
-  if (fmt === 4)
-    return {
-      type: "PaintLinearGradient",
-      colorLine: convertColorLine(paint.ColorLine),
-      x0: paint.x0 ?? 0,
-      y0: paint.y0 ?? 0,
-      x1: paint.x1 ?? 0,
-      y1: paint.y1 ?? 0,
-      x2: paint.x2 ?? 0,
-      y2: paint.y2 ?? 0,
-    };
-  if (fmt === 5)
-    return {
-      type: "PaintVarLinearGradient",
-      colorLine: convertColorLine(paint.ColorLine),
-      x0: paint.x0 ?? 0,
-      y0: paint.y0 ?? 0,
-      x1: paint.x1 ?? 0,
-      y1: paint.y1 ?? 0,
-      x2: paint.x2 ?? 0,
-      y2: paint.y2 ?? 0,
-    };
-
-  // PaintRadialGradient / PaintVarRadialGradient (fmt 6–7)
-  if (fmt === 6)
-    return {
-      type: "PaintRadialGradient",
-      colorLine: convertColorLine(paint.ColorLine),
-      x0: paint.x0 ?? 0,
-      y0: paint.y0 ?? 0,
-      r0: paint.r0 ?? 0,
-      x1: paint.x1 ?? 0,
-      y1: paint.y1 ?? 0,
-      r1: paint.r1 ?? 0,
-    };
-  if (fmt === 7)
-    return {
-      type: "PaintVarRadialGradient",
-      colorLine: convertColorLine(paint.ColorLine),
-      x0: paint.x0 ?? 0,
-      y0: paint.y0 ?? 0,
-      r0: paint.r0 ?? 0,
-      x1: paint.x1 ?? 0,
-      y1: paint.y1 ?? 0,
-      r1: paint.r1 ?? 0,
-    };
-
-  // PaintSweepGradient / PaintVarSweepGradient (fmt 8–9)
-  // fontTools gives angles in degrees; OpenType spec / canvas uses turns (0.0–1.0)
-  if (fmt === 8)
-    return {
-      type: "PaintSweepGradient",
-      colorLine: convertColorLine(paint.ColorLine),
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      startAngle: (paint.startAngle ?? 0) / 360,
-      endAngle: (paint.endAngle ?? 0) / 360,
-    };
-  if (fmt === 9)
-    return {
-      type: "PaintVarSweepGradient",
-      colorLine: convertColorLine(paint.ColorLine),
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      startAngle: (paint.startAngle ?? 0) / 360,
-      endAngle: (paint.endAngle ?? 0) / 360,
-    };
-
-  // PaintGlyph (fmt 10)
-  if (fmt === 10)
-    return {
-      type: "PaintGlyph",
-      glyphName: paint.Glyph,
-      paint: convertPaintGraph(paint.Paint),
-    };
-
-  // PaintColrGlyph (fmt 11)
-  if (fmt === 11)
-    return {
-      type: "PaintColrGlyph",
-      glyphName: paint.Glyph,
-    };
-
-  // PaintTransform / PaintVarTransform (fmt 12–13)
-  if (fmt === 12)
-    return {
-      type: "PaintTransform",
-      transform: paint.Transform,
-      paint: convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 13)
-    return {
-      type: "PaintVarTransform",
-      transform: paint.Transform,
-      paint: convertPaintGraph(paint.Paint),
-    };
-
-  // PaintTranslate / PaintVarTranslate (fmt 14–15)
-  if (fmt === 14)
-    return {
-      type: "PaintTranslate",
-      dx: paint.dx ?? 0,
-      dy: paint.dy ?? 0,
-      paint: convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 15)
-    return {
-      type: "PaintVarTranslate",
-      dx: paint.dx ?? 0,
-      dy: paint.dy ?? 0,
-      paint: convertPaintGraph(paint.Paint),
-    };
-
-  // PaintScale / PaintVarScale (fmt 16–17)
-  if (fmt === 16)
-    return {
-      type: "PaintScale",
-      scaleX: paint.scaleX ?? 1,
-      scaleY: paint.scaleY ?? 1,
-      paint: convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 17)
-    return {
-      type: "PaintVarScale",
-      scaleX: paint.scaleX ?? 1,
-      scaleY: paint.scaleY ?? 1,
-      paint: convertPaintGraph(paint.Paint),
-    };
-
-  // PaintScaleAroundCenter / PaintVarScaleAroundCenter (fmt 18–19)
-  if (fmt === 18)
-    return {
-      type: "PaintScaleAroundCenter",
-      scaleX: paint.scaleX ?? 1,
-      scaleY: paint.scaleY ?? 1,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 19)
-    return {
-      type: "PaintVarScaleAroundCenter",
-      scaleX: paint.scaleX ?? 1,
-      scaleY: paint.scaleY ?? 1,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: convertPaintGraph(paint.Paint),
-    };
-
-  // PaintScaleUniform / PaintVarScaleUniform (fmt 20–21)
-  if (fmt === 20)
-    return {
-      type: "PaintScaleUniform",
-      scale: paint.scale ?? 1,
-      paint: convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 21)
-    return {
-      type: "PaintVarScaleUniform",
-      scale: paint.scale ?? 1,
-      paint: convertPaintGraph(paint.Paint),
-    };
-
-  // PaintScaleUniformAroundCenter / PaintVarScaleUniformAroundCenter (fmt 22–23)
-  if (fmt === 22)
-    return {
-      type: "PaintScaleUniformAroundCenter",
-      scale: paint.scale ?? 1,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 23)
-    return {
-      type: "PaintVarScaleUniformAroundCenter",
-      scale: paint.scale ?? 1,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: convertPaintGraph(paint.Paint),
-    };
-
-  // PaintRotate / PaintVarRotate (fmt 24–25)
-  // fontTools gives angle in degrees; convert to turns
-  if (fmt === 24)
-    return {
-      type: "PaintRotate",
-      angle: (paint.angle ?? 0) / 360,
-      paint: convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 25)
-    return {
-      type: "PaintVarRotate",
-      angle: (paint.angle ?? 0) / 360,
-      paint: convertPaintGraph(paint.Paint),
-    };
-
-  // PaintRotateAroundCenter / PaintVarRotateAroundCenter (fmt 26–27)
-  if (fmt === 26)
-    return {
-      type: "PaintRotateAroundCenter",
-      angle: (paint.angle ?? 0) / 360,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 27)
-    return {
-      type: "PaintVarRotateAroundCenter",
-      angle: (paint.angle ?? 0) / 360,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: convertPaintGraph(paint.Paint),
-    };
-
-  // PaintSkew / PaintVarSkew (fmt 28–29)
-  // fontTools gives skew angles in degrees; convert to turns
-  if (fmt === 28)
-    return {
-      type: "PaintSkew",
-      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
-      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
-      paint: convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 29)
-    return {
-      type: "PaintVarSkew",
-      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
-      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
-      paint: convertPaintGraph(paint.Paint),
-    };
-
-  // PaintSkewAroundCenter / PaintVarSkewAroundCenter (fmt 30–31)
-  if (fmt === 30)
-    return {
-      type: "PaintSkewAroundCenter",
-      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
-      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 31)
-    return {
-      type: "PaintVarSkewAroundCenter",
-      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
-      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: convertPaintGraph(paint.Paint),
-    };
-
-  // PaintComposite (fmt 32)
-  if (fmt === 32)
-    return {
-      type: "PaintComposite",
-      sourcePaint: convertPaintGraph(paint.SourcePaint),
-      compositeMode: paint.CompositeMode ?? "src_over",
-      backdropPaint: convertPaintGraph(paint.BackdropPaint),
-    };
-
-  // Unknown format — pass through as-is for forward compatibility
-  console.warn(`convertPaintGraph: unknown paint Format ${fmt}`, paint);
-  return paint;
-}
 
 // ---------------------------------------------------------------------------
 // Module-level pure helpers
@@ -489,7 +173,6 @@ function makeMinusButton(onclick, title) {
   );
 }
 
-// panel instance passed explicitly — no `this` dependency at module level
 function makeVaryToggle(rawVal, layerIdx, paramKey, panel) {
   const variable = isVariable(rawVal);
   return html.button(
@@ -535,209 +218,11 @@ function makeVaryToggle(rawVal, layerIdx, paramKey, panel) {
 }
 
 // ---------------------------------------------------------------------------
-// Masterless variation helpers
+// Variable helpers
 // ---------------------------------------------------------------------------
 
 export function isVariable(val) {
   return typeof val === "object" && val !== null && "keyframes" in val;
-}
-
-export function resolveAtLocation(val, axisValues) {
-  if (!isVariable(val)) return val;
-  const tag = val.keyframes[0]?.axis;
-  const loc = axisValues?.[tag] ?? 0;
-  const kfs = val.keyframes.filter((k) => k.axis === tag).sort((a, b) => a.loc - b.loc);
-  for (let i = 0; i < kfs.length - 1; i++) {
-    if (loc >= kfs[i].loc && loc <= kfs[i + 1].loc) {
-      const t = (loc - kfs[i].loc) / (kfs[i + 1].loc - kfs[i].loc);
-      return kfs[i].value + t * (kfs[i + 1].value - kfs[i].value);
-    }
-  }
-  return loc <= (kfs[0]?.loc ?? 0) ? kfs[0]?.value ?? 0 : kfs.at(-1)?.value ?? 0;
-}
-
-// ---------------------------------------------------------------------------
-// Canvas preview renderer
-// ---------------------------------------------------------------------------
-
-function paletteIndexToCSS(index, alpha, palette) {
-  const entry = palette?.[index];
-  if (!entry) return `rgba(0,0,0,${alpha})`;
-  const [r, g, b, a] = entry;
-  return `rgba(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)},${
-    (a ?? 1) * alpha
-  })`;
-}
-
-function applyGlyphClip(ctx, glyphName, outlines) {
-  const path = outlines?.[glyphName];
-  if (!path) return;
-  ctx.beginPath();
-  const p2d = path instanceof Path2D ? path : path.path2D;
-  if (p2d) ctx.clip(p2d, "nonzero");
-}
-
-function applyColorLine(grad, colorLine, axisValues, palette, startAngle, endAngle) {
-  if (!colorLine?.colorStops) return;
-  const rangeAngle = endAngle != null ? endAngle - startAngle : 1;
-  for (const stop of colorLine.colorStops) {
-    const offset = resolveAtLocation(stop.stopOffset, axisValues);
-    const alpha = resolveAtLocation(stop.alpha, axisValues) ?? 1.0;
-    const normOffset =
-      endAngle != null ? (offset * rangeAngle) / (Math.PI * 2) : offset;
-    grad.addColorStop(
-      Math.max(0, Math.min(1, normOffset)),
-      paletteIndexToCSS(stop.paletteIndex, alpha, palette)
-    );
-  }
-}
-
-function renderPaint(ctx, paint, axisValues, palette, outlines) {
-  if (!paint) return;
-  const t = paint.type?.replace("PaintVar", "Paint");
-
-  if (t === "PaintColrLayers") {
-    for (const layer of paint.layers ?? [])
-      renderPaint(ctx, layer, axisValues, palette, outlines);
-  } else if (t === "PaintColrGlyph") {
-    const ref = outlines?.[paint.glyph];
-    if (ref?.colorv1) renderPaint(ctx, ref.colorv1, axisValues, palette, outlines);
-  } else if (t === "PaintGlyph") {
-    ctx.save();
-    applyGlyphClip(ctx, paint.glyph, outlines);
-    renderPaint(ctx, paint.paint, axisValues, palette, outlines);
-    ctx.restore();
-  } else if (t === "PaintComposite") {
-    renderPaint(ctx, paint.backdropPaint, axisValues, palette, outlines);
-    ctx.globalCompositeOperation = paint.compositeMode ?? "src-over";
-    renderPaint(ctx, paint.sourcePaint, axisValues, palette, outlines);
-    ctx.globalCompositeOperation = "src-over";
-  } else if (t === "PaintSolid") {
-    const alpha = resolveAtLocation(paint.alpha, axisValues);
-    ctx.fillStyle = paletteIndexToCSS(paint.paletteIndex, alpha, palette);
-    ctx.fill();
-  } else if (t === "PaintLinearGradient") {
-    const grad = ctx.createLinearGradient(
-      resolveAtLocation(paint.x0, axisValues),
-      -resolveAtLocation(paint.y0, axisValues),
-      resolveAtLocation(paint.x1, axisValues),
-      -resolveAtLocation(paint.y1, axisValues)
-    );
-    applyColorLine(grad, paint.colorLine, axisValues, palette);
-    ctx.fillStyle = grad;
-    ctx.fill();
-  } else if (t === "PaintRadialGradient") {
-    const grad = ctx.createRadialGradient(
-      resolveAtLocation(paint.x0, axisValues),
-      -resolveAtLocation(paint.y0, axisValues),
-      resolveAtLocation(paint.r0, axisValues),
-      resolveAtLocation(paint.x1, axisValues),
-      -resolveAtLocation(paint.y1, axisValues),
-      resolveAtLocation(paint.r1, axisValues)
-    );
-    applyColorLine(grad, paint.colorLine, axisValues, palette);
-    ctx.fillStyle = grad;
-    ctx.fill();
-  } else if (t === "PaintSweepGradient") {
-    const sa = resolveAtLocation(paint.startAngle, axisValues) * Math.PI * 2;
-    const ea = resolveAtLocation(paint.endAngle, axisValues) * Math.PI * 2;
-    const grad = ctx.createConicGradient(
-      sa - Math.PI / 2,
-      resolveAtLocation(paint.centerX, axisValues),
-      -resolveAtLocation(paint.centerY, axisValues)
-    );
-    applyColorLine(grad, paint.colorLine, axisValues, palette, sa, ea);
-    ctx.fillStyle = grad;
-    ctx.fill();
-  } else if (t === "PaintTranslate") {
-    ctx.save();
-    ctx.translate(
-      resolveAtLocation(paint.dx, axisValues),
-      -resolveAtLocation(paint.dy, axisValues)
-    );
-    renderPaint(ctx, paint.paint, axisValues, palette, outlines);
-    ctx.restore();
-  } else if (t === "PaintScale") {
-    ctx.save();
-    ctx.scale(
-      resolveAtLocation(paint.scaleX, axisValues),
-      resolveAtLocation(paint.scaleY, axisValues)
-    );
-    renderPaint(ctx, paint.paint, axisValues, palette, outlines);
-    ctx.restore();
-  } else if (t === "PaintScaleUniform") {
-    const s = resolveAtLocation(paint.scale, axisValues);
-    ctx.save();
-    ctx.scale(s, s);
-    renderPaint(ctx, paint.paint, axisValues, palette, outlines);
-    ctx.restore();
-  } else if (t === "PaintScaleAroundCenter") {
-    const cx = resolveAtLocation(paint.centerX, axisValues);
-    const cy = -resolveAtLocation(paint.centerY, axisValues);
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(
-      resolveAtLocation(paint.scaleX, axisValues),
-      resolveAtLocation(paint.scaleY, axisValues)
-    );
-    ctx.translate(-cx, -cy);
-    renderPaint(ctx, paint.paint, axisValues, palette, outlines);
-    ctx.restore();
-  } else if (t === "PaintScaleUniformAroundCenter") {
-    const s = resolveAtLocation(paint.scale, axisValues);
-    const cx = resolveAtLocation(paint.centerX, axisValues);
-    const cy = -resolveAtLocation(paint.centerY, axisValues);
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(s, s);
-    ctx.translate(-cx, -cy);
-    renderPaint(ctx, paint.paint, axisValues, palette, outlines);
-    ctx.restore();
-  } else if (t === "PaintRotate") {
-    ctx.save();
-    ctx.rotate(resolveAtLocation(paint.angle, axisValues) * Math.PI * 2);
-    renderPaint(ctx, paint.paint, axisValues, palette, outlines);
-    ctx.restore();
-  } else if (t === "PaintRotateAroundCenter") {
-    const cx = resolveAtLocation(paint.centerX, axisValues);
-    const cy = -resolveAtLocation(paint.centerY, axisValues);
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(resolveAtLocation(paint.angle, axisValues) * Math.PI * 2);
-    ctx.translate(-cx, -cy);
-    renderPaint(ctx, paint.paint, axisValues, palette, outlines);
-    ctx.restore();
-  } else if (t === "PaintSkew") {
-    const xSkew = resolveAtLocation(paint.xSkewAngle, axisValues) * Math.PI * 2;
-    const ySkew = resolveAtLocation(paint.ySkewAngle, axisValues) * Math.PI * 2;
-    ctx.save();
-    ctx.transform(1, Math.tan(ySkew), Math.tan(xSkew), 1, 0, 0);
-    renderPaint(ctx, paint.paint, axisValues, palette, outlines);
-    ctx.restore();
-  } else if (t === "PaintSkewAroundCenter") {
-    const xSkew = resolveAtLocation(paint.xSkewAngle, axisValues) * Math.PI * 2;
-    const ySkew = resolveAtLocation(paint.ySkewAngle, axisValues) * Math.PI * 2;
-    const cx = resolveAtLocation(paint.centerX, axisValues);
-    const cy = -resolveAtLocation(paint.centerY, axisValues);
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.transform(1, Math.tan(ySkew), Math.tan(xSkew), 1, 0, 0);
-    ctx.translate(-cx, -cy);
-    renderPaint(ctx, paint.paint, axisValues, palette, outlines);
-    ctx.restore();
-  } else if (t === "PaintTransform") {
-    ctx.save();
-    ctx.transform(
-      resolveAtLocation(paint.xx, axisValues),
-      resolveAtLocation(paint.yx, axisValues),
-      resolveAtLocation(paint.xy, axisValues),
-      resolveAtLocation(paint.yy, axisValues),
-      resolveAtLocation(paint.dx, axisValues),
-      -resolveAtLocation(paint.dy, axisValues)
-    );
-    renderPaint(ctx, paint.paint, axisValues, palette, outlines);
-    ctx.restore();
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -755,17 +240,7 @@ export default class ColorLayersPanel extends Panel {
       ["selectedGlyphName"],
       () => this.update()
     );
-    this.sceneController.sceneSettingsController.addKeyListener(["location"], () =>
-      this._onLocationChange()
-    );
     this.sceneController.addCurrentGlyphChangeListener(() => this.update());
-  }
-
-  _onLocationChange() {
-    const pg = this.sceneController.sceneModel.getSelectedPositionedGlyph();
-    const layerGlyph = pg?.glyph?.instance;
-    if (!layerGlyph?.customData?.[COLRV1_KEY]) return;
-    this.update();
   }
 
   getContentElement() {
@@ -951,6 +426,7 @@ export default class ColorLayersPanel extends Panel {
       ]);
       return;
     }
+
     const palette = palettes[0];
     const glyphName = this.sceneController.sceneSettings.selectedGlyphName;
     if (!glyphName) {
@@ -961,40 +437,35 @@ export default class ColorLayersPanel extends Panel {
     }
 
     this._currentGlyphName = glyphName;
-    const pg = this.sceneController.sceneModel.getSelectedPositionedGlyph();
 
+    // SIMPLIFIED: Just get the colorv1 data directly
     const varGlyphController =
       await this.sceneController.sceneModel.getSelectedVariableGlyphController();
     const varGlyph = varGlyphController?.glyph;
+    const pg = this.sceneController.sceneModel.getSelectedPositionedGlyph();
     const instanceGlyph = pg?.glyph?.instance;
-    const defaultSource =
-      varGlyph?.sources?.find((s) => !s.inactive) ?? varGlyph?.sources?.[0];
-    const ttfLayerGlyph = varGlyph?.layers?.[defaultSource?.layerName]?.glyph;
-    const layerGlyph =
-      instanceGlyph?.customData?.[COLRV1_KEY] != null ? instanceGlyph : ttfLayerGlyph;
 
-    // TTF paint lives on varGlyph.customData — synthesize a layerGlyph-like object
-    const ttfPaintRaw = varGlyph?.customData?.["fontra.colrv1.paintGraph"];
-    let ttfPaintGraph = ttfPaintRaw != null ? convertPaintGraph(ttfPaintRaw) : null;
+    // Check both instance and varGlyph for colorv1 data
+    const colorV1Data =
+      instanceGlyph?.customData?.[COLRV1_KEY] ?? varGlyph?.customData?.[COLRV1_KEY];
 
-    // ensure root is always PaintColrLayers so _renderV1UI finds .layers
-    if (ttfPaintGraph != null && ttfPaintGraph.type !== "PaintColrLayers") {
-      ttfPaintGraph = { type: "PaintColrLayers", layers: [ttfPaintGraph] };
-    }
-    const effectiveLayerGlyph =
-      layerGlyph?.customData?.[COLRV1_KEY] != null
-        ? layerGlyph
-        : ttfPaintGraph != null
-        ? { customData: { [COLRV1_KEY]: ttfPaintGraph } }
-        : null;
-
-    const hasV1 = !!effectiveLayerGlyph?.customData?.[COLRV1_KEY];
+    const hasV1 = !!colorV1Data;
     const hasV0 = !!varGlyph?.customData?.[CUSTOM_DATA_KEY]?.length;
 
-    if (hasV1) this._renderV1UI(effectiveLayerGlyph, glyphName, palette);
-    else if (hasV0) this._renderV0UI(varGlyph, glyphName, palette);
-    else this._renderEmptyUI(glyphName, palette);
+    if (hasV1) {
+      // Wrap in PaintColrLayers if needed for UI consistency
+      let paint = colorV1Data;
+      if (paint.type !== "PaintColrLayers") {
+        paint = { type: "PaintColrLayers", layers: [paint] };
+      }
+      this._renderV1UI(paint, glyphName, palette);
+    } else if (hasV0) {
+      this._renderV0UI(varGlyph, glyphName, palette);
+    } else {
+      this._renderEmptyUI(glyphName, palette);
+    }
   }
+
   _renderEmptyUI(glyphName, palette) {
     this.colorLayersForm.setFieldDescriptions([
       { type: "text", value: translate("color-layers.no-layers-yet") },
@@ -1021,11 +492,7 @@ export default class ColorLayersPanel extends Panel {
     ]);
   }
 
-  _renderV1UI(glyph, glyphName, palette) {
-    const paint = glyph.customData[COLRV1_KEY] ?? {
-      type: "PaintColrLayers",
-      layers: [],
-    };
+  _renderV1UI(paint, glyphName, palette) {
     this._currentPaint = paint;
     const layers = paint.layers ?? [];
     const formContents = [];
@@ -1052,10 +519,18 @@ export default class ColorLayersPanel extends Panel {
     } else {
       for (let i = 0; i < layers.length; i++) {
         const layer = layers[i];
-        const layerLabel =
-          layer.type === "PaintGlyph" || layer.type === "PaintVarGlyph"
-            ? `${i}: PaintGlyph "${layer.glyph ?? "?"}"`
-            : `${i}: ${layer.type ?? "Paint"}`;
+
+        let layerLabel = "";
+
+        if (layer.type === "PaintGlyph" || layer.type === "PaintVarGlyph") {
+          const glyphName = layer.glyph ?? "?";
+          layerLabel = `${i}: PaintGlyph "${glyphName}"`;
+        } else if (layer.type === "PaintColrGlyph") {
+          const glyphName = layer.glyph ?? "?";
+          layerLabel = `${i}: PaintColrGlyph "${glyphName}"`;
+        } else {
+          layerLabel = `${i}: ${layer.type ?? "Paint"}`;
+        }
 
         formContents.push({
           type: "header",
@@ -1066,13 +541,6 @@ export default class ColorLayersPanel extends Panel {
           ),
         });
 
-        formContents.push({
-          type: "edit-text",
-          key: JSON.stringify(["v1PaintType", i]),
-          label: translate("color-layers.paint-type"),
-          value: layer.type ?? "",
-        });
-
         if (layer.type === "PaintGlyph" || layer.type === "PaintVarGlyph") {
           formContents.push({
             type: "edit-text",
@@ -1081,7 +549,6 @@ export default class ColorLayersPanel extends Panel {
             value: layer.glyph ?? "",
           });
 
-          // ── Fill paint type selector ──────────────────────────────────
           const fillPaintTypes = [
             "PaintSolid",
             "PaintLinearGradient",
@@ -1170,7 +637,6 @@ export default class ColorLayersPanel extends Panel {
                   ),
             });
           }
-          // ─────────────────────────────────────────────────────────────
         }
 
         const fillPaint = layer.paint ?? layer;
@@ -1236,7 +702,6 @@ export default class ColorLayersPanel extends Panel {
         j += 2;
       } else {
         if (isVariable(rawVal)) {
-          // Render existing Keyframes
           for (let ki = 0; ki < rawVal.keyframes.length; ki++) {
             const kf = rawVal.keyframes[ki];
             formContents.push({
@@ -1273,7 +738,6 @@ export default class ColorLayersPanel extends Panel {
             });
           }
 
-          // Add New Keyframe Button (at the end of the KF list)
           formContents.push({
             type: "button",
             label: "",
@@ -1288,7 +752,6 @@ export default class ColorLayersPanel extends Panel {
               ),
           });
         } else {
-          // Static field logic
           formContents.push({
             type: "edit-number",
             key: JSON.stringify(["v1Param", layerIdx, fd.key]),
@@ -1319,7 +782,6 @@ export default class ColorLayersPanel extends Panel {
         j++;
       }
 
-      // Safety: prevents infinite loop
       if (j === 0) {
         j = schema.length;
         break;
@@ -1374,12 +836,6 @@ export default class ColorLayersPanel extends Panel {
         });
       }
     }
-  }
-
-  _renderPreview(layerGlyph, axisValues) {
-    const paint = layerGlyph.customData[COLRV1_KEY];
-    const palette = this.fontController.customData[PALETTES_KEY]?.[0] ?? [];
-    renderPaint(this.previewCtx, paint, axisValues, palette, this.glyphOutlines);
   }
 
   _renderV0UI(glyph, glyphName, palette) {
@@ -1573,8 +1029,6 @@ export default class ColorLayersPanel extends Panel {
     const layers = (paint.layers ?? []).map((layer, i) => {
       if (i !== layerIndex) return layer;
       const fillPaint = layer.paint ?? layer;
-
-      // Handle nested colorLine
       if (fillPaint.colorLine && arrayKey === "colorStops") {
         const newFill = {
           ...fillPaint,
@@ -1584,31 +1038,23 @@ export default class ColorLayersPanel extends Panel {
           ? { ...layer, paint: newFill }
           : { ...layer, ...newFill };
       }
-
-      // Default fallback for flat arrays
       return layer.paint != null
         ? { ...layer, paint: { ...layer.paint, [arrayKey]: newArray } }
         : { ...layer, [arrayKey]: newArray };
     });
-
     await this._writeV1Paint({ ...paint, layers });
   }
 
   async _writeV1Paint(newPaint) {
     await this.sceneController.editGlyphAndRecordChanges((varGlyph) => {
-      const defaultSource =
-        varGlyph.sources?.find((s) => !s.inactive && !s.locationBase) ??
-        varGlyph.sources?.[0];
-      const layerGlyph = varGlyph.layers?.[defaultSource?.layerName]?.glyph;
-      if (layerGlyph) {
-        if (!layerGlyph.customData) layerGlyph.customData = {};
-        layerGlyph.customData[COLRV1_KEY] = newPaint;
-      }
+      // SIMPLIFIED: Write directly to customData["colorv1"]
+      if (!varGlyph.customData) varGlyph.customData = {};
+      varGlyph.customData[COLRV1_KEY] = newPaint;
       return translate("color-layers.edit-colrv1-paint");
     });
   }
 
-  // ── COLRv0 mutations ──────────────────────────────────────────────────────
+  // ── COLRv0 mutations (unchanged) ─────────────────────────────────────────
 
   _nextLayerName(mapping) {
     const existing = new Set(mapping.map(([n]) => n));
@@ -1653,8 +1099,6 @@ export default class ColorLayersPanel extends Panel {
     await this._writeMapping(glyphName, mapping);
   }
 
-  // ── COLRv0 → COLRv1 converter ─────────────────────────────────────────────
-
   async _convertV0toV1(glyphName, mapping, palette) {
     const layers = mapping.map(([layerName, colorIndex]) => ({
       type: "PaintGlyph",
@@ -1662,33 +1106,25 @@ export default class ColorLayersPanel extends Panel {
       paint: { type: "PaintSolid", paletteIndex: colorIndex, alpha: 1.0 },
     }));
     await this.sceneController.editGlyphAndRecordChanges((varGlyph) => {
-      const defaultSource =
-        varGlyph.sources?.find((s) => !s.inactive && !s.locationBase) ??
-        varGlyph.sources?.[0];
-      const layerGlyph = varGlyph.layers?.[defaultSource?.layerName]?.glyph;
-      if (layerGlyph) {
-        if (!layerGlyph.customData) layerGlyph.customData = {};
-        layerGlyph.customData[COLRV1_KEY] = { type: "PaintColrLayers", layers };
-      }
+      if (!varGlyph.customData) varGlyph.customData = {};
+      varGlyph.customData[COLRV1_KEY] = { type: "PaintColrLayers", layers };
       delete varGlyph.customData[CUSTOM_DATA_KEY];
       return translate("color-layers.convert-v0-to-v1");
     });
   }
+
   _getCurrentDesignSpaceTarget() {
     const location = this.sceneController.sceneSettings.location || {};
     const axes = this.fontController.globalAxes ?? [];
 
-    // Check for any axis that is NOT at its default value
     for (const axis of axes) {
       const currentVal = location[axis.tag];
       const defaultVal = axis.defaultValue ?? 0;
-
       if (currentVal !== undefined && currentVal !== defaultVal) {
         return { tag: axis.tag, loc: currentVal };
       }
     }
 
-    // Fallback: If all sliders are at default, use the first available axis
     if (axes.length > 0) {
       const firstTag = axes[0].tag;
       return {
@@ -1706,8 +1142,6 @@ export default class ColorLayersPanel extends Panel {
     const val = target[field];
 
     const { tag, loc } = this._getCurrentDesignSpaceTarget();
-
-    // Determine the value to pin (interpolated if already variable, scalar if not)
     const currentValue = isVariable(val) ? resolveAtLocation(val, { [tag]: loc }) : val;
 
     let newKfs = [];
@@ -1717,9 +1151,7 @@ export default class ColorLayersPanel extends Panel {
       newKfs = [{ axis: tag, loc, value: val }];
     }
 
-    // Keep keyframes sorted by location for the resolver
     newKfs.sort((a, b) => a.loc - b.loc);
-
     await this._setV1FieldKeyframes(glyphName, paint, layerIdx, field, newKfs);
   }
 }

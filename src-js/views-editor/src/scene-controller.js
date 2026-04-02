@@ -250,7 +250,7 @@ export class SceneController {
     this.fontController.addChangeListener(
       { axes: null },
       (change, isExternalChange) => {
-        // the CrossAxisMapping may have changed, force to re-sync the location
+        // Force re-sync of the location
         this.sceneSettings.fontLocationSource = {
           ...this.sceneSettings.fontLocationSource,
         };
@@ -590,6 +590,39 @@ export class SceneController {
       "positionedLines",
       (event) => {
         this._adjustScrollPosition();
+      },
+      true
+    );
+
+    this.sceneSettingsController.addKeyListener(
+      "positionedLines",
+      (event) => {
+        // --- COLRv1 Pre-fetch ---
+        for (const line of this.sceneModel.positionedLines ?? []) {
+          for (const pg of line.glyphs ?? []) {
+            const customData =
+              pg.glyph?.instance?.customData ??
+              pg.varGlyph?.glyph?.customData ??
+              pg.varGlyph?.customData;
+
+            if (!customData) continue;
+            const colrData = customData["colorv1"];
+            if (!colrData) continue;
+
+            const clipGlyphs = _collectClipGlyphsFromPaint(colrData);
+            const explicit = customData["fontra.colrv1.referencedGlyphs"] ?? [];
+            const allRefs = new Set([...clipGlyphs, ...explicit]);
+
+            for (const glyphName of allRefs) {
+              const selfName = pg.varGlyph?.name ?? pg.varGlyph?.glyph?.name;
+              if (glyphName === selfName) continue;
+
+              this.fontController.loadGlyphs([...allRefs]).then(() => {
+                this.canvasController.requestUpdate();
+              });
+            }
+          }
+        }
       },
       true
     );

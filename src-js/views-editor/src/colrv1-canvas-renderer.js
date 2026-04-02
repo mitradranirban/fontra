@@ -13,8 +13,6 @@ export const COLRV1_KEY = "colorv1";
 
 // ---------------------------------------------------------------------------
 // Tag location builder
-// Build a location dict keyed by BOTH axis.tag AND axis.name so resolveVal
-// matches regardless of whether keyframes store "SHDW" or "shadow".
 // ---------------------------------------------------------------------------
 
 export function getTagLocation(fontController, sceneSettings) {
@@ -35,23 +33,36 @@ export function getTagLocation(fontController, sceneSettings) {
 }
 
 // ---------------------------------------------------------------------------
-// Paint graph resolver — handles both .fontra and raw TTF paintEntries
+// Paint graph resolver
 // ---------------------------------------------------------------------------
 
 export function getPaintGraph(customData) {
-  if (!customData) return null;
-  // .fontra source — already in Fontra format (has "type" key)
-  const fontraFormat = customData[COLRV1_KEY];
-  if (fontraFormat) return fontraFormat;
+  console.log("getPaintGraph called with:", customData);
 
-  // TTF/OTF backend via opentype.py — stored as "fontra.colrv1.paintGraph"
-  // May be raw fontTools format (has numeric "Format" key) or already Fontra format
+  if (!customData) {
+    console.log("No customData");
+    return null;
+  }
+
+  // Primary: .fontra format and converted TTF/OTF data
+  const fontraFormat = customData[COLRV1_KEY];
+  console.log(`Checking customData["${COLRV1_KEY}"]:`, fontraFormat);
+
+  if (fontraFormat) {
+    console.log("Found Fontra format paint");
+    return fontraFormat;
+  }
+
+  // Fallback: legacy storage
   const paintGraph = customData["fontra.colrv1.paintGraph"];
+  console.log('Checking customData["fontra.colrv1.paintGraph"]:', paintGraph);
+
   if (paintGraph) {
-    if (paintGraph.Format != null) return _convertPaintGraph(paintGraph);
+    console.log("Found legacy paintGraph");
     return paintGraph;
   }
 
+  console.log("No paint found");
   return null;
 }
 
@@ -83,8 +94,8 @@ export function resolveVal(val, axisValues) {
   if (loc >= sorted[sorted.length - 1].loc) return sorted[sorted.length - 1].value;
 
   for (let i = 0; i < sorted.length - 1; i++) {
-    const lo = sorted[i],
-      hi = sorted[i + 1];
+    const lo = sorted[i];
+    const hi = sorted[i + 1];
     if (loc >= lo.loc && loc <= hi.loc) {
       const t = (loc - lo.loc) / (hi.loc - lo.loc);
       return lo.value + t * (hi.value - lo.value);
@@ -104,43 +115,92 @@ export function renderCOLRv1(
   axisValues,
   activePaletteIndex = 0,
   controller = null,
-  cache
+  externalCache
 ) {
+  // DEBUG: Log entry point
+  console.log("=== renderCOLRv1 called ===");
+  console.log("positionedGlyph:", positionedGlyph);
+
   const glyphController = positionedGlyph?.glyph;
-  if (!glyphController) return;
+  if (!glyphController) {
+    console.warn("No glyphController found");
+    return;
+  }
 
   const instanceCd = glyphController.instance?.customData;
   const varGlyphCd =
     positionedGlyph?.varGlyph?.glyph?.customData ??
     positionedGlyph?.varGlyph?.customData;
 
+  // DEBUG: Log customData sources
+  console.log("instanceCd:", instanceCd);
+  console.log("varGlyphCd:", varGlyphCd);
+  console.log("COLRV1_KEY value:", COLRV1_KEY);
+
+  // Get the paint graph
   const resolvedPaint = getPaintGraph(instanceCd) ?? getPaintGraph(varGlyphCd);
-  if (!resolvedPaint) return;
+
+  // DEBUG: Log the resolved paint
+  console.log("resolvedPaint:", resolvedPaint);
+
+  if (!resolvedPaint) {
+    console.warn("No resolvedPaint found");
+    return;
+  }
 
   const palettes = fontController.customData?.[PALETTES_KEY];
-  if (!palettes?.length) return;
 
-  const pi = Math.max(0, Math.min(activePaletteIndex, palettes.length - 1));
-  const palette = palettes[pi];
+  // DEBUG: Log palette info
+  console.log("palettes:", palettes);
+  console.log("activePaletteIndex:", activePaletteIndex);
 
-  const outlineCache = new Map();
-  const pathCache = cache instanceof Map ? cache : new Map();
-  const referencedGlyphs =
-    instanceCd?.["fontra.colrv1.referencedGlyphs"] ??
-    varGlyphCd?.["fontra.colrv1.referencedGlyphs"] ??
-    [];
-  for (const name of referencedGlyphs) {
-    // 1. Correct the argument order to match your helper's definition
-    // 2. Remove 'outlineCache' from the call (use pathCache instead)
-    const p = _getOutlinePath2D(name, fontController, controller, pathCache);
+  if (!palettes?.length) {
+    console.warn("No palettes found");
+    return;
+  }
 
-    // 3. If the path isn't ready yet, we can't draw this layer.
-    // Return to avoid errors in _renderPaint
+  const paletteIndex = Math.max(0, Math.min(activePaletteIndex, palettes.length - 1));
+  const palette = palettes[paletteIndex];
+
+  // DEBUG: Log selected palette
+  console.log("Selected palette index:", paletteIndex);
+  console.log("Selected palette:", palette);
+  console.log(
+    "fontController methods:",
+    Object.getOwnPropertyNames(Object.getPrototypeOf(fontController)).filter((m) =>
+      m.toLowerCase().includes("glyph")
+    )
+  );
+
+  // Create or reuse cache for glyph outlines
+  const cache = externalCache instanceof Map ? externalCache : new Map();
+  // Collect ALL clip glyph names from the paint graph
+  const clipGlyphs = _collectClipGlyphs(resolvedPaint);
+  const allGlyphsToFetch = clipGlyphs; // no referencedGlyphs to merge anymore
+
+  console.log("glyphs to fetch:", [...allGlyphsToFetch]);
+
+  let allReady = true;
+  for (const name of allGlyphsToFetch) {
+    const p = _getOutlinePath2D(
+      name,
+      fontController,
+      controller,
+      cache,
+      positionedGlyph
+    );
     if (!p) {
       console.log(`Waiting for ${name}...`);
-      continue;
+      allReady = false;
     }
   }
+
+  if (!allReady) {
+    console.log("Not all clip glyphs ready, skipping render");
+    return;
+  }
+
+  // Render the paint graph
   ctx.save();
   _renderPaint(
     ctx,
@@ -148,14 +208,37 @@ export function renderCOLRv1(
     palette,
     axisValues,
     fontController,
-    outlineCache,
+    cache,
     positionedGlyph,
     0,
     controller
   );
   ctx.restore();
-}
 
+  // DEBUG: Log completion
+  console.log("=== renderCOLRv1 completed ===");
+}
+//  function to collect component paints
+function _collectClipGlyphs(paint, result = new Set()) {
+  if (!paint) return result;
+  switch (paint.type) {
+    case "PaintGlyph":
+    case "PaintVarGlyph":
+      result.add(paint.glyph);
+      _collectClipGlyphs(paint.paint, result);
+      break;
+    case "PaintColrLayers":
+      for (const layer of paint.layers ?? []) _collectClipGlyphs(layer, result);
+      break;
+    case "PaintComposite":
+      _collectClipGlyphs(paint.backdropPaint, result);
+      _collectClipGlyphs(paint.sourcePaint, result);
+      break;
+    default:
+      if (paint.paint) _collectClipGlyphs(paint.paint, result);
+  }
+  return result;
+}
 // ---------------------------------------------------------------------------
 // Paint graph walker
 // ---------------------------------------------------------------------------
@@ -166,14 +249,14 @@ function _renderPaint(
   palette,
   axisValues,
   fontController,
-  outlineCache,
+  cache,
   positionedGlyph,
   _depth = 0,
   controller
 ) {
   if (!paint) return;
   if (_depth > 32) {
-    console.warn("COLRv1: max recursion depth");
+    console.warn("COLRv1: max recursion depth exceeded");
     return;
   }
 
@@ -186,7 +269,7 @@ function _renderPaint(
           palette,
           axisValues,
           fontController,
-          outlineCache,
+          cache,
           positionedGlyph,
           _depth + 1,
           controller
@@ -195,32 +278,63 @@ function _renderPaint(
       break;
     }
 
-    case "PaintGlyph": {
-      const glyphName = paint.glyphName ?? paint.Glyph ?? paint.glyph ?? "";
-      const path2d =
-        _getOutlinePath2D(glyphName, fontController, outlineCache, controller) ??
-        positionedGlyph?.glyph?.flattenedPath2d;
-      ctx.save();
-      if (path2d) ctx.clip(path2d);
-      _renderPaint(
-        ctx,
-        paint.paint ?? paint.Paint,
-        palette,
-        axisValues,
-        fontController,
-        outlineCache,
-        positionedGlyph,
-        _depth + 1,
-        controller
-      );
-      ctx.restore();
+    case "PaintGlyph":
+    case "PaintVarGlyph": {
+      const glyphName = paint.glyph ?? "";
+
+      // Check if the referenced glyph has its own COLRv1 data
+      const refGlyph = fontController.getCachedGlyph?.(glyphName);
+      const refPaint = getPaintGraph(refGlyph);
+
+      if (refPaint) {
+        // Render the referenced color glyph directly
+        _renderPaint(
+          ctx,
+          refPaint,
+          palette,
+          axisValues,
+          fontController,
+          cache,
+          positionedGlyph,
+          _depth + 1,
+          controller
+        );
+      } else {
+        // Use the glyph outline as a clip path
+        const path2d = _getOutlinePath2D(
+          glyphName,
+          fontController,
+          controller,
+          cache,
+          positionedGlyph
+        );
+        ctx.save();
+
+        if (path2d) {
+          ctx.clip(path2d);
+        }
+
+        _renderPaint(
+          ctx,
+          paint.paint,
+          palette,
+          axisValues,
+          fontController,
+          cache,
+          positionedGlyph,
+          _depth + 1,
+          controller
+        );
+        ctx.restore();
+      }
       break;
     }
 
     case "PaintColrGlyph": {
-      const refGlyph = fontController.getCachedGlyph?.(paint.glyphName);
-      const refCd = refGlyph?.customData ?? refGlyph?.instance?.customData;
-      const refPaint = getPaintGraph(refCd);
+      const glyphName = paint.glyph ?? "";
+      const refGlyph = fontController.getCachedGlyph?.(glyphName);
+      const refPaint = getPaintGraph(refGlyph);
+
       if (refPaint) {
         _renderPaint(
           ctx,
@@ -228,7 +342,7 @@ function _renderPaint(
           palette,
           axisValues,
           fontController,
-          outlineCache,
+          cache,
           positionedGlyph,
           _depth + 1,
           controller
@@ -255,6 +369,7 @@ function _renderPaint(
       const x2 = resolveVal(paint.x2, axisValues);
       const y2 = resolveVal(paint.y2, axisValues);
 
+      // Calculate perpendicular gradient direction
       const dx2 = x2 - x0;
       const dy2 = y2 - y0;
       const len2sq = dx2 * dx2 + dy2 * dy2;
@@ -279,18 +394,6 @@ function _renderPaint(
 
     case "PaintRadialGradient":
     case "PaintVarRadialGradient": {
-      ctx.save();
-      if (paint.transform) {
-        const t = paint.transform;
-        ctx.transform(
-          resolveVal(t.xx, axisValues) ?? 1,
-          resolveVal(t.yx, axisValues) ?? 0,
-          resolveVal(t.xy, axisValues) ?? 0,
-          resolveVal(t.yy, axisValues) ?? 1,
-          resolveVal(t.dx, axisValues) ?? 0,
-          resolveVal(t.dy, axisValues) ?? 0
-        );
-      }
       try {
         const grad = ctx.createRadialGradient(
           resolveVal(paint.x0, axisValues),
@@ -304,9 +407,8 @@ function _renderPaint(
         ctx.fillStyle = grad;
         _fillBig(ctx);
       } catch (e) {
-        /* degenerate radii */
+        // Degenerate radii - skip rendering
       }
-      ctx.restore();
       break;
     }
 
@@ -320,6 +422,7 @@ function _renderPaint(
           resolveVal(paint.centerX, axisValues),
           resolveVal(paint.centerY, axisValues)
         );
+
         const arcSpan = endAngle - startAngle;
         if (Math.abs(arcSpan) > 1e-10 && paint.colorLine?.colorStops?.length) {
           const scale = arcSpan / (Math.PI * 2);
@@ -336,7 +439,9 @@ function _renderPaint(
         }
         ctx.fillStyle = grad;
         _fillBig(ctx);
-      } catch (e) {}
+      } catch (e) {
+        // Skip on error
+      }
       break;
     }
 
@@ -350,7 +455,7 @@ function _renderPaint(
         palette,
         axisValues,
         fontController,
-        outlineCache,
+        cache,
         positionedGlyph,
         _depth + 1,
         controller
@@ -369,7 +474,7 @@ function _renderPaint(
         palette,
         axisValues,
         fontController,
-        outlineCache,
+        cache,
         positionedGlyph,
         _depth + 1,
         controller
@@ -393,7 +498,7 @@ function _renderPaint(
         palette,
         axisValues,
         fontController,
-        outlineCache,
+        cache,
         positionedGlyph,
         _depth + 1,
         controller
@@ -415,7 +520,7 @@ function _renderPaint(
         palette,
         axisValues,
         fontController,
-        outlineCache,
+        cache,
         positionedGlyph,
         _depth + 1,
         controller
@@ -441,7 +546,7 @@ function _renderPaint(
         palette,
         axisValues,
         fontController,
-        outlineCache,
+        cache,
         positionedGlyph,
         _depth + 1,
         controller
@@ -461,7 +566,7 @@ function _renderPaint(
         palette,
         axisValues,
         fontController,
-        outlineCache,
+        cache,
         positionedGlyph,
         _depth + 1,
         controller
@@ -485,7 +590,7 @@ function _renderPaint(
         palette,
         axisValues,
         fontController,
-        outlineCache,
+        cache,
         positionedGlyph,
         _depth + 1,
         controller
@@ -511,7 +616,7 @@ function _renderPaint(
         palette,
         axisValues,
         fontController,
-        outlineCache,
+        cache,
         positionedGlyph,
         _depth + 1,
         controller
@@ -541,7 +646,7 @@ function _renderPaint(
         palette,
         axisValues,
         fontController,
-        outlineCache,
+        cache,
         positionedGlyph,
         _depth + 1,
         controller
@@ -568,7 +673,7 @@ function _renderPaint(
         palette,
         axisValues,
         fontController,
-        outlineCache,
+        cache,
         positionedGlyph,
         _depth + 1,
         controller
@@ -585,7 +690,7 @@ function _renderPaint(
         palette,
         axisValues,
         fontController,
-        outlineCache,
+        cache,
         positionedGlyph,
         _depth + 1,
         controller
@@ -597,7 +702,7 @@ function _renderPaint(
         palette,
         axisValues,
         fontController,
-        outlineCache,
+        cache,
         positionedGlyph,
         _depth + 1,
         controller
@@ -607,25 +712,29 @@ function _renderPaint(
     }
 
     default:
+      // Unknown paint type - ignore
       break;
   }
 }
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Helper functions
 // ---------------------------------------------------------------------------
 
-const BIG = 100_000;
+const BIG = 100000;
+
 function _fillBig(ctx) {
   ctx.fillRect(-BIG, -BIG, BIG * 2, BIG * 2);
 }
 
 function _applyColorLine(gradient, colorLine, palette, axisValues) {
   if (!colorLine?.colorStops?.length) return;
+
   const stops = [...colorLine.colorStops].sort(
     (a, b) =>
       resolveVal(a.stopOffset, axisValues) - resolveVal(b.stopOffset, axisValues)
   );
+
   for (const stop of stops) {
     const t = Math.max(0, Math.min(1, resolveVal(stop.stopOffset, axisValues)));
     const alpha = resolveVal(stop.alpha ?? 1.0, axisValues);
@@ -633,7 +742,7 @@ function _applyColorLine(gradient, colorLine, palette, axisValues) {
     try {
       gradient.addColorStop(t, color);
     } catch (e) {
-      /* skip invalid t */
+      // Skip invalid color stops
     }
   }
 }
@@ -641,11 +750,12 @@ function _applyColorLine(gradient, colorLine, palette, axisValues) {
 function _paletteColor(palette, index, alphaOverride = 1.0) {
   const entry = palette?.[index];
   if (!entry) return `rgba(0,0,0,${alphaOverride})`;
+
   const [r, g, b, a = 1.0] = entry;
   const finalAlpha = a * alphaOverride;
-  return `rgba(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(
+  return `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(
     b * 255
-  )},${finalAlpha.toFixed(4)})`;
+  )}, ${finalAlpha.toFixed(4)})`;
 }
 
 function _compositeMode(mode) {
@@ -681,336 +791,265 @@ function _compositeMode(mode) {
   return map[mode] ?? "source-over";
 }
 
-function _getOutlinePath2D(glyphName, fontController, controller, cache) {
-  // 1. Immediate Return if Cached
+// Module-level — outside the function
+const _resolvedPathCache = new Map();
+const _pendingGlyphs = new Set();
+
+function _getOutlinePath2D(
+  glyphName,
+  fontController,
+  controller,
+  cache,
+  positionedGlyph
+) {
+  if (!cache || typeof cache.has !== "function") return null;
+
+  // 1. Check frame cache
   if (cache.has(glyphName)) return cache.get(glyphName);
 
-  // 2. Check active UI controllers (Live edits)
-  const gc =
-    controller?.glyphControllers?.get(glyphName) ||
-    controller?.sceneModel?.getGlyphController?.(glyphName);
+  // 2. Check module-level resolved cache (survives across frames)
+  if (_resolvedPathCache.has(glyphName)) {
+    const p = _resolvedPathCache.get(glyphName);
+    cache.set(glyphName, p);
+    return p;
+  }
 
+  // 3. Self-reference: clip glyph IS the glyph being rendered
+  const currentGlyphName =
+    positionedGlyph?.varGlyph?.name ?? positionedGlyph?.varGlyph?.glyph?.name;
+
+  if (glyphName === currentGlyphName) {
+    const gc = positionedGlyph?.glyph;
+    const path = gc?.flattenedPath2d ?? _convertFontraPathToPath2D(gc?.instance?.path);
+    if (path) {
+      _resolvedPathCache.set(glyphName, path);
+      cache.set(glyphName, path);
+      return path;
+    }
+  }
+
+  // 4. Try synchronous scene controller
+  const gc = controller?.glyphControllers?.get(glyphName);
   let path = gc?.flattenedPath2d || gc?.instance?.path2d;
 
-  // 3. Synchronous check of the Font Data
-  if (!path && fontController) {
-    const glyph = fontController.getGlyph?.(glyphName);
-    path = glyph?.path2d || glyph?.layers?.[0]?.path2d;
-
-    // 4. THE TRIGGER: If data is missing, ask the fontController to load it
-    // We don't 'await' here because we must return to the Canvas loop immediately.
-    if (!glyph && fontController.getCachedGlyph) {
-      // This call is async and will populate the internal cache once finished
-      fontController.getCachedGlyph(glyphName).then(() => {
-        controller.requestUpdate();
-      });
+  if (!path) {
+    const sceneGc = controller?.sceneModel?.getGlyphController?.(glyphName);
+    if (sceneGc && !(sceneGc instanceof Promise)) {
+      path = sceneGc?.flattenedPath2d || sceneGc?.instance?.path2d;
     }
   }
 
-  if (path) {
-    cache.set(glyphName, path);
-    return path;
-  }
+  if (!_pendingGlyphs.has(glyphName)) {
+    _pendingGlyphs.add(glyphName);
 
-  // Still waiting... will try again next frame
+    // getGlyphInstance returns a StaticGlyphController with flattenedPath2d
+    const instancePromise = fontController.getGlyphInstance?.(
+      glyphName,
+      {}, // location — empty = default
+      {} // options
+    );
+
+    if (instancePromise instanceof Promise) {
+      instancePromise
+        .then((staticGc) => {
+          console.log(
+            `[getGlyphInstance] "${glyphName}":`,
+            staticGc,
+            "flattenedPath2d:",
+            staticGc?.flattenedPath2d
+          );
+          _pendingGlyphs.delete(glyphName);
+
+          const path =
+            staticGc?.flattenedPath2d ??
+            _convertFontraPathToPath2D(staticGc?.instance?.path);
+          if (path) {
+            _resolvedPathCache.set(glyphName, path);
+            controller?.requestUpdate?.();
+          } else {
+            console.warn(`No path from getGlyphInstance for ${glyphName}`, staticGc);
+          }
+        })
+        .catch((e) => {
+          _pendingGlyphs.delete(glyphName);
+          console.warn("getGlyphInstance error for", glyphName, e);
+        });
+    } else {
+      _pendingGlyphs.delete(glyphName);
+    }
+  }
   return null;
 }
-function _isEmptyPath(path) {
-  if (!path) return true;
-  return !(
-    (path.contours && path.contours.length > 0) ||
-    (path.pointTypes && path.coordinates && path.coordinates.length > 0) ||
-    (path.commands && path.commands.length > 0)
-  );
-}
 
-function getPath2D(pathData) {
+// New helper function to convert Fontra path format to Path2D with curve support
+function _convertFontraPathToPath2D(pathData) {
   if (!pathData) return new Path2D();
-  if (pathData instanceof Path2D) return pathData; // Already converted
+  if (pathData instanceof Path2D) return pathData;
 
   const p = new Path2D();
-  // If it's Fontra's standard contours format
+
+  // Handle unpacked contours format (from Fontra)
   if (Array.isArray(pathData.contours)) {
-    pathData.contours.forEach((c) => {
-      if (!c.points?.length) return;
-      p.moveTo(c.points[0].x, c.points[0].y);
-      // ... (keep curve logic if your font has curves)
-    });
-  }
-  // If it's the efficient "Packed" format
-  else if (pathData.pointTypes && pathData.coordinates) {
-    const coords = pathData.coordinates;
-    for (let i = 0; i < coords.length; i += 2) {
-      if (i === 0) p.moveTo(coords[i], coords[i + 1]);
-      else p.lineTo(coords[i], coords[i + 1]);
+    for (const contour of pathData.contours) {
+      if (!contour.points?.length) continue;
+
+      const points = contour.points;
+      const isClosed = contour.isClosed;
+
+      // Move to first point
+      p.moveTo(points[0].x, points[0].y);
+
+      let i = 1;
+      while (i < points.length) {
+        const pt = points[i];
+        const type = pt.type;
+
+        if (type === "line" || type === "move" || type == null) {
+          // Line segment
+          p.lineTo(pt.x, pt.y);
+          i++;
+        } else if (type === "cubic") {
+          // Cubic bezier curve: needs 3 points (control1, control2, end)
+          const c1 = pt;
+          const c2 = points[i + 1];
+          const end = points[i + 2];
+          if (c2 && end) {
+            p.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, end.x, end.y);
+            i += 3;
+          } else {
+            // Invalid cubic, treat as line
+            p.lineTo(pt.x, pt.y);
+            i++;
+          }
+        } else if (type === "quad") {
+          // Quadratic bezier curve: needs 2 points (control, end)
+          const control = pt;
+          const end = points[i + 1];
+          if (end) {
+            p.quadraticCurveTo(control.x, control.y, end.x, end.y);
+            i += 2;
+          } else {
+            // Invalid quad, treat as line
+            p.lineTo(pt.x, pt.y);
+            i++;
+          }
+        } else {
+          // Unknown type, treat as line
+          p.lineTo(pt.x, pt.y);
+          i++;
+        }
+      }
+
+      if (isClosed) {
+        p.closePath();
+      }
     }
   }
+  // Handle packed path format
+  else if (pathData.pointTypes && pathData.coordinates && pathData.contourInfo) {
+    _convertPackedPathToPath2D(p, pathData);
+  }
+
   return p;
 }
-// ---------------------------------------------------------------------------
-// fontTools raw format → Fontra paint format converter
-// ---------------------------------------------------------------------------
 
-function _convertColorLine(colorLine) {
-  if (!colorLine) return null;
-  return {
-    extend: colorLine.Extend ?? "pad",
-    colorStops: (colorLine.ColorStop ?? []).map((stop) => ({
-      stopOffset: stop.StopOffset ?? 0,
-      paletteIndex: stop.Color?.PaletteIndex ?? stop.PaletteIndex ?? 0,
-      alpha: stop.Color?.Alpha ?? stop.Alpha ?? 1,
-    })),
-  };
+// Helper to convert packed path format with proper curves
+function _convertPackedPathToPath2D(p, path) {
+  const coords = path.coordinates;
+  const types = path.pointTypes;
+  const contourInfo = path.contourInfo;
+
+  let pointIndex = 0;
+  let coordIndex = 0;
+
+  for (let contourIdx = 0; contourIdx < contourInfo.length; contourIdx++) {
+    const info = contourInfo[contourIdx];
+    const numPoints = info.length;
+    const isClosed = info.isClosed;
+    const startPointIndex = pointIndex;
+
+    if (numPoints === 0) continue;
+
+    // Get the first point
+    let x = coords[coordIndex];
+    let y = coords[coordIndex + 1];
+    p.moveTo(x, y);
+    coordIndex += 2;
+    pointIndex++;
+
+    let i = 1;
+    while (i < numPoints) {
+      const pointType = types[pointIndex];
+      const isOnCurve = !!(pointType & 0x01);
+      const isCubic = !!(pointType & 0x02); // Cubic flag
+
+      x = coords[coordIndex];
+      y = coords[coordIndex + 1];
+      coordIndex += 2;
+
+      if (isOnCurve) {
+        // On-curve point - line segment
+        p.lineTo(x, y);
+        i++;
+        pointIndex++;
+      } else if (isCubic) {
+        // Cubic bezier - need 2 more points (control2 and end)
+        if (i + 2 <= numPoints) {
+          const c1 = { x, y };
+
+          // Control point 2
+          const c2x = coords[coordIndex];
+          const c2y = coords[coordIndex + 1];
+          coordIndex += 2;
+
+          // End point (on-curve)
+          const endX = coords[coordIndex];
+          const endY = coords[coordIndex + 1];
+          coordIndex += 2;
+
+          p.bezierCurveTo(c1.x, c1.y, c2x, c2y, endX, endY);
+          i += 3;
+          pointIndex += 3;
+        } else {
+          // Invalid cubic, treat as line
+          p.lineTo(x, y);
+          i++;
+          pointIndex++;
+        }
+      } else {
+        // Quadratic bezier - need 1 more point (end)
+        if (i + 1 <= numPoints) {
+          const control = { x, y };
+
+          // End point (on-curve)
+          const endX = coords[coordIndex];
+          const endY = coords[coordIndex + 1];
+          coordIndex += 2;
+
+          p.quadraticCurveTo(control.x, control.y, endX, endY);
+          i += 2;
+          pointIndex += 2;
+        } else {
+          // Invalid quad, treat as line
+          p.lineTo(x, y);
+          i++;
+          pointIndex++;
+        }
+      }
+    }
+
+    if (isClosed) {
+      p.closePath();
+    }
+  }
 }
 
-function _convertPaintGraph(paint) {
-  if (!paint || typeof paint !== "object") return paint;
-  const fmt = paint.Format;
-
-  if (fmt === 1)
-    return {
-      type: "PaintColrLayers",
-      layers: (paint.Layers ?? []).map(_convertPaintGraph),
-    };
-  if (fmt === 2)
-    return {
-      type: "PaintSolid",
-      paletteIndex: paint.PaletteIndex ?? 0,
-      alpha: paint.Alpha ?? 1,
-    };
-  if (fmt === 3)
-    return {
-      type: "PaintVarSolid",
-      paletteIndex: paint.PaletteIndex ?? 0,
-      alpha: paint.Alpha ?? 1,
-    };
-  if (fmt === 4)
-    return {
-      type: "PaintLinearGradient",
-      colorLine: _convertColorLine(paint.ColorLine),
-      x0: paint.x0 ?? 0,
-      y0: paint.y0 ?? 0,
-      x1: paint.x1 ?? 0,
-      y1: paint.y1 ?? 0,
-      x2: paint.x2 ?? 0,
-      y2: paint.y2 ?? 0,
-    };
-  if (fmt === 5)
-    return {
-      type: "PaintVarLinearGradient",
-      colorLine: _convertColorLine(paint.ColorLine),
-      x0: paint.x0 ?? 0,
-      y0: paint.y0 ?? 0,
-      x1: paint.x1 ?? 0,
-      y1: paint.y1 ?? 0,
-      x2: paint.x2 ?? 0,
-      y2: paint.y2 ?? 0,
-    };
-  if (fmt === 6)
-    return {
-      type: "PaintRadialGradient",
-      colorLine: _convertColorLine(paint.ColorLine),
-      x0: paint.x0 ?? 0,
-      y0: paint.y0 ?? 0,
-      r0: paint.r0 ?? 0,
-      x1: paint.x1 ?? 0,
-      y1: paint.y1 ?? 0,
-      r1: paint.r1 ?? 0,
-    };
-  if (fmt === 7)
-    return {
-      type: "PaintVarRadialGradient",
-      colorLine: _convertColorLine(paint.ColorLine),
-      x0: paint.x0 ?? 0,
-      y0: paint.y0 ?? 0,
-      r0: paint.r0 ?? 0,
-      x1: paint.x1 ?? 0,
-      y1: paint.y1 ?? 0,
-      r1: paint.r1 ?? 0,
-    };
-  if (fmt === 8)
-    return {
-      type: "PaintSweepGradient",
-      colorLine: _convertColorLine(paint.ColorLine),
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      startAngle: (paint.startAngle ?? 0) / 360,
-      endAngle: (paint.endAngle ?? 0) / 360,
-    };
-  if (fmt === 9)
-    return {
-      type: "PaintVarSweepGradient",
-      colorLine: _convertColorLine(paint.ColorLine),
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      startAngle: (paint.startAngle ?? 0) / 360,
-      endAngle: (paint.endAngle ?? 0) / 360,
-    };
-  if (fmt === 10)
-    return {
-      type: "PaintGlyph",
-      glyphName: paint.Glyph ?? paint.glyph ?? paint.glyphName ?? "",
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 11)
-    return {
-      type: "PaintColrGlyph",
-      glyphName: paint.Glyph ?? paint.glyph ?? paint.glyphName ?? "",
-    };
-  if (fmt === 12)
-    return {
-      type: "PaintTransform",
-      transform: paint.Transform,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 13)
-    return {
-      type: "PaintVarTransform",
-      transform: paint.Transform,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 14)
-    return {
-      type: "PaintTranslate",
-      dx: paint.dx ?? 0,
-      dy: paint.dy ?? 0,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 15)
-    return {
-      type: "PaintVarTranslate",
-      dx: paint.dx ?? 0,
-      dy: paint.dy ?? 0,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 16)
-    return {
-      type: "PaintScale",
-      scaleX: paint.scaleX ?? 1,
-      scaleY: paint.scaleY ?? 1,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 17)
-    return {
-      type: "PaintVarScale",
-      scaleX: paint.scaleX ?? 1,
-      scaleY: paint.scaleY ?? 1,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 18)
-    return {
-      type: "PaintScaleAroundCenter",
-      scaleX: paint.scaleX ?? 1,
-      scaleY: paint.scaleY ?? 1,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 19)
-    return {
-      type: "PaintVarScaleAroundCenter",
-      scaleX: paint.scaleX ?? 1,
-      scaleY: paint.scaleY ?? 1,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 20)
-    return {
-      type: "PaintScaleUniform",
-      scale: paint.scale ?? 1,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 21)
-    return {
-      type: "PaintVarScaleUniform",
-      scale: paint.scale ?? 1,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 22)
-    return {
-      type: "PaintScaleUniformAroundCenter",
-      scale: paint.scale ?? 1,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 23)
-    return {
-      type: "PaintVarScaleUniformAroundCenter",
-      scale: paint.scale ?? 1,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 24)
-    return {
-      type: "PaintRotate",
-      angle: (paint.angle ?? 0) / 360,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 25)
-    return {
-      type: "PaintVarRotate",
-      angle: (paint.angle ?? 0) / 360,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 26)
-    return {
-      type: "PaintRotateAroundCenter",
-      angle: (paint.angle ?? 0) / 360,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 27)
-    return {
-      type: "PaintVarRotateAroundCenter",
-      angle: (paint.angle ?? 0) / 360,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 28)
-    return {
-      type: "PaintSkew",
-      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
-      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 29)
-    return {
-      type: "PaintVarSkew",
-      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
-      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 30)
-    return {
-      type: "PaintSkewAroundCenter",
-      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
-      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 31)
-    return {
-      type: "PaintVarSkewAroundCenter",
-      xSkewAngle: (paint.xSkewAngle ?? 0) / 360,
-      ySkewAngle: (paint.ySkewAngle ?? 0) / 360,
-      centerX: paint.centerX ?? 0,
-      centerY: paint.centerY ?? 0,
-      paint: _convertPaintGraph(paint.Paint),
-    };
-  if (fmt === 32)
-    return {
-      type: "PaintComposite",
-      sourcePaint: _convertPaintGraph(paint.SourcePaint),
-      compositeMode: paint.CompositeMode ?? "src_over",
-      backdropPaint: _convertPaintGraph(paint.BackdropPaint),
-    };
-
-  console.warn(`_convertPaintGraph: unknown Format ${fmt}`, paint);
-  return paint;
+function _isEmptyPath(path) {
+  if (!path) return true;
+  if (path instanceof Path2D) return false;
+  return !(
+    path.contours?.length > 0 ||
+    path.coordinates?.length > 0 ||
+    path.commands?.length > 0
+  );
 }
