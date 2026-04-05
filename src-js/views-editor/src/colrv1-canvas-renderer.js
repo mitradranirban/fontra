@@ -37,32 +37,16 @@ export function getTagLocation(fontController, sceneSettings) {
 // ---------------------------------------------------------------------------
 
 export function getPaintGraph(customData) {
-  console.log("getPaintGraph called with:", customData);
-
-  if (!customData) {
-    console.log("No customData");
-    return null;
-  }
+  if (!customData) return null;
 
   // Primary: .fontra format and converted TTF/OTF data
   const fontraFormat = customData[COLRV1_KEY];
-  console.log(`Checking customData["${COLRV1_KEY}"]:`, fontraFormat);
-
-  if (fontraFormat) {
-    console.log("Found Fontra format paint");
-    return fontraFormat;
-  }
+  if (fontraFormat) return fontraFormat;
 
   // Fallback: legacy storage
   const paintGraph = customData["fontra.colrv1.paintGraph"];
-  console.log('Checking customData["fontra.colrv1.paintGraph"]:', paintGraph);
+  if (paintGraph) return paintGraph;
 
-  if (paintGraph) {
-    console.log("Found legacy paintGraph");
-    return paintGraph;
-  }
-
-  console.log("No paint found");
   return null;
 }
 
@@ -117,10 +101,6 @@ export function renderCOLRv1(
   controller = null,
   externalCache
 ) {
-  // DEBUG: Log entry point
-  console.log("=== renderCOLRv1 called ===");
-  console.log("positionedGlyph:", positionedGlyph);
-
   const glyphController = positionedGlyph?.glyph;
   if (!glyphController) {
     console.warn("No glyphController found");
@@ -132,28 +112,13 @@ export function renderCOLRv1(
     positionedGlyph?.varGlyph?.glyph?.customData ??
     positionedGlyph?.varGlyph?.customData;
 
-  // DEBUG: Log customData sources
-  console.log("instanceCd:", instanceCd);
-  console.log("varGlyphCd:", varGlyphCd);
-  console.log("COLRV1_KEY value:", COLRV1_KEY);
-
-  // Get the paint graph
   const resolvedPaint = getPaintGraph(instanceCd) ?? getPaintGraph(varGlyphCd);
-
-  // DEBUG: Log the resolved paint
-  console.log("resolvedPaint:", resolvedPaint);
-
   if (!resolvedPaint) {
     console.warn("No resolvedPaint found");
     return;
   }
 
   const palettes = fontController.customData?.[PALETTES_KEY];
-
-  // DEBUG: Log palette info
-  console.log("palettes:", palettes);
-  console.log("activePaletteIndex:", activePaletteIndex);
-
   if (!palettes?.length) {
     console.warn("No palettes found");
     return;
@@ -162,26 +127,13 @@ export function renderCOLRv1(
   const paletteIndex = Math.max(0, Math.min(activePaletteIndex, palettes.length - 1));
   const palette = palettes[paletteIndex];
 
-  // DEBUG: Log selected palette
-  console.log("Selected palette index:", paletteIndex);
-  console.log("Selected palette:", palette);
-  console.log(
-    "fontController methods:",
-    Object.getOwnPropertyNames(Object.getPrototypeOf(fontController)).filter((m) =>
-      m.toLowerCase().includes("glyph")
-    )
-  );
-
   // Create or reuse cache for glyph outlines
   const cache = externalCache instanceof Map ? externalCache : new Map();
-  // Collect ALL clip glyph names from the paint graph
+
+  // Collect ALL clip glyph names from the paint graph and wait until ready
   const clipGlyphs = _collectClipGlyphs(resolvedPaint);
-  const allGlyphsToFetch = clipGlyphs; // no referencedGlyphs to merge anymore
-
-  console.log("glyphs to fetch:", [...allGlyphsToFetch]);
-
   let allReady = true;
-  for (const name of allGlyphsToFetch) {
+  for (const name of clipGlyphs) {
     const p = _getOutlinePath2D(
       name,
       fontController,
@@ -189,16 +141,10 @@ export function renderCOLRv1(
       cache,
       positionedGlyph
     );
-    if (!p) {
-      console.log(`Waiting for ${name}...`);
-      allReady = false;
-    }
+    if (!p) allReady = false;
   }
 
-  if (!allReady) {
-    console.log("Not all clip glyphs ready, skipping render");
-    return;
-  }
+  if (!allReady) return;
 
   // Render the paint graph
   ctx.save();
@@ -214,11 +160,12 @@ export function renderCOLRv1(
     controller
   );
   ctx.restore();
-
-  // DEBUG: Log completion
-  console.log("=== renderCOLRv1 completed ===");
 }
-//  function to collect component paints
+
+// ---------------------------------------------------------------------------
+// Clip glyph collector
+// ---------------------------------------------------------------------------
+
 function _collectClipGlyphs(paint, result = new Set()) {
   if (!paint) return result;
   switch (paint.type) {
@@ -239,6 +186,7 @@ function _collectClipGlyphs(paint, result = new Set()) {
   }
   return result;
 }
+
 // ---------------------------------------------------------------------------
 // Paint graph walker
 // ---------------------------------------------------------------------------
@@ -309,11 +257,7 @@ function _renderPaint(
           positionedGlyph
         );
         ctx.save();
-
-        if (path2d) {
-          ctx.clip(path2d);
-        }
-
+        if (path2d) ctx.clip(path2d);
         _renderPaint(
           ctx,
           paint.paint,
@@ -334,7 +278,6 @@ function _renderPaint(
       const glyphName = paint.glyph ?? "";
       const refGlyph = fontController.getCachedGlyph?.(glyphName);
       const refPaint = getPaintGraph(refGlyph);
-
       if (refPaint) {
         _renderPaint(
           ctx,
@@ -369,7 +312,6 @@ function _renderPaint(
       const x2 = resolveVal(paint.x2, axisValues);
       const y2 = resolveVal(paint.y2, axisValues);
 
-      // Calculate perpendicular gradient direction
       const dx2 = x2 - x0;
       const dy2 = y2 - y0;
       const len2sq = dx2 * dx2 + dy2 * dy2;
@@ -683,9 +625,17 @@ function _renderPaint(
     }
 
     case "PaintComposite": {
-      ctx.save();
+      // Get canvas dimensions from current transform
+      const dpr = window.devicePixelRatio || 1;
+      const w = ctx.canvas.width;
+      const h = ctx.canvas.height;
+
+      // Render backdrop into offscreen buffer
+      const backdropCanvas = new OffscreenCanvas(w, h);
+      const backdropCtx = backdropCanvas.getContext("2d");
+      backdropCtx.setTransform(ctx.getTransform());
       _renderPaint(
-        ctx,
+        backdropCtx,
         paint.backdropPaint,
         palette,
         axisValues,
@@ -695,9 +645,13 @@ function _renderPaint(
         _depth + 1,
         controller
       );
-      ctx.globalCompositeOperation = _compositeMode(paint.compositeMode);
+
+      // Render source into offscreen buffer
+      const sourceCanvas = new OffscreenCanvas(w, h);
+      const sourceCtx = sourceCanvas.getContext("2d");
+      sourceCtx.setTransform(ctx.getTransform());
       _renderPaint(
-        ctx,
+        sourceCtx,
         paint.sourcePaint,
         palette,
         axisValues,
@@ -707,10 +661,19 @@ function _renderPaint(
         _depth + 1,
         controller
       );
+
+      // Composite source onto backdrop
+      backdropCtx.globalCompositeOperation = _compositeMode(paint.compositeMode);
+      backdropCtx.setTransform(1, 0, 0, 1, 0, 0); // reset for drawImage
+      backdropCtx.drawImage(sourceCanvas, 0, 0);
+
+      // Paint the composited result onto the main canvas
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0); // reset for drawImage
+      ctx.drawImage(backdropCanvas, 0, 0);
       ctx.restore();
       break;
     }
-
     default:
       // Unknown paint type - ignore
       break;
@@ -747,7 +710,13 @@ function _applyColorLine(gradient, colorLine, palette, axisValues) {
   }
 }
 
-function _paletteColor(palette, index, alphaOverride = 1.0) {
+function _paletteColor(palette, index, alphaOverride = 1.0, ctx = null) {
+  // 0xFFFF = COLRv1 "use foreground color" — same as what the editor set on ctx
+  if (index === 0xffff || index === 65535) {
+    const fg = ctx?.fillStyle ?? "rgba(0,0,0,1)";
+    // apply alphaOverride to whatever the theme color is
+    return fg;
+  }
   const entry = palette?.[index];
   if (!entry) return `rgba(0,0,0,${alphaOverride})`;
 
@@ -790,6 +759,10 @@ function _compositeMode(mode) {
   };
   return map[mode] ?? "source-over";
 }
+
+// ---------------------------------------------------------------------------
+// Glyph outline path resolver
+// ---------------------------------------------------------------------------
 
 // Module-level — outside the function
 const _resolvedPathCache = new Map();
@@ -842,7 +815,6 @@ function _getOutlinePath2D(
   if (!_pendingGlyphs.has(glyphName)) {
     _pendingGlyphs.add(glyphName);
 
-    // getGlyphInstance returns a StaticGlyphController with flattenedPath2d
     const instancePromise = fontController.getGlyphInstance?.(
       glyphName,
       {}, // location — empty = default
@@ -852,14 +824,7 @@ function _getOutlinePath2D(
     if (instancePromise instanceof Promise) {
       instancePromise
         .then((staticGc) => {
-          console.log(
-            `[getGlyphInstance] "${glyphName}":`,
-            staticGc,
-            "flattenedPath2d:",
-            staticGc?.flattenedPath2d
-          );
           _pendingGlyphs.delete(glyphName);
-
           const path =
             staticGc?.flattenedPath2d ??
             _convertFontraPathToPath2D(staticGc?.instance?.path);
@@ -881,7 +846,10 @@ function _getOutlinePath2D(
   return null;
 }
 
-// New helper function to convert Fontra path format to Path2D with curve support
+// ---------------------------------------------------------------------------
+// Path conversion helpers
+// ---------------------------------------------------------------------------
+
 function _convertFontraPathToPath2D(pathData) {
   if (!pathData) return new Path2D();
   if (pathData instanceof Path2D) return pathData;
@@ -896,7 +864,6 @@ function _convertFontraPathToPath2D(pathData) {
       const points = contour.points;
       const isClosed = contour.isClosed;
 
-      // Move to first point
       p.moveTo(points[0].x, points[0].y);
 
       let i = 1;
@@ -905,11 +872,9 @@ function _convertFontraPathToPath2D(pathData) {
         const type = pt.type;
 
         if (type === "line" || type === "move" || type == null) {
-          // Line segment
           p.lineTo(pt.x, pt.y);
           i++;
         } else if (type === "cubic") {
-          // Cubic bezier curve: needs 3 points (control1, control2, end)
           const c1 = pt;
           const c2 = points[i + 1];
           const end = points[i + 2];
@@ -917,32 +882,26 @@ function _convertFontraPathToPath2D(pathData) {
             p.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, end.x, end.y);
             i += 3;
           } else {
-            // Invalid cubic, treat as line
             p.lineTo(pt.x, pt.y);
             i++;
           }
         } else if (type === "quad") {
-          // Quadratic bezier curve: needs 2 points (control, end)
           const control = pt;
           const end = points[i + 1];
           if (end) {
             p.quadraticCurveTo(control.x, control.y, end.x, end.y);
             i += 2;
           } else {
-            // Invalid quad, treat as line
             p.lineTo(pt.x, pt.y);
             i++;
           }
         } else {
-          // Unknown type, treat as line
           p.lineTo(pt.x, pt.y);
           i++;
         }
       }
 
-      if (isClosed) {
-        p.closePath();
-      }
+      if (isClosed) p.closePath();
     }
   }
   // Handle packed path format
@@ -953,7 +912,6 @@ function _convertFontraPathToPath2D(pathData) {
   return p;
 }
 
-// Helper to convert packed path format with proper curves
 function _convertPackedPathToPath2D(p, path) {
   const coords = path.coordinates;
   const types = path.pointTypes;
@@ -966,11 +924,9 @@ function _convertPackedPathToPath2D(p, path) {
     const info = contourInfo[contourIdx];
     const numPoints = info.length;
     const isClosed = info.isClosed;
-    const startPointIndex = pointIndex;
 
     if (numPoints === 0) continue;
 
-    // Get the first point
     let x = coords[coordIndex];
     let y = coords[coordIndex + 1];
     p.moveTo(x, y);
@@ -981,56 +937,43 @@ function _convertPackedPathToPath2D(p, path) {
     while (i < numPoints) {
       const pointType = types[pointIndex];
       const isOnCurve = !!(pointType & 0x01);
-      const isCubic = !!(pointType & 0x02); // Cubic flag
+      const isCubic = !!(pointType & 0x02);
 
       x = coords[coordIndex];
       y = coords[coordIndex + 1];
       coordIndex += 2;
 
       if (isOnCurve) {
-        // On-curve point - line segment
         p.lineTo(x, y);
         i++;
         pointIndex++;
       } else if (isCubic) {
-        // Cubic bezier - need 2 more points (control2 and end)
         if (i + 2 <= numPoints) {
           const c1 = { x, y };
-
-          // Control point 2
           const c2x = coords[coordIndex];
           const c2y = coords[coordIndex + 1];
           coordIndex += 2;
-
-          // End point (on-curve)
           const endX = coords[coordIndex];
           const endY = coords[coordIndex + 1];
           coordIndex += 2;
-
           p.bezierCurveTo(c1.x, c1.y, c2x, c2y, endX, endY);
           i += 3;
           pointIndex += 3;
         } else {
-          // Invalid cubic, treat as line
           p.lineTo(x, y);
           i++;
           pointIndex++;
         }
       } else {
-        // Quadratic bezier - need 1 more point (end)
         if (i + 1 <= numPoints) {
           const control = { x, y };
-
-          // End point (on-curve)
           const endX = coords[coordIndex];
           const endY = coords[coordIndex + 1];
           coordIndex += 2;
-
           p.quadraticCurveTo(control.x, control.y, endX, endY);
           i += 2;
           pointIndex += 2;
         } else {
-          // Invalid quad, treat as line
           p.lineTo(x, y);
           i++;
           pointIndex++;
@@ -1038,9 +981,7 @@ function _convertPackedPathToPath2D(p, path) {
       }
     }
 
-    if (isClosed) {
-      p.closePath();
-    }
+    if (isClosed) p.closePath();
   }
 }
 

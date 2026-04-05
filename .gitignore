@@ -266,3 +266,6 @@ src/fontra/localplugins/
 
 # Generated HTML/JS files
 src/fontra/client
+
+# sed backup
+.bak
