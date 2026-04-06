@@ -227,7 +227,9 @@ export default class TextEntryPanel extends Panel {
   }
 
   async getShaper() {
-    const shaperInfoPromise = this.textSettings.applyTextShaping
+    const applyTextShaping = this.textSettings.applyTextShaping;
+
+    const shaperInfoPromise = applyTextShaping
       ? this.textSettings.shaperInfo
       : this.textSettings.dumbShaperInfo;
 
@@ -237,13 +239,20 @@ export default class TextEntryPanel extends Panel {
 
     const { shaper, messages, canEmulateSomeGPOS } = await shaperInfoPromise;
 
+    if (applyTextShaping != this.textSettings.applyTextShaping) {
+      // The setting was changed since we were called: ignore, or else we may
+      // override the correct things that may have been set up before us.
+      return;
+    }
+
     const errorMessages = messages.filter((message) => message.level != "warning");
     const numberOfErrorsMessage = errorMessages.length == 1 ? "an error" : "errors";
 
     this.updateShaperError(
       errorMessages.length
         ? `The OpenType feature code contains ${numberOfErrorsMessage}`
-        : null
+        : null,
+      errorMessages[0]
     );
 
     return shaper;
@@ -363,7 +372,9 @@ export default class TextEntryPanel extends Panel {
   setupAccordionElement() {
     this.textSettingsController.addKeyListener("textScript", async (event) => {
       const shaper = await this.getShaper();
-      this.updateLanguages(shaper?.getScriptAndLanguageInfo() ?? {});
+      if (shaper) {
+        this.updateLanguages(shaper.getScriptAndLanguageInfo());
+      }
     });
 
     this.accordion = new Accordion();
@@ -486,10 +497,6 @@ export default class TextEntryPanel extends Panel {
     this.textScriptOptions = [{ label: "Automatic", value: null }];
     this.textLanguageOptions = [{ label: "Default (dflt)", value: null }];
 
-    const opentypeFeaturesURL = new URL(window.location);
-    opentypeFeaturesURL.pathname = "fontinfo.html";
-    opentypeFeaturesURL.hash = "#opentype-feature-code-panel";
-
     this.accordion.items = [
       {
         id: "shaping-options-accordion-item",
@@ -536,8 +543,8 @@ export default class TextEntryPanel extends Panel {
             {
               id: "features-errors",
               class: "hidden",
-              href: opentypeFeaturesURL,
-              target: "_blank",
+              href: "", // will get filled in later
+              target: `fontra.fontinfo.${this.editorController.projectIdentifier}`,
             },
             [
               html.createDomElement("inline-svg", {
@@ -604,11 +611,18 @@ export default class TextEntryPanel extends Panel {
     showMenu(menuItems, { x: buttonRect.left, y: buttonRect.bottom });
   }
 
-  updateShaperError(error) {
+  updateShaperError(error, errorMessage) {
     const errorElement = this.accordion.querySelector("#features-errors");
     const messageElement = this.accordion.querySelector("#features-errors-message");
     errorElement.classList.toggle("hidden", !error);
     messageElement.innerText = error ?? "";
+
+    if (errorMessage) {
+      const opentypeFeaturesURL = new URL(window.location);
+      opentypeFeaturesURL.pathname = "fontinfo.html";
+      opentypeFeaturesURL.hash = `#opentype-feature-code-panel#C${errorMessage.span[0]}-${errorMessage.span[1]}`;
+      errorElement.href = opentypeFeaturesURL;
+    }
   }
 
   updateFeatures(shaper) {

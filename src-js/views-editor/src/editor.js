@@ -107,8 +107,8 @@ const PASTE_BEHAVIOR_REPLACE = "replace";
 const PASTE_BEHAVIOR_ADD = "add";
 
 export class EditorController extends ViewController {
-  constructor(font) {
-    super(font);
+  constructor(font, projectIdentifier) {
+    super(font, projectIdentifier);
     const canvas = document.querySelector("#edit-canvas");
     canvas.focus();
     // This relates to getActionIdentifierFromKeyEvent which contains logic that
@@ -1209,6 +1209,25 @@ export class EditorController extends ViewController {
     }
     this.sceneController.setSelectedTool(this.tools[selectedToolIdentifier]);
     this.selectedToolIdentifier = selectedToolIdentifier;
+  }
+
+  getPenTool() {
+    return this.tools[this.getToolIdentifierFromMultiTool("pen-tool")];
+  }
+
+  getToolIdentifierFromMultiTool(toolIdentifier) {
+    for (const editToolItem of document.querySelectorAll(
+      "#edit-tools > .tool-button"
+    )) {
+      if (
+        editToolItem.classList.contains("multi-tool") &&
+        editToolItem.dataset.tool === toolIdentifier
+      ) {
+        return editToolItem.children[0].dataset.tool;
+      }
+    }
+
+    return toolIdentifier;
   }
 
   themeChanged() {

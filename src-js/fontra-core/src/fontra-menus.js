@@ -58,11 +58,10 @@ function getFontraMenu() {
         enabled: () => true,
         callback: () => {
           const url = new URL(window.location);
-          console.log(url.pathname);
           const target = "/applicationsettings.html";
           window.open(
             `${target}#${panelID}-panel`,
-            url.pathname.includes(target) ? "_self" : undefined
+            url.pathname.includes(target) ? "_self" : "fontra.applicationsettings"
           );
         },
       }));
@@ -169,7 +168,7 @@ const fontOverviewInfoKeys = [
   "fontLocationUser",
 ];
 
-function getFontMenuItems() {
+function getFontMenuItems(viewController) {
   const menuItems = [
     ["font-info.title", "#font-info-panel"],
     ["axes.title", "#axes-panel"],
@@ -179,7 +178,7 @@ function getFontMenuItems() {
     ["development-status-definitions.title", "#development-status-definitions-panel"],
     ["color-palettes.title", "#color-palettes-panel"],
     [undefined, undefined], // divider
-    ["font-overview.title", "fontoverview"],
+    ["font-overview.title", null],
   ];
   return menuItems.map(([title, panelID]) =>
     title
@@ -188,9 +187,9 @@ function getFontMenuItems() {
           callback: () => {
             const url = new URL(window.location);
             url.hash = "";
-            const openNewTab = !url.pathname.includes("fontinfo");
+            const openNewTab = !url.pathname.includes("fontinfo") || !panelID;
 
-            if (panelID === "fontoverview") {
+            if (!panelID) {
               const viewInfo = readObjectFromURLFragment();
               if (viewInfo) {
                 const fontOverviewInfo = {};
@@ -212,7 +211,14 @@ function getFontMenuItems() {
               url.hash = panelID;
             }
 
-            window.open(url.toString(), openNewTab ? undefined : "_self");
+            window.open(
+              url.toString(),
+              openNewTab
+                ? `fontra.${panelID ? "fontinfo" : "fontoverview"}.${
+                    viewController.projectIdentifier
+                  }`
+                : "_self"
+            );
           },
         }
       : MenuItemDivider

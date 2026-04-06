@@ -1,9 +1,31 @@
 # Changelog for Fontra
 
-## 2026-03-?? [version 2026.3.6]
+## 2026-04-?? [version 2026.4.1]
+
+### New features
+
+- [pointer tool] Convert a line to a curve with alt-click (eliminating the need to switch to the pen tool for this) [PR 2538](https://github.com/fontra/fontra/pull/2538)
 
 ### Fixes
 
+- [font overview] Accept the alt/option key as a modifier to toggle the glyph selection (when clicking or dragging). This can already be done with the command/Windows/meta key, but that has an annoying side effect on Windows. [Issue 2536](https://github.com/fontra/fontra/issues/2536), [PR 2537](https://github.com/fontra/fontra/pull/2537)
+
+## 2026-04-01 [version 2026.4.0]
+
+### New features
+
+- [fontra-pak] Add "Download latest Fontra Pak" button for Linux platform. Contributed by Dr Anirban Mitra. [PR 233](https://github.com/fontra/fontra-pak/pull/233)
+- [fontra-pak] Added "Webfont" (.woff2) export option. Contributed by Dr Anirban Mitra. [PR 232](https://github.com/fontra/fontra-pak/pull/232)
+- Added a "Shaping debugger", as part of the "Input characters and output glyphs" panel. It sits in a new closed-by-default accordion item between "Input characters" and "Output glyphs" and allows the user to step through all the processing steps involved with text shaping and OpenType feature application, such as character reordering, glyph substition and glyph positioning. The user can see what effect each step has on the rendered string, both visually in the canvas and textually/numerically in the output glyphs list. This builds on the HarfBuzz "message API", and offers similar functionality to the [Crowbar](https://github.com/simoncozens/crowbar) tool. [PR 2500](https://github.com/fontra/fontra/pull/2500)
+
+### Improvements
+
+- Improved browser tab management significantly: when navigating to the font info view or to the font overview, activate an existing tab for that view. This avoids opening redundant new tabs, and allows the user to switch tabs with the "Font" menu. [PR 2520](https://github.com/fontra/fontra/pull/2520)
+
+### Fixes
+
+- [ufo] Prevent ufo write error and export error when a path contains an invalid number of subsequent cubic off-curve points. [PR 2529](https://github.com/fontra/fontra/pull/2529)
+- [shaping] Fixed emulated mark positioning around "multiplied" glyph. [Issue 2521](https://github.com/fontra/fontra/issues/2521), [PR 2523](https://github.com/fontra/fontra/pull/2523)
 - Prevent editing of metrics and kerning when the font is read-only, and prevent editing metrics when glyphs are locked. [Issue 2407](https://github.com/fontra/fontra/issues/2407), [PR 2513](https://github.com/fontra/fontra/pull/2513)
 
 ## 2026-03-24 [version 2026.3.5]
