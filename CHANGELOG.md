@@ -1,9 +1,10 @@
 # Changelog for Fontra
 
-## 2026-04-?? [version 2026.4.1]
+## 2026-04-08 [version 2026.4.1]
 
 ### New features
 
+- Add support for conditional substitutions, or "designspace rules". This allows Fontra to view these substitutions from .designspace or .fontra files. A user interface to _author_ these rules will follow later. [Issue 2460](https://github.com/fontra/fontra/issues/2460), [PR 2539](https://github.com/fontra/fontra/pull/2539)
 - [pointer tool] Convert a line to a curve with alt-click (eliminating the need to switch to the pen tool for this) [PR 2538](https://github.com/fontra/fontra/pull/2538)
 
 ### Fixes

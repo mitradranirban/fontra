@@ -220,6 +220,8 @@ class FontHandler:
                 value = await self.backend.getGlyphInfos()
             case "customData":
                 value = await self.backend.getCustomData()
+            case "conditionalSubstitutions":
+                value = await self.backend.getConditionalSubstitutions()
             case "unitsPerEm":
                 value = await self.backend.getUnitsPerEm()
             case "features":
@@ -303,6 +305,10 @@ class FontHandler:
     @remoteMethod
     async def getColorPalettes(self, *, connection=None):
         return await self.getData("colorPalettes")
+
+    @remoteMethod
+    async def getConditionalSubstitutions(self, *, connection=None):
+        return await self.getData("conditionalSubstitutions")
 
     @remoteMethod
     async def getMetaInfo(self, *, connection=None):

@@ -8,6 +8,7 @@ from aiohttp import web
 
 from .classes import (
     Axes,
+    ConditionalSubstitutions,
     FontInfo,
     FontSource,
     ImageData,
@@ -60,6 +61,9 @@ class ReadableFontBackend(Protocol):
     async def getGlyphInfos(self) -> dict[str, Any]:
         pass
 
+    async def getConditionalSubstitutions(self) -> ConditionalSubstitutions:
+        pass
+
 
 @runtime_checkable
 class WritableFontBackend(ReadableFontBackend, Protocol):
@@ -96,6 +100,11 @@ class WritableFontBackend(ReadableFontBackend, Protocol):
         pass
 
     async def putGlyphInfos(self, glyphInfos: dict[str, Any]) -> None:
+        pass
+
+    async def putConditionalSubstitutions(
+        self, substitutions: ConditionalSubstitutions
+    ) -> None:
         pass
 
 
