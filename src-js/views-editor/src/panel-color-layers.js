@@ -1045,15 +1045,32 @@ export default class ColorLayersPanel extends Panel {
     await this._writeV1Paint({ ...paint, layers });
   }
 
+  // Restoration logic for panel-color-layers.js
   async _writeV1Paint(newPaint) {
     await this.sceneController.editGlyphAndRecordChanges((varGlyph) => {
-      // SIMPLIFIED: Write directly to customData["colorv1"]
-      if (!varGlyph.customData) varGlyph.customData = {};
-      varGlyph.customData[COLRV1_KEY] = newPaint;
+      // 1. Find the specific layer the user is actually looking at/editing
+      const defaultSource =
+        varGlyph.sources?.find((s) => !s.inactive && !s.locationBase) ??
+        varGlyph.sources?.[0];
+      const layerName = defaultSource?.layerName;
+      const layerGlyph = varGlyph.layers?.[layerName]?.glyph;
+
+      if (layerGlyph) {
+        // 2. SUCCESS: Write to the nested location (C.json style)
+        if (!layerGlyph.customData) layerGlyph.customData = {};
+        layerGlyph.customData[COLRV1_KEY] = newPaint;
+
+        // 3. CLEANUP: Delete the "LLM-simplified" root data so it doesn't
+        // confuse the compiler or the tool later.
+        if (varGlyph.customData?.[COLRV1_KEY]) {
+          delete varGlyph.customData[COLRV1_KEY];
+        }
+      } else {
+        console.error("Paint Tool Error: Could not find target layer for data write.");
+      }
       return translate("color-layers.edit-colrv1-paint");
     });
   }
-
   // ── COLRv0 mutations (unchanged) ─────────────────────────────────────────
 
   _nextLayerName(mapping) {
@@ -1075,10 +1092,42 @@ export default class ColorLayersPanel extends Panel {
     const layerName = this._nextLayerName(mapping);
     const colorIndex = mapping.length < paletteSize ? mapping.length : 0;
     const newMapping = [...mapping, [layerName, colorIndex]];
+
     await this.sceneController.editGlyphAndRecordChanges((glyph) => {
-      if (!glyph.layers[layerName])
-        glyph.layers[layerName] = { glyph: { path: { contours: [] }, components: [] } };
+      // 1. Create the layer entry if it doesn't exist (Geometric structure)
+      if (!glyph.layers[layerName]) {
+        glyph.layers[layerName] = {
+          glyph: {
+            path: { contours: [] },
+            components: [],
+            customData: {}, // Ensure customData exists at the layer level
+          },
+        };
+      }
+
+      // 2. Update the COLRv0 mapping (for backward compatibility)
       glyph.customData[CUSTOM_DATA_KEY] = newMapping;
+
+      // 3. Update COLRv1 structure if it exists (C.json style)
+      // We check if the glyph is already being treated as a COLRv1 glyph
+      const defaultSource =
+        glyph.sources?.find((s) => !s.inactive && !s.locationBase) ??
+        glyph.sources?.[0];
+      const primaryLayerName = defaultSource?.layerName;
+      const primaryLayerGlyph = glyph.layers?.[primaryLayerName]?.glyph;
+
+      if (primaryLayerGlyph && primaryLayerGlyph.customData?.[COLRV1_KEY]) {
+        const paint = primaryLayerGlyph.customData[COLRV1_KEY];
+        if (paint.layers) {
+          // Add the new layer to the COLRv1 paint graph
+          paint.layers.push({
+            type: "PaintGlyph",
+            glyph: glyphName, // Or the specific component name
+            paint: { type: "PaintSolid", paletteIndex: colorIndex, alpha: 1.0 },
+          });
+        }
+      }
+
       return translate("color-layers.add-layer");
     });
   }
@@ -1102,13 +1151,30 @@ export default class ColorLayersPanel extends Panel {
   async _convertV0toV1(glyphName, mapping, palette) {
     const layers = mapping.map(([layerName, colorIndex]) => ({
       type: "PaintGlyph",
-      glyph: layerName,
+      glyph: layerName, // In V1, this usually refers to the glyph name itself or a component
       paint: { type: "PaintSolid", paletteIndex: colorIndex, alpha: 1.0 },
     }));
+
     await this.sceneController.editGlyphAndRecordChanges((varGlyph) => {
-      if (!varGlyph.customData) varGlyph.customData = {};
-      varGlyph.customData[COLRV1_KEY] = { type: "PaintColrLayers", layers };
-      delete varGlyph.customData[CUSTOM_DATA_KEY];
+      // 1. Find the target layer (C.json style)
+      const defaultSource =
+        varGlyph.sources?.find((s) => !s.inactive && !s.locationBase) ??
+        varGlyph.sources?.[0];
+      const layerName = defaultSource?.layerName;
+      const layerGlyph = varGlyph.layers?.[layerName]?.glyph;
+
+      if (layerGlyph) {
+        // 2. Attach the new COLRv1 paint to the specific layer
+        if (!layerGlyph.customData) layerGlyph.customData = {};
+        layerGlyph.customData[COLRV1_KEY] = { type: "PaintColrLayers", layers };
+
+        // 3. Clean up the old COLRv0 data (usually stored in 'colorv0')
+        delete varGlyph.customData[CUSTOM_DATA_KEY];
+
+        // 4. Safety: Ensure no "D.json" style root data exists
+        if (varGlyph.customData?.[COLRV1_KEY]) delete varGlyph.customData[COLRV1_KEY];
+      }
+
       return translate("color-layers.convert-v0-to-v1");
     });
   }

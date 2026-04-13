@@ -131,8 +131,8 @@
 {
 "glyph": "A",
 "paint": {
-"centerX": 250,
-"centerY": 250,
+"centerX": 225,
+"centerY": 177,
 "colorLine": {
 "colorStops": [
 {
@@ -147,8 +147,8 @@
 }
 ]
 },
-"endAngle": 1,
-"startAngle": 0,
+"endAngle": 0.5864528351407139,
+"startAngle": 0.13939689247334835,
 "type": "PaintSweepGradient"
 },
 "type": "PaintGlyph"
