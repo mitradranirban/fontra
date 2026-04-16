@@ -1,0 +1,95 @@
+{
+"name": "D",
+"sources": [
+{
+"name": "",
+"layerName": "202ed5cd",
+"locationBase": "202ed5cd"
+}
+],
+"layers": {
+"202ed5cd": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 44,
+"y": 799
+},
+{
+"x": 44,
+"y": 13
+},
+{
+"x": 940,
+"y": 13
+},
+{
+"x": 940,
+"y": 711
+}
+],
+"isClosed": true
+},
+{
+"points": [
+{
+"x": 326,
+"y": 486
+},
+{
+"x": 623,
+"y": 398
+},
+{
+"x": 623,
+"y": 305
+},
+{
+"x": 326,
+"y": 305
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 1000,
+"customData": {
+"colorv1": {
+"layers": [
+{
+"glyph": "D",
+"paint": {
+"centerX": 443,
+"centerY": 318,
+"colorLine": {
+"colorStops": [
+{
+"alpha": 1,
+"paletteIndex": 0,
+"stopOffset": 0
+},
+{
+"alpha": 1,
+"paletteIndex": 1,
+"stopOffset": 1
+}
+]
+},
+"endAngle": 0.6809308726389224,
+"startAngle": 0.12415432478661496,
+"type": "PaintSweepGradient"
+},
+"type": "PaintGlyph"
+}
+],
+"type": "PaintColrLayers"
+}
+}
+}
+}
+}
+}

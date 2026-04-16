@@ -4,6 +4,7 @@ import { translate } from "@fontra/core/localization.js";
 import { BaseInfoPanel } from "./panel-base.js";
 
 export const PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes";
+export const PALETTE_LABELS_KEY = "org.colrpak.colorPaletteLabels";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -28,6 +29,20 @@ function hexToRgb(hex) {
     parseInt(hex.slice(3, 5), 16) / 255,
     parseInt(hex.slice(5, 7), 16) / 255,
   ];
+}
+
+function normalizePaletteLabels(labels, paletteCount) {
+  const result = Array.isArray(labels) ? [...labels] : [];
+  while (result.length < paletteCount) result.push(null);
+  return result.slice(0, paletteCount).map((label) => {
+    if (typeof label !== "string") return null;
+    const trimmed = label.trim();
+    return trimmed || null;
+  });
+}
+
+function getPaletteDisplayLabel(index, paletteLabels) {
+  return paletteLabels[index] || translate("color-palettes.palette-label", index);
 }
 
 /**
@@ -92,6 +107,11 @@ export class ColorPalettesPanel extends BaseInfoPanel {
         this.fontController.customData?.[PALETTES_KEY] ?? [[[0, 0, 0, 1.0]]]
     );
 
+    const paletteLabels = normalizePaletteLabels(
+      structuredClone(this.fontController.customData?.[PALETTE_LABELS_KEY] ?? []),
+      palettes.length
+    );
+
     // Clamp in case palettes were removed
     if (this.#activePaletteIndex >= palettes.length) {
       this.#activePaletteIndex = palettes.length - 1;
@@ -113,8 +133,9 @@ export class ColorPalettesPanel extends BaseInfoPanel {
           const tab = html.button(
             {
               class: `palette-tab${tabPi === activePi ? " active" : ""}`,
+              title: getPaletteDisplayLabel(tabPi, paletteLabels),
             },
-            [translate("color-palettes.palette-label", tabPi)]
+            [getPaletteDisplayLabel(tabPi, paletteLabels)]
           );
           tab.addEventListener("click", () => {
             this.#activePaletteIndex = tabPi;
@@ -127,19 +148,48 @@ export class ColorPalettesPanel extends BaseInfoPanel {
     }
 
     // ── Section header ────────────────────────────────────────────────────
+    const entryWord =
+      activePalette.length === 1
+        ? translate("color-palettes.entries-count-single")
+        : translate("color-palettes.entries-count-plural");
+
     const paletteHeader = html.div({ class: "palette-section-header" }, [
       html.span({ class: "palette-label" }, [
-        translate("color-palettes.palette-label", activePi),
+        getPaletteDisplayLabel(activePi, paletteLabels),
       ]),
       document.createTextNode(" - "),
       html.span({ class: "palette-entry-count" }, [
-        `${activePalette.length} ${activePalette.length === 1 ? "entry" : "entries"}`,
+        `${activePalette.length} ${entryWord}`,
       ]),
+    ]);
+
+    // ── Palette naming UI ────────────────────────────────────────────────
+    const paletteNameInput = html.input({
+      type: "text",
+      class: "palette-name-input",
+      placeholder: translate("color-palettes.palette-name-placeholder"),
+      value: paletteLabels[activePi] ?? "",
+    });
+
+    paletteNameInput.addEventListener("change", async (e) => {
+      paletteLabels[activePi] = e.target.value.trim() || null;
+      await this.savePalettesAndLabels(palettes, paletteLabels);
+    });
+
+    const paletteNameRow = html.div({ class: "palette-name-row" }, [
+      html.label({ class: "palette-name-label" }, [
+        translate("color-palettes.palette-name-label"),
+      ]),
+      paletteNameInput,
+    ]);
+
+    const paletteNotice = html.div({ class: "palette-name-notice" }, [
+      translate("color-palettes.palette-name-notice"),
     ]);
 
     // ── Swatches ──────────────────────────────────────────────────────────
     const swatches = activePalette.map((color, ci) =>
-      this.#makeSwatch(color, ci, activePi, palettes, usageMap)
+      this.#makeSwatch(color, ci, activePi, palettes, paletteLabels, usageMap)
     );
 
     const addColorBtn = html.button({ class: "add-color-btn" }, [
@@ -147,7 +197,7 @@ export class ColorPalettesPanel extends BaseInfoPanel {
     ]);
     addColorBtn.addEventListener("click", async () => {
       palettes[activePi].push([0, 0, 0, 1.0]);
-      await this.savePalettes(palettes);
+      await this.savePalettesAndLabels(palettes, paletteLabels);
     });
 
     const swatchGrid = html.div({ class: "color-swatches" }, [
@@ -156,7 +206,12 @@ export class ColorPalettesPanel extends BaseInfoPanel {
     ]);
 
     this.panelElement.appendChild(
-      html.div({ class: "color-palette-section" }, [paletteHeader, swatchGrid])
+      html.div({ class: "color-palette-section" }, [
+        paletteHeader,
+        paletteNameRow,
+        paletteNotice,
+        swatchGrid,
+      ])
     );
 
     // ── Palette management buttons ────────────────────────────────────────
@@ -167,20 +222,25 @@ export class ColorPalettesPanel extends BaseInfoPanel {
     ]);
     addPaletteBtn.addEventListener("click", async () => {
       palettes.push(structuredClone(activePalette));
+      paletteLabels.push(null);
       this.#activePaletteIndex = palettes.length - 1;
-      await this.savePalettes(palettes);
+      await this.savePalettesAndLabels(palettes, paletteLabels);
     });
     paletteActions.appendChild(addPaletteBtn);
 
     if (palettes.length > 1) {
       const removePaletteBtn = html.button(
-        { class: "remove-palette-btn", title: "Remove this palette" },
+        {
+          class: "remove-palette-btn",
+          title: translate("color-palettes.remove-color"),
+        },
         [translate("color-palettes.remove-palette") || "− Remove Palette"]
       );
       removePaletteBtn.addEventListener("click", async () => {
         palettes.splice(activePi, 1);
+        paletteLabels.splice(activePi, 1);
         this.#activePaletteIndex = Math.max(0, activePi - 1);
-        await this.savePalettes(palettes);
+        await this.savePalettesAndLabels(palettes, paletteLabels);
       });
       paletteActions.appendChild(removePaletteBtn);
     }
@@ -190,7 +250,7 @@ export class ColorPalettesPanel extends BaseInfoPanel {
 
   // ── Swatch builder ────────────────────────────────────────────────────────
 
-  #makeSwatch(color, ci, activePi, palettes, usageMap) {
+  #makeSwatch(color, ci, activePi, palettes, paletteLabels, usageMap) {
     const [r, g, b, a = 1.0] = color;
 
     // Color picker
@@ -202,7 +262,7 @@ export class ColorPalettesPanel extends BaseInfoPanel {
     colorInput.addEventListener("change", async (e) => {
       const [nr, ng, nb] = hexToRgb(e.target.value);
       palettes[activePi][ci] = [nr, ng, nb, palettes[activePi][ci][3] ?? 1.0];
-      await this.savePalettes(palettes);
+      await this.savePalettesAndLabels(palettes, paletteLabels);
     });
 
     // Alpha slider
@@ -224,7 +284,7 @@ export class ColorPalettesPanel extends BaseInfoPanel {
         "--swatch-color",
         `rgb(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)})`
       );
-      await this.savePalettes(palettes);
+      await this.savePalettesAndLabels(palettes, paletteLabels);
     });
 
     // Usage badge
@@ -248,7 +308,7 @@ export class ColorPalettesPanel extends BaseInfoPanel {
     removeBtn.addEventListener("click", async () => {
       if (palettes[activePi].length <= 1) return;
       palettes[activePi].splice(ci, 1);
-      await this.savePalettes(palettes);
+      await this.savePalettesAndLabels(palettes, paletteLabels);
     });
 
     return html.div({ class: "swatch-entry" }, [
@@ -263,10 +323,22 @@ export class ColorPalettesPanel extends BaseInfoPanel {
   // ── Persistence ───────────────────────────────────────────────────────────
 
   async savePalettes(palettes) {
+    const paletteLabels = normalizePaletteLabels(
+      this.fontController.customData?.[PALETTE_LABELS_KEY] ?? [],
+      palettes.length
+    );
+    await this.savePalettesAndLabels(palettes, paletteLabels);
+  }
+
+  async savePalettesAndLabels(palettes, paletteLabels) {
     const root = { customData: { ...this.fontController.customData } };
+    const normalizedLabels = normalizePaletteLabels(paletteLabels, palettes.length);
+
     const changes = recordChanges(root, (root) => {
       root.customData[PALETTES_KEY] = palettes;
+      root.customData[PALETTE_LABELS_KEY] = normalizedLabels;
     });
+
     if (changes.hasChange) {
       await this.postChange(
         changes.change,
@@ -274,6 +346,7 @@ export class ColorPalettesPanel extends BaseInfoPanel {
         translate("color-palettes.edit-description")
       );
       this.fontController.customData[PALETTES_KEY] = palettes;
+      this.fontController.customData[PALETTE_LABELS_KEY] = normalizedLabels;
       await this.setupUI();
     }
   }

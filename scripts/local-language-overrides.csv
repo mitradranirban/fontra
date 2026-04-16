@@ -1,32 +1,32 @@
-,color-palettes.title,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes,Color Palettes
-,sidebar.color-layers.title,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers
-,color-layers.title,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers
-,color-layers.no-glyph-selected,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers,Select a glyph to assign color layers
-,color-layers.no-layers-yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet,No color layers defined yet
-,color-layers.add-layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer,Add Color Layer
-,color-layers.remove-layer,Remove,Remove,Remove,Remove,Remove,Remove,Remove,Remove,Remove,Remove,Remove
-,color-layers.edit-description,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping,Edit color layer mapping
-,color-layers.no-palette,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font,No color palette defined in font
-,color-palettes.add-palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette,Add Palette
-,color-palettes.color-index-tooltip,Color index %0,Color index %0,Color index %0,Color index %0,Color index %0,Color index %0,Color index %0,Color index %0,Color index %0,Color index %0,Color index %0
-,color-palettes.edit-description,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes,Edit color palettes
-,color-palettes.palette-label,Palette %0,Palette %0,Palette %0,Palette %0,Palette %0,Palette %0,Palette %0,Palette %0,Palette %0,Palette %0,Palette %0
-,color-palettes.add-color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color,+ Add Color
-,color-palettes.remove-palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette,Remove Palette
-,color-palettes.palette-entry-count,%0 entries,%0 entries,%0 entries,%0 entries,%0 entries,%0 entries,%0 entries,%0 entries,%0 entries,%0 entries,%0 entries
-,color-layers.color-index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index
-,color-layers.alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha,Alpha
-,color-layers.paint-type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type,Paint Type
-,color-layers.glyph,Glyph,Glyph,Glyph,Glyph,Glyph,Glyph,Glyph,Glyph,Glyph,Glyph,Glyph
+,color-palettes.title,Color Palettes,调色板,カラーパレット,색상 팔레트,Palettes de couleurs,Farbpaletten,Paletas de colores,Kleurpaletten,የቀለም ስርዓቶች,色彩調色盤,Mga Pallet ng Kulay
+,sidebar.color-layers.title,Color Layers,颜色图层,カラーレイヤー,색상 레이어,Calques de couleur,Farbebenen,Capas de color,Kleurlagen,የቀለም ሽፋኖች,色彩圖層,Mga Layer ng Kulay
+,color-layers.title,Color Layers,颜色图层,カラーレイヤー,색상 레이어,Calques de couleur,Farbebenen,Capas de color,Kleurlagen,የቀለም ሽፋኖች,色彩圖層,Mga Layer ng Kulay
+,color-layers.no-glyph-selected,Select a glyph to assign color layers,选择字形以分配颜色图层,カラーレイヤーを割り当てるグリフを選択,색상 레이어를 할당할 글리프를 선택하세요,Sélectionnez un glyphe pour attribuer des calques de couleur,"Wählen Sie ein Glyph aus, um Farbebenen zuzuweisen",Selecciona un glifo para asignar capas de color,Selecteer een glyph om kleurlagen toe te wijzen,ቀለም ሽፋኖችን ለመወሰን ፊደል ይምረጡ,選擇字符以分配色彩圖層,Pumili ng glyph upang magtalaga ng mga layer ng kulay
+,color-layers.no-layers-yet,No color layers defined yet,尚未定义颜色图层,カラーレイヤーはまだ定義されていません,아직 정의된 색상 레이어가 없습니다,Aucun calque de couleur défini pour l'instant,Noch keine Farbebenen definiert,Aún no hay capas de color definidas,Nog geen kleurlagen gedefinieerd,እስካሁን ምንም የቀለም ሽፋን አልተወሰነም,尚未定義色彩圖層,Wala pang mga layer ng kulay na tinukoy
+,color-layers.add-layer,Add Color Layer,添加颜色图层,カラーレイヤーを追加,색상 레이어 추가,Ajouter un calque de couleur,Farbebene hinzufügen,Agregar capa de color,Kleurlaag toevoegen,የቀለም ሽፋን ጨምር,新增色彩圖層,Magdagdag ng Layer ng Kulay
+,color-layers.remove-layer,Remove,删除,削除,제거,Supprimer,Entfernen,Eliminar,Verwijderen,አስወግድ,移除,Alisin
+,color-layers.edit-description,Edit color layer mapping,编辑颜色图层映射,カラーレイヤーマッピングを編集,색상 레이어 매핑 편집,Modifier le mappage des calques de couleur,Farbebenen-Zuordnung bearbeiten,Editar asignación de capas de color,Kleurlaagmapping bewerken,የቀለም ሽፋን ካርታ አርም,編輯色彩圖層對應,I-edit ang pagmamapa ng layer ng kulay
+,color-layers.no-palette,No color palette defined in font,字体中未定义调色板,フォントにカラーパレットが定義されていません,폰트에 색상 팔레트가 정의되지 않았습니다,Aucune palette de couleurs définie dans la police,Keine Farbpalette in der Schriftart definiert,No hay paleta de colores definida en la fuente,Geen kleurenpalet gedefinieerd in lettertype,በቅርጸ-ቁምፊ ውስጥ ምንም የቀለም ስርዓት አልተወሰነም,字型中未定義色彩調色盤,Walang color palette na tinukoy sa font
+,color-palettes.add-palette,Add Palette,添加调色板,パレットを追加,팔레트 추가,Ajouter une palette,Palette hinzufügen,Agregar paleta,Palet toevoegen,ስርዓት ጨምር,新增調色盤,Magdagdag ng Pallet
+,color-palettes.color-index-tooltip,Color index %0,颜色索引 %0,カラーインデックス %0,색상 인덱스 %0,Index de couleur %0,Farbindex %0,Índice de color %0,Kleurindex %0,የቀለም ኢንዴክስ %0,色彩索引 %0,Index ng kulay %0
+,color-palettes.edit-description,Edit color palettes,编辑调色板,カラーパレットを編集,색상 팔레트 편집,Modifier les palettes de couleurs,Farbpaletten bearbeiten,Editar paletas de colores,Kleurpaletten bewerken,የቀለም ስርዓቶችን አርም,編輯色彩調色盤,I-edit ang mga pallet ng kulay
+,color-palettes.palette-label,Palette %0,调色板 %0,パレット %0,팔레트 %0,Palette %0,Palette %0,Paleta %0,Palet %0,ስርዓት %0,調色盤 %0,Pallet %0
+,color-palettes.add-color,+ Add Color,+ 添加颜色,+ カラーを追加,+ 색상 추가,+ Ajouter une couleur,+ Farbe hinzufügen,+ Agregar color,+ Kleur toevoegen,+ ቀለም ጨምር,+ 新增顏色,+ Magdagdag ng Kulay
+,color-palettes.remove-palette,Remove Palette,删除调色板,パレットを削除,팔레트 제거,Supprimer la palette,Palette entfernen,Eliminar paleta,Palet verwijderen,ስርዓት አስወግድ,移除調色盤,Alisin ang Pallet
+,color-palettes.palette-entry-count,%0 entries,%0 个条目,%0 エントリ,%0 항목,%0 entrées,%0 Einträge,%0 entradas,%0 vermeldingen,%0 ግቤቶች,%0 個項目,%0 na entry
+,color-layers.color-index,Color Index,颜色索引,カラーインデックス,색상 인덱스,Index de couleur,Farbindex,Índice de color,Kleurindex,የቀለም ኢንዴክስ,色彩索引,Index ng Kulay
+,color-layers.alpha,Alpha,透明度,アルファ,알파,Alpha,Alpha,Alfa,Alpha,አልፋ,透明度,Alpha
+,color-layers.paint-type,Paint Type,绘制类型,ペイントタイプ,페인트 유형,Type de peinture,Maltyp,Tipo de pintura,Verftype,የቀለም አይነት,繪製類型,Uri ng Paint
+,color-layers.glyph,Glyph,字形,グリフ,글리프,Glyphe,Glyph,Glifo,Glyph,ፊደል,字符,Glyph
 ,color-layers.colrv1-header,COLRv1,COLRv1,COLRv1,COLRv1,COLRv1,COLRv1,COLRv1,COLRv1,COLRv1,COLRv1,COLRv1
-,color-layers.color-stops,Color Stops,Color Stops,Color Stops,Color Stops,Color Stops,Color Stops,Color Stops,Color Stops,Color Stops,Color Stops,Color Stops
-,color-layers.stop,Stop,Stop,Stop,Stop,Stop,Stop,Stop,Stop,Stop,Stop,Stop
-,color-layers.edit-colrv1-paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint,Edit COLRv1 Paint
-,color-layers.convert-v0-to-v1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1,Convert COLRv0 → COLRv1
-,color-layers.add-stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop,Add Stop
-,color-layers.remove-stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop,Remove Stop
-,color-layers.no-stops-yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet,No stops yet
-,color-layers.stop-offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset,Stop Offset
+,color-layers.color-stops,Color Stops,颜色停止点,カラーストップ,색상 정지점,Points d'arrêt de couleur,Farbstopps,Paradas de color,Kleurstops,የቀለም ማቆሚያዎች,色彩停止點,Mga Color Stop
+,color-layers.stop,Stop,停止,ストップ,정지,Arrêt,Stopp,Parada,Stop,ማቆሚያ,停止,Stop
+,color-layers.edit-colrv1-paint,Edit COLRv1 Paint,编辑 COLRv1 绘制,COLRv1 ペイントを編集,COLRv1 페인트 편집,Modifier la peinture COLRv1,COLRv1-Malerei bearbeiten,Editar pintura COLRv1,COLRv1-verf bewerken,COLRv1 ቀለም አርም,編輯 COLRv1 繪製,I-edit ang COLRv1 Paint
+,color-layers.convert-v0-to-v1,Convert COLRv0 → COLRv1,将 COLRv0 转换为 COLRv1,COLRv0 を COLRv1 に変換,COLRv0을 COLRv1으로 변환,Convertir COLRv0 → COLRv1,COLRv0 → COLRv1 konvertieren,Convertir COLRv0 → COLRv1,COLRv0 → COLRv1 converteren,COLRv0 ወደ COLRv1 ቀይር,將 COLRv0 轉換為 COLRv1,I-convert ang COLRv0 → COLRv1
+,color-layers.add-stop,Add Stop,添加停止点,ストップを追加,정지점 추가,Ajouter un arrêt,Stopp hinzufügen,Agregar parada,Stop toevoegen,ማቆሚያ ጨምር,新增停止點,Magdagdag ng Stop
+,color-layers.remove-stop,Remove Stop,删除停止点,ストップを削除,정지점 제거,Supprimer l'arrêt,Stopp entfernen,Eliminar parada,Stop verwijderen,ማቆሚያ አስወግድ,移除停止點,Alisin ang Stop
+,color-layers.no-stops-yet,No stops yet,尚无停止点,ストップはまだありません,아직 정지점이 없습니다,Aucun arrêt pour l'instant,Noch keine Stopps,Aún no hay paradas,Nog geen stops,እስካሁን ምንም ማቆሚያ የለም,尚無停止點,Wala pang mga stop
+,color-layers.stop-offset,Stop Offset,停止偏移,ストップオフセット,정지 오프셋,Décalage d'arrêt,Stopp-Versatz,Desplazamiento de parada,Stop-offset,የማቆሚያ ልዩነት,停止偏移,Stop Offset
 ,color-layers.x0,x0,x0,x0,x0,x0,x0,x0,x0,x0,x0,x0
 ,color-layers.y0,y0,y0,y0,y0,y0,y0,y0,y0,y0,y0,y0
 ,color-layers.x1,x1,x1,x1,x1,x1,x1,x1,x1,x1,x1,x1
@@ -37,21 +37,26 @@
 ,color-layers.r1,r1,r1,r1,r1,r1,r1,r1,r1,r1,r1,r1
 ,color-layers.centerX,centerX,centerX,centerX,centerX,centerX,centerX,centerX,centerX,centerX,centerX,centerX
 ,color-layers.centerY,centerY,centerY,centerY,centerY,centerY,centerY,centerY,centerY,centerY,centerY,centerY
-,color-layers.start-angle,Start °,Start °,Start °,Start °,Start °,Start °,Start °,Start °,Start °,Start °,Start °
-,color-layers.end-angle,End °,End °,End °,End °,End °,End °,End °,End °,End °,End °,End °
-,color-panel.make-variable,Make variable on axis,Make variable on axis,Make variable on axis,Make variable on axis,Make variable on axis,Make variable on axis,Make variable on axis,Make variable on axis,Make variable on axis,Make variable on axis,Make variable on axis
+,color-layers.start-angle,Start °,起始角 °,開始角度 °,시작 각도 °,Angle de départ °,Startwinkel °,Ángulo inicial °,Starthoek °,የመጀመሪያ ማዕዘን °,起始角度 °,Simula na Anggulo °
+,color-layers.end-angle,End °,结束角 °,終了角度 °,종료 각도 °,Angle de fin °,Endwinkel °,Ángulo final °,Eindhoek °,የመጨረሻ ማዕዘን °,結束角度 °,Wakas na Anggulo °
+,color-panel.make-variable,Make variable on axis,在轴上设为可变,軸上で可変にする,축에서 가변으로 설정,Rendre variable sur l'axe,Auf der Achse variabel machen,Hacer variable en el eje,Variabel maken op as,በዘንግ ላይ ተለዋዋጭ አድርግ,在軸上設為可變,Gawing variable sa axis
 ,color-panel.make-variable-short,⬦,⬦,⬦,⬦,⬦,⬦,⬦,⬦,⬦,⬦,⬦
-,color-panel.remove-variable,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value,Remove variation revert to static value
+,color-panel.remove-variable,Remove variation revert to static value,删除变体并恢复为静态值,バリエーションを削除して静的値に戻す,변형 제거 및 정적 값으로 되돌리기,Supprimer la variation et revenir à la valeur statique,Variation entfernen und statischen Wert wiederherstellen,Eliminar variación y revertir al valor estático,Variatie verwijderen en terugkeren naar statische waarde,ልዩነት አስወግድ ወደ ቋሚ ዋጋ ተመለስ,移除變體並恢復為靜態值,Alisin ang variation at ibalik sa static na halaga
 ,color-panel.remove-variable-short,⬧,⬧,⬧,⬧,⬧,⬧,⬧,⬧,⬧,⬧,⬧
-,color-panel.remove-keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe,Remove this keyframe
+,color-panel.remove-keyframe,Remove this keyframe,删除此关键帧,このキーフレームを削除,이 키프레임 제거,Supprimer ce keyframe,Dieses Keyframe entfernen,Eliminar este fotograma clave,Dit keyframe verwijderen,ይህን ቁልፍ ፍሬም አስወግድ,移除此關鍵影格,Alisin ang keyframe na ito
 ,color-panel.remove-keyframe-short,×,×,×,×,×,×,×,×,×,×,×
-,color-panel.add-keyframe,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location,Add keyframe at current axis location
+,color-panel.add-keyframe,Add keyframe at current axis location,在当前轴位置添加关键帧,現在の軸位置にキーフレームを追加,현재 축 위치에 키프레임 추가,Ajouter un keyframe à la position actuelle de l'axe,Keyframe an der aktuellen Achsenposition hinzufügen,Agregar fotograma clave en la ubicación actual del eje,Keyframe toevoegen op huidige aspositie,በአሁኑ ዘንግ ቦታ ቁልፍ ፍሬም ጨምር,在目前軸位置新增關鍵影格,Magdagdag ng keyframe sa kasalukuyang lokasyon ng axis
 ,color-panel.add-keyframe-short,+,+,+,+,+,+,+,+,+,+,+
-,color-layers.angle-turns,Angle (turns),Angle (turns),Angle (turns),Angle (turns),Angle (turns),Angle (turns),Angle (turns),Angle (turns),Angle (turns),Angle (turns),Angle (turns)
-,color-layers.fill-paint-type,Fill Paint Type,Fill Paint Type,Fill Paint Type,Fill Paint Type,Fill Paint Type,Fill Paint Type,Fill Paint Type,Fill Paint Type,Fill Paint Type,Fill Paint Type,Fill Paint Type
-,color-layers.start-v0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0,Start COLRv0
-,color-layers.start-v1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1,Start COLRv1
-,sidebar.color-layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers,Color Layers
-,editor.paint-tool-unified,Paint Tool,Paint Tool,Paint Tool,Paint Tool,Paint Tool,Paint Tool,Paint Tool,Paint Tool,Paint Tool,Paint Tool,Paint Tool
+,color-layers.angle-turns,Angle (turns),角度（圈）,角度（回転）,각도 (회전),Angle (tours),Winkel (Umdrehungen),Ángulo (vueltas),Hoek (omwentelingen),ማዕዘን (ዙሮች),角度（圈）,Anggulo (mga bilis)
+,color-layers.fill-paint-type,Fill Paint Type,填充绘制类型,塗りつぶしペイントタイプ,채우기 페인트 유형,Type de peinture de remplissage,Füllmaltyp,Tipo de pintura de relleno,Opvulverftype,የሙሌት ቀለም አይነት,填充繪製類型,Uri ng Fill Paint
+,color-layers.start-v0,Start COLRv0,开始 COLRv0,COLRv0 を開始,COLRv0 시작,Démarrer COLRv0,COLRv0 starten,Iniciar COLRv0,COLRv0 starten,COLRv0 ጀምር,開始 COLRv0,Simulan ang COLRv0
+,color-layers.start-v1,Start COLRv1,开始 COLRv1,COLRv1 を開始,COLRv1 시작,Démarrer COLRv1,COLRv1 starten,Iniciar COLRv1,COLRv1 starten,COLRv1 ጀምር,開始 COLRv1,Simulan ang COLRv1
+,sidebar.color-layers,Color Layers,颜色图层,カラーレイヤー,색상 레이어,Calques de couleur,Farbebenen,Capas de color,Kleurlagen,የቀለም ሽፋኖች,色彩圖層,Mga Layer ng Kulay
+,editor.paint-tool-unified,Paint Tool,绘制工具,ペイントツール,페인트 도구,Outil Peinture,Malwerkzeug,Herramienta de pintura,Verfgereedschap,የቀለም መሳሪያ,繪製工具,Tool sa Pagpinta
 ,color-layers.color-index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index,Color Index
-,action.export-as.woff2,Web Font (*.woff2),Web Font (*.woff2),Web Font (*.woff2),Web Font (*.woff2),Web Font (*.woff2),Web Font (*.woff2),Web Font (*.woff2),Web Font (*.woff2),Web Font (*.woff2),Web Font (*.woff2),Web Font (*.woff2)
+,action.export-as.woff2,Web Font (*.woff2),网页字体 (*.woff2),ウェブフォント (*.woff2),웹 폰트 (*.woff2),Police web (*.woff2),Webschrift (*.woff2),Fuente web (*.woff2),Weblettertype (*.woff2),የድር ቅርጸ-ቁምፊ (*.woff2),網頁字型 (*.woff2),Web Font (*.woff2)
+,color-palettes.palette-name-label,Palette name,调色板名称,パレット名,팔레트 이름,Nom de la palette,Palettenname,Nombre de la paleta,Palet naam,የስርዓቱ ስም,調色盤名稱,Pangalan ng Pallet
+,color-palettes.palette-name-placeholder,Optional palette name,可选调色板名称,オプションのパレット名,선택적 팔레트 이름,Nom de palette optionnel,Optionaler Palettenname,Nombre de paleta opcional,Optionele paletnaam,ምርጫ የስርዓቱ ስም,可選調色盤名稱,Opsyonal na pangalan ng pallet
+,color-palettes.palette-name-notice,"Palette names are currently supported for fontra source / COLRv1 compile only. If added in UFO source, they are not yet preserved/exported by the current UFO/fontmake path.",调色板名称目前仅支持 fontra 源 / COLRv1 编译。若在 UFO 源中添加，当前 UFO/fontmake 路径尚不支持保留/导出。,パレット名は現在、fontraソース / COLRv1コンパイルのみでサポートされています。UFOソースに追加した場合、現在のUFO/fontmakeパスではまだ保存/エクスポートされません。,"팔레트 이름은 현재 fontra 소스 / COLRv1 컴파일에서만 지원됩니다. UFO 소스에 추가된 경우, 현재 UFO/fontmake 경로에서는 아직 보존/내보내기가 지원되지 않습니다.","Les noms de palette sont actuellement pris en charge uniquement pour la source fontra / compilation COLRv1. Ajoutés dans une source UFO, ils ne sont pas encore conservés/exportés par le chemin UFO/fontmake actuel.",Palettennamen werden derzeit nur für Fontra-Quelle / COLRv1-Kompilierung unterstützt. Bei UFO-Quellen werden sie vom aktuellen UFO/fontmake-Pfad noch nicht gespeichert/exportiert.,"Los nombres de paleta actualmente solo son compatibles con la fuente fontra / compilación COLRv1. Si se agregan en la fuente UFO, aún no se conservan/exportan por la ruta UFO/fontmake actual.","Paletnamen worden momenteel alleen ondersteund voor fontra-bron / COLRv1-compilatie. Indien toegevoegd in UFO-bron, worden ze nog niet bewaard/geëxporteerd via het huidige UFO/fontmake-pad.",የፓሌት ስሞች በአሁኑ ጊዜ ለ fontra ምንጭ / COLRv1 ማጠናቀሪያ ብቻ ይደገፋሉ። በ UFO ምንጭ ውስጥ ከተጨመሩ፣ በአሁኑ UFO/fontmake መንገድ ገና አይቀመጡም/አይላኩም።,調色盤名稱目前僅支援 fontra 來源 / COLRv1 編譯。若在 UFO 來源中新增，目前的 UFO/fontmake 路徑尚不支援保留/匯出。,"Ang mga pangalan ng pallet ay kasalukuyang sinusuportahan lamang para sa fontra source / COLRv1 compile. Kung idagdag sa UFO source, hindi pa ito nini-preserve/ine-export ng kasalukuyang UFO/fontmake path."
+,color-palettes.entries-count-single,entry,条目,エントリ,항목,entrée,Eintrag,entrada,vermelding,ግቤት,個項目,entry
+,color-palettes.entries-count-plural,entries,条目,エントリ,항목,entrées,Einträge,entradas,vermeldingen,ግቤቶች,個項目,mga entry
