@@ -52,6 +52,261 @@ shaperFontTables = {
     "post",
 }
 
+_VAR_PAINT_FORMATS = {
+    3: (2, (("Alpha", "f2dot14"),)),
+    5: (
+        4,
+        (
+            ("x0", "int16"),
+            ("y0", "int16"),
+            ("x1", "int16"),
+            ("y1", "int16"),
+            ("x2", "int16"),
+            ("y2", "int16"),
+        ),
+    ),
+    7: (
+        6,
+        (
+            ("x0", "int16"),
+            ("y0", "int16"),
+            ("r0", "int16"),
+            ("x1", "int16"),
+            ("y1", "int16"),
+            ("r1", "int16"),
+        ),
+    ),
+    9: (
+        8,
+        (
+            ("centerX", "int16"),
+            ("centerY", "int16"),
+            ("startAngle", "angle"),
+            ("endAngle", "angle"),
+        ),
+    ),
+    13: (12, ()),
+    15: (14, (("dx", "int16"), ("dy", "int16"))),
+    17: (16, (("scaleX", "f2dot14"), ("scaleY", "f2dot14"))),
+    19: (
+        18,
+        (
+            ("scaleX", "f2dot14"),
+            ("scaleY", "f2dot14"),
+            ("centerX", "int16"),
+            ("centerY", "int16"),
+        ),
+    ),
+    21: (20, (("scale", "f2dot14"),)),
+    23: (22, (("scale", "f2dot14"), ("centerX", "int16"), ("centerY", "int16"))),
+    25: (24, (("angle", "angle"),)),
+    27: (26, (("angle", "angle"), ("centerX", "int16"), ("centerY", "int16"))),
+    29: (28, (("xSkewAngle", "angle"), ("ySkewAngle", "angle"))),
+    31: (
+        30,
+        (
+            ("xSkewAngle", "angle"),
+            ("ySkewAngle", "angle"),
+            ("centerX", "int16"),
+            ("centerY", "int16"),
+        ),
+    ),
+}
+
+
+def _convertVarDelta(rawDelta: float, valueType: str) -> float:
+    if valueType == "int16":
+        return rawDelta
+    elif valueType == "f2dot14":
+        return fixedToFloat(rawDelta, 14)
+    elif valueType == "fixed":
+        return fixedToFloat(rawDelta, 16)
+    elif valueType == "angle":
+        return fixedToFloat(rawDelta, 14) * 180.0
+    return rawDelta
+
+
+def _varIndexAdd(base: int, offset: int) -> int:
+    outer = base >> 16
+    inner = base & 0xFFFF
+    return (outer << 16) | (inner + offset)
+
+
+def _resolveVarIndex(
+    base: int | None, offset: int, varIndexMap: list[int] | None
+) -> int | None:
+    if base is None or base == 0xFFFFFFFF:
+        return None
+
+    if varIndexMap:
+        mapIndex = base + offset
+        if mapIndex < 0 or mapIndex >= len(varIndexMap):
+            return None
+        varIndex = varIndexMap[mapIndex]
+        if varIndex is None or varIndex == NO_VARIATION_INDEX or varIndex == 0xFFFFFFFF:
+            return None
+        return varIndex
+
+    return _varIndexAdd(base, offset)
+
+
+def _applyVarDeltas(
+    obj: dict,
+    attrs: tuple[tuple[str, str], ...],
+    instancer,
+    varIndexMap: list[int] | None = None,
+) -> dict:
+    if not isinstance(obj, dict):
+        return obj
+
+    obj = deepcopy(obj)
+    base = obj.get("VarIndexBase")
+
+    if base is None or base == 0xFFFFFFFF:
+        obj.pop("VarIndexBase", None)
+        return obj
+
+    for i, (attr, valueType) in enumerate(attrs):
+        varIndex = _resolveVarIndex(base, i, varIndexMap)
+        if varIndex is None:
+            continue
+        rawDelta = instancer[varIndex]
+        if rawDelta:
+            obj[attr] = obj.get(attr, 0) + _convertVarDelta(rawDelta, valueType)
+
+    obj.pop("VarIndexBase", None)
+    return obj
+
+
+def _instantiateColorStop(
+    stop: dict, instancer, varIndexMap: list[int] | None = None
+) -> dict:
+    if not isinstance(stop, dict):
+        return stop
+    return _applyVarDeltas(
+        stop, (("StopOffset", "f2dot14"), ("Alpha", "f2dot14")), instancer, varIndexMap
+    )
+
+
+def _instantiateColorLine(
+    colorLine: dict, instancer, varIndexMap: list[int] | None = None
+) -> dict:
+    if not isinstance(colorLine, dict):
+        return colorLine
+    colorLine = deepcopy(colorLine)
+    colorLine["ColorStop"] = [
+        _instantiateColorStop(stop, instancer, varIndexMap)
+        for stop in colorLine.get("ColorStop", [])
+    ]
+    return colorLine
+
+
+def _instantiateTransform(
+    transform: dict, instancer, varIndexMap: list[int] | None = None
+) -> dict:
+    if not isinstance(transform, dict):
+        return transform
+    return _applyVarDeltas(
+        transform,
+        (
+            ("xx", "fixed"),
+            ("yx", "fixed"),
+            ("xy", "fixed"),
+            ("yy", "fixed"),
+            ("dx", "fixed"),
+            ("dy", "fixed"),
+        ),
+        instancer,
+        varIndexMap,
+    )
+
+
+def _instantiatePaint(
+    paint: dict, instancer, varIndexMap: list[int] | None = None
+) -> dict:
+    if not isinstance(paint, dict):
+        return paint
+
+    paint = deepcopy(paint)
+    fmt = paint.get("Format")
+
+    if fmt in _VAR_PAINT_FORMATS:
+        staticFmt, attrs = _VAR_PAINT_FORMATS[fmt]
+        paint = _applyVarDeltas(paint, attrs, instancer, varIndexMap)
+        paint["Format"] = staticFmt
+
+    if "Paint" in paint:
+        paint["Paint"] = _instantiatePaint(paint["Paint"], instancer, varIndexMap)
+    if "SourcePaint" in paint:
+        paint["SourcePaint"] = _instantiatePaint(
+            paint["SourcePaint"], instancer, varIndexMap
+        )
+    if "BackdropPaint" in paint:
+        paint["BackdropPaint"] = _instantiatePaint(
+            paint["BackdropPaint"], instancer, varIndexMap
+        )
+    if "Layers" in paint:
+        paint["Layers"] = [
+            _instantiatePaint(p, instancer, varIndexMap) for p in paint["Layers"]
+        ]
+
+    if "ColorLine" in paint:
+        paint["ColorLine"] = _instantiateColorLine(
+            paint["ColorLine"], instancer, varIndexMap
+        )
+
+    if "Transform" in paint:
+        paint["Transform"] = _instantiateTransform(
+            paint["Transform"], instancer, varIndexMap
+        )
+
+    paint.pop("VarIndexBase", None)
+    return paint
+
+
+def _collectVarIndicesFromPaint(
+    paint: dict, result: set[int], varIndexMap: list[int] | None = None
+) -> None:
+    if not isinstance(paint, dict):
+        return
+
+    fmt = paint.get("Format")
+    if fmt in _VAR_PAINT_FORMATS:
+        _, attrs = _VAR_PAINT_FORMATS[fmt]
+        base = paint.get("VarIndexBase")
+        if base is not None and base != 0xFFFFFFFF:
+            for i in range(len(attrs)):
+                varIndex = _resolveVarIndex(base, i, varIndexMap)
+                if varIndex is not None:
+                    result.add(varIndex)
+
+    transform = paint.get("Transform")
+    if isinstance(transform, dict):
+        base = transform.get("VarIndexBase")
+        if base is not None and base != 0xFFFFFFFF:
+            for i in range(6):
+                varIndex = _resolveVarIndex(base, i, varIndexMap)
+                if varIndex is not None:
+                    result.add(varIndex)
+
+    colorLine = paint.get("ColorLine")
+    if isinstance(colorLine, dict):
+        for stop in colorLine.get("ColorStop", []):
+            if isinstance(stop, dict):
+                base = stop.get("VarIndexBase")
+                if base is not None and base != 0xFFFFFFFF:
+                    for i in range(2):
+                        varIndex = _resolveVarIndex(base, i, varIndexMap)
+                        if varIndex is not None:
+                            result.add(varIndex)
+
+    for key in ("Paint", "SourcePaint", "BackdropPaint"):
+        if key in paint:
+            _collectVarIndicesFromPaint(paint[key], result, varIndexMap)
+
+    for layer in paint.get("Layers", []):
+        _collectVarIndicesFromPaint(layer, result, varIndexMap)
+
 
 def _convertPaintGraphToFontra(paint: dict) -> dict:
     """
@@ -325,6 +580,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         fontAxes: list[FontAxis] = [
             axis for axis in self.axes.axes if isinstance(axis, FontAxis)
         ]
+
         self.fontSources = unpackFontSources(self.font, fontAxes)
         self.fontSourcesInstancer = FontSourcesInstancer(
             fontAxes=self.axes.axes, fontSources=self.fontSources
@@ -339,6 +595,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             if "CFF2" in self.font
             else None
         )
+
         self.characterMap = self.font.getBestCmap()
         glyphMap: dict[str, list[int]] = {}
         for glyphName in self.font.getGlyphOrder():
@@ -356,6 +613,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         self.colrLayerList: list[Any] = []
         self.colrVarIndexMap: list[Any] = []
         self.colrVarStore: dict[str, Any] = {}
+        self.colrOtVarStore = None
         self.colorPalettes: list[list[RGBAColor]] = []
         self.colrGlyphPaintEntries: dict[str, list[dict]] = {}
 
@@ -372,12 +630,16 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                 self.colrPaintGraphs = colrUnbuilder.unbuildColrV1(
                     colr.LayerList, colr.BaseGlyphList
                 )
+                self.colrClipBoxes: dict[str, Any] = {}
+                if getattr(colr, "ClipList", None):
+                    self.colrClipBoxes = colr.ClipList.clips
                 self.colrGlyphPaintEntries: dict[str, list[dict]] = {}
                 for paintGraph in self.colrPaintGraphs.values():
                     _indexPaintGlyphs(paintGraph, self.colrGlyphPaintEntries)
                 if getattr(colr, "VarIndexMap", None):
                     self.colrVarIndexMap = list(colr.VarIndexMap.mapping)
                 if getattr(colr, "VarStore", None):
+                    self.colrOtVarStore = colr.VarStore
                     self.colrVarStore = _serializeVarStore(colr.VarStore)
 
         cpalTable = self.font.get("CPAL")
@@ -402,7 +664,16 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         return self.glyphMap
 
     async def getGlyph(self, glyphName: str) -> VariableGlyph | None:
-        if glyphName not in self.glyphSet:
+        isColorOnly = (
+            glyphName in self.colrPaintGraphs
+            or glyphName in self.colrV0Layers
+            or (
+                hasattr(self, "colrGlyphPaintEntries")
+                and glyphName in self.colrGlyphPaintEntries
+            )
+        )
+
+        if glyphName not in self.glyphSet and not isColorOnly:
             return None
 
         defaultSourceIdentifier = self.fontSourcesInstancer.defaultSourceIdentifier
@@ -410,9 +681,23 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         defaultLayerName = defaultSourceIdentifier
 
         glyph = VariableGlyph(name=glyphName)
-        staticGlyph = buildStaticGlyph(self.glyphSet, glyphName)
+
+        if glyphName in self.glyphSet:
+            staticGlyph = buildStaticGlyph(self.glyphSet, glyphName)
+        else:
+            staticGlyph = StaticGlyph()
+            staticGlyph.path = PackedPath()
+            staticGlyph.components = []
+            staticGlyph.xAdvance = (
+                self.font["hmtx"].metrics.get(glyphName, (0, 0))[0]
+                if "hmtx" in self.font
+                else 0
+            )
+
         layers = {defaultLayerName: Layer(glyph=staticGlyph)}
         defaultLocation = {axis.name: 0 for axis in self.axes.axes}
+        layerLocations = {defaultLayerName: defaultLocation.copy()}
+
         sources = [
             GlyphSource(
                 location={},
@@ -429,14 +714,27 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             if varGlyphSet is None:
                 varGlyphSet = self.font.getGlyphSet(location=fullLoc, normalized=True)
                 self.variationGlyphSets[locStr] = varGlyphSet
-            varGlyph = buildStaticGlyph(varGlyphSet, glyphName)
+
+            if glyphName in varGlyphSet:
+                varGlyph = buildStaticGlyph(varGlyphSet, glyphName)
+            else:
+                varGlyph = StaticGlyph()
+                varGlyph.path = PackedPath()
+                varGlyph.components = []
+                varGlyph.xAdvance = (
+                    self.font["hmtx"].metrics.get(glyphName, (0, 0))[0]
+                    if "hmtx" in self.font
+                    else 0
+                )
 
             sourceLocation = unnormalizeLocation(fullLoc, self.axes.axes)
             locationBase = self.fontSourcesInstancer.getSourceIdentifierForLocation(
                 sourceLocation
             )
             layerName = locationBase if locationBase is not None else locStr
+
             layers[layerName] = Layer(glyph=varGlyph)
+            layerLocations[layerName] = fullLoc.copy()
 
             sources.append(
                 GlyphSource(
@@ -446,25 +744,46 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                     layerName=layerName,
                 )
             )
+
         if self.charStrings is not None:
             checkAndFixCFF2Compatibility(glyphName, layers)
+
         glyph.layers = layers
         glyph.sources = sources
+
         # Attach COLRv0 layer list to customData
         if glyphName in self.colrV0Layers:
             glyph.customData["fontra.colrv0.layers"] = self.colrV0Layers[glyphName]
 
-        # Attach COLRv1 paint graph to customData (converted to Fontra format)
-        if glyphName in self.colrPaintGraphs:
-            fontraPaint = _convertPaintGraphToFontra(self.colrPaintGraphs[glyphName])
-            # Store directly in "colorv1" key (same as .fontra format)
-            glyph.customData["colorv1"] = fontraPaint
+        # Process COLRv1 variations via layer-specific locations
+        fvarAxes = self.font["fvar"].axes if "fvar" in self.font else None
 
-            # Keep referencedGlyphs for pre-fetching
-            referencedGlyphs = []
-            _collectPaintGlyphNames(fontraPaint, referencedGlyphs)
-            if referencedGlyphs:
-                glyph.customData["fontra.colrv1.referencedGlyphs"] = referencedGlyphs
+        if glyphName in self.colrPaintGraphs:
+            rawPaint = self.colrPaintGraphs[glyphName]
+
+            for layerName, layer in layers.items():
+                loc = layerLocations.get(layerName, defaultLocation)
+
+                if self.colrOtVarStore is not None and fvarAxes is not None:
+                    instancer = VarStoreInstancer(self.colrOtVarStore, fvarAxes, loc)
+                    layerPaint = _instantiatePaint(
+                        rawPaint, instancer, self.colrVarIndexMap or None
+                    )
+                else:
+                    layerPaint = deepcopy(rawPaint)
+
+                fontraPaint = _convertPaintGraphToFontra(layerPaint)
+
+                # Correctly assign to the layer's glyph customData
+                layer.glyph.customData["colorv1"] = fontraPaint
+
+                referencedGlyphs = []
+                _collectPaintGlyphNames(fontraPaint, referencedGlyphs)
+                if referencedGlyphs:
+                    layer.glyph.customData["fontra.colrv1.referencedGlyphs"] = (
+                        referencedGlyphs
+                    )
+
         elif (
             hasattr(self, "colrGlyphPaintEntries")
             and glyphName in self.colrGlyphPaintEntries
@@ -475,9 +794,69 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                 rawPaint = entries[0]
             else:
                 rawPaint = {"Format": 1, "Layers": entries}
-            fontraPaint = _convertPaintGraphToFontra(rawPaint)
-            # Store directly in "colorv1" key
-            glyph.customData["colorv1"] = fontraPaint
+
+            for layerName, layer in layers.items():
+                # Process COLRv1 variations via layer-specific locations
+                fvarAxes = self.font["fvar"].axes if "fvar" in self.font else None
+
+                # ADD THIS: Process ClipBox data
+                if (
+                    getattr(self, "colrClipBoxes", None)
+                    and glyphName in self.colrClipBoxes
+                ):
+                    rawClipBox = self.colrClipBoxes[glyphName]
+                    for layerName, layer in layers.items():
+                        loc = layerLocations.get(layerName, defaultLocation)
+
+                        clipDict = {
+                            "Format": rawClipBox.Format,
+                            "xMin": rawClipBox.xMin,
+                            "yMin": rawClipBox.yMin,
+                            "xMax": rawClipBox.xMax,
+                            "yMax": rawClipBox.yMax,
+                        }
+                        if rawClipBox.Format == 2:
+                            clipDict["VarIndexBase"] = rawClipBox.VarIndexBase
+
+                        if self.colrOtVarStore is not None and fvarAxes is not None:
+                            instancer = VarStoreInstancer(
+                                self.colrOtVarStore, fvarAxes, loc
+                            )
+                            layerClip = _applyVarDeltas(
+                                clipDict,
+                                (
+                                    ("xMin", "int16"),
+                                    ("yMin", "int16"),
+                                    ("xMax", "int16"),
+                                    ("yMax", "int16"),
+                                ),
+                                instancer,
+                                self.colrVarIndexMap or None,
+                            )
+                        else:
+                            layerClip = clipDict
+
+                        # Save into the glyph layer's customData so Fontra preserves it
+                        layer.glyph.customData["fontra.colrv1.clipBox"] = {
+                            "xMin": layerClip["xMin"],
+                            "yMin": layerClip["yMin"],
+                            "xMax": layerClip["xMax"],
+                            "yMax": layerClip["yMax"],
+                        }
+                loc = layerLocations.get(layerName, defaultLocation)
+
+                if self.colrOtVarStore is not None and fvarAxes is not None:
+                    instancer = VarStoreInstancer(self.colrOtVarStore, fvarAxes, loc)
+                    layerPaint = _instantiatePaint(
+                        rawPaint, instancer, self.colrVarIndexMap or None
+                    )
+                else:
+                    layerPaint = deepcopy(rawPaint)
+
+                fontraPaint = _convertPaintGraphToFontra(layerPaint)
+
+                # Correctly assign to the layer's glyph customData
+                layer.glyph.customData["colorv1"] = fontraPaint
 
         return glyph
 
@@ -485,15 +864,46 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         # TODO/FIXME: This misses variations that only exist in HVAR/VVAR
         locations = set()
 
+        if (
+            self.colrOtVarStore is not None
+            and "fvar" in self.font
+            and glyphName in self.colrPaintGraphs
+        ):
+            fvarAxes = self.font["fvar"].axes
+            varIndices = set()
+            _collectVarIndicesFromPaint(
+                self.colrPaintGraphs[glyphName],
+                varIndices,
+                self.colrVarIndexMap or None,
+            )
+            if getattr(self, "colrClipBoxes", None) and glyphName in self.colrClipBoxes:
+                clipBox = self.colrClipBoxes[glyphName]
+                if clipBox.Format == 2:
+                    base = clipBox.VarIndexBase
+                    if base is not None and base != 0xFFFFFFFF:
+                        for i in range(4):
+                            varIdx = _resolveVarIndex(
+                                base, i, self.colrVarIndexMap or None
+                            )
+                            if varIdx is not None:
+                                varIndices.add(varIdx)
+            locations |= {
+                locationToTuple(loc)
+                for varIdx in varIndices
+                for loc in getLocationsFromVarstore(
+                    self.colrOtVarStore, fvarAxes, varIdx >> 16
+                )
+            }
+
         if self.gvarVariations is not None and glyphName in self.gvarVariations:
             locations |= {
                 tuple(sorted(coords))
                 for variation in self.gvarVariations[glyphName]
                 for coords in product(
-                    *(
+                    *[
                         [(k, v) for v in sorted(set(tent)) if v]
                         for k, tent in variation.axes.items()
-                    )
+                    ]
                 )
             }
 
@@ -507,21 +917,30 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             else:
                 composite = self.varcTable.VarCompositeGlyphs.VarCompositeGlyph[index]
                 for component in composite.components:
-                    if component.axisValuesVarIndex != NO_VARIATION_INDEX:
+
+                    # 1. Correctly guard and shift axisValuesVarIndex
+                    if (
+                        component.axisValuesVarIndex is not None
+                        and component.axisValuesVarIndex != NO_VARIATION_INDEX
+                    ):
                         locations.update(
                             locationToTuple(loc)
                             for loc in getLocationsFromMultiVarstore(
                                 component.axisValuesVarIndex >> 16, varStore, fvarAxes
                             )
                         )
-                    if component.transformVarIndex != NO_VARIATION_INDEX:
+
+                    # 2. Correctly guard and shift transformVarIndex
+                    if (
+                        component.transformVarIndex is not None
+                        and component.transformVarIndex != NO_VARIATION_INDEX
+                    ):
                         locations.update(
                             locationToTuple(loc)
                             for loc in getLocationsFromMultiVarstore(
                                 component.transformVarIndex >> 16, varStore, fvarAxes
                             )
                         )
-
         if (
             self.charStrings is not None
             and glyphName in self.charStrings
@@ -589,7 +1008,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             f = io.BytesIO()
             font.save(f)
 
-        data = f.getvalue()
+            data = f.getvalue()
 
         return ShaperFontData(
             glyphOrderSorting=ShaperFontGlyphOrderSorting.FROMGLYPHMAP, data=data
@@ -629,6 +1048,7 @@ def getLocationsFromVarstore(
         if varDataIndex is not None
         else varStore.VarData
     )
+
     for varData in varDatas:
         for regionIndex in varData.VarRegionIndex:
             location = {
@@ -663,6 +1083,7 @@ def unpackAxes(font: TTFont) -> Axes:
         if avar is not None
         else {}
     )
+
     axisList: list[FontAxis | DiscreteFontAxis] = []
     for axis in fvar.axes:
         normMin = -1 if axis.minValue < axis.defaultValue else 0
@@ -670,14 +1091,14 @@ def unpackAxes(font: TTFont) -> Axes:
         mapping = avarMapping.get(axis.axisTag, [])
         if mapping:
             mapping = [
-                [
+                (
                     unnormalizeValue(
                         inValue, axis.minValue, axis.defaultValue, axis.maxValue
                     ),
                     unnormalizeValue(
                         outValue, axis.minValue, axis.defaultValue, axis.maxValue
                     ),
-                ]
+                )
                 for inValue, outValue in mapping
                 if normMin <= outValue <= normMax
             ]
@@ -689,6 +1110,7 @@ def unpackAxes(font: TTFont) -> Axes:
         axisName = (
             axisNameRecord.toUnicode() if axisNameRecord is not None else axis.axisTag
         )
+
         axisList.append(
             FontAxis(
                 minValue=axis.minValue,
@@ -711,7 +1133,7 @@ def unpackAxes(font: TTFont) -> Axes:
 
         locations = set()
         for varIdx in varIdxMap.mapping:
-            if varIdx == NO_VARIATION_INDEX:
+            if varIdx is None or varIdx == NO_VARIATION_INDEX:
                 continue
 
             for loc in getLocationsFromVarstore(varStore, fvarAxes, varIdx >> 16):
@@ -723,7 +1145,7 @@ def unpackAxes(font: TTFont) -> Axes:
 
             outputLocation = {}
             for i, varIdx in enumerate(varIdxMap.mapping):
-                if varIdx == NO_VARIATION_INDEX:
+                if varIdx is None or varIdx == NO_VARIATION_INDEX:
                     continue
 
                 outputLocation[fvarAxes[i].axisTag] = fixedToFloat(
@@ -762,6 +1184,7 @@ def unpackFontSources(
     defaultSourceName = findNameForLocationFromInstances(
         mapLocationBackward(defaultLocation, fontraAxes), fvarInstances
     )
+
     if defaultSourceName is None:
         defaultSourceName = getEnglishNameWithFallback(nameTable, [17, 2], "Regular")
 
@@ -790,8 +1213,8 @@ def unpackFontSources(
         lineMetricsH["descender"] = LineMetric(value=os2Table.sTypoDescender)
         lineMetricsH["capHeight"] = LineMetric(value=os2Table.sCapHeight)
         lineMetricsH["xHeight"] = LineMetric(value=os2Table.sxHeight)
-    # else:
-    #     ...fall back to hhea table?
+        # else:
+        # ...fall back to hhea table?
 
     mvarTable = font.get("MVAR")
     if mvarTable is not None:
@@ -812,6 +1235,7 @@ def unpackFontSources(
         sourceName = findNameForLocationFromInstances(
             mapLocationBackward(source.location, fontraAxes), fvarInstances
         )
+
         if sourceName is None:
             sourceName = locationToString(source.location)
 
@@ -821,6 +1245,7 @@ def unpackFontSources(
             mvarInstancer = VarStoreInstancer(
                 mvarTable.table.VarStore, fvarAxes, location
             )
+
             for rec in mvarTable.table.ValueRecord:
                 whichMetrics, metricKey = MVAR_MAPPING.get(rec.ValueTag, (None, None))
                 if whichMetrics is not None:
@@ -982,21 +1407,21 @@ class VarIndexCollector(SimpleT2Decompiler):
 
 
 def checkAndFixCFF2Compatibility(glyphName: str, layers: dict[str, Layer]) -> None:
-    #
+
     # https://github.com/fonttools/fonttools/issues/2838
-    #
+
     # Via ttGlyphSet.py, we're using SegmentToPointPen to convert CFF/T2 segments
     # to points, which normally leads to closing curve-to points being removed.
-    #
+
     # However, as the fonttools issue above shows, in some situations, it does
     # not close onto the starting point at *some* locations, due to rounding errors
     # in the source deltas.
-    #
+
     # This functions detects those cases and compensates for it by appending the
     # starting point at the end of the contours that *do* close nicely.
-    #
+
     # This is a somewhat ugly trade-off to keep interpolation compatibility.
-    #
+
     layerList = list(layers.values())
     firstPath = layerList[0].glyph.packedPath
     firstPointTypes = firstPath.pointTypes
@@ -1033,4 +1458,4 @@ def checkAndFixCFF2Compatibility(glyphName: str, layers: dict[str, Layer]) -> No
                 firstPoint = unpackedContours[i]["points"][0]
                 firstPoint["smooth"] = False
                 unpackedContours[i]["points"].append(firstPoint)
-        layer.glyph.path = PackedPath.fromUnpackedContours(unpackedContours)
+                layer.glyph.path = PackedPath.fromUnpackedContours(unpackedContours)
