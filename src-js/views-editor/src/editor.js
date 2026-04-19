@@ -340,6 +340,12 @@ export class EditorController extends ViewController {
         () => this.doAddComponent(),
         () => this.canEditGlyph()
       );
+      registerAction(
+        "action.add-paint",
+        { topic },
+        () => this.doAddPaint(),
+        () => this.canEditGlyph()
+      );
 
       registerAction(
         "action.add-anchor",
@@ -1413,6 +1419,7 @@ export class EditorController extends ViewController {
     this.glyphEditContextMenuItems = [];
 
     this.glyphEditContextMenuItems.push({ actionIdentifier: "action.add-component" });
+    this.glyphEditContextMenuItems.push({ actionIdentifier: "action.add-paint" });
     this.glyphEditContextMenuItems.push({ actionIdentifier: "action.add-anchor" });
     this.glyphEditContextMenuItems.push({ actionIdentifier: "action.add-guideline" });
     this.glyphEditContextMenuItems.push({
@@ -2304,7 +2311,83 @@ export class EditorController extends ViewController {
       return translate("action.add-component");
     });
   }
+  async doAddPaint() {
+    // 1. Prompt the user to select a glyph
+    const glyphName = await this.runGlyphSearchDialog(
+      translate("action.add-paint"),
+      translate("dialog.add"),
+      true
+    );
 
+    if (!glyphName) {
+      return;
+    }
+
+    // 2. Fetch the referenced glyph to ensure it exists
+    const baseGlyph = await this.fontController.getGlyph(glyphName);
+    if (!baseGlyph) {
+      return;
+    }
+
+    // 3. Create the new paint node using the strict renderer schema
+    const newPaintNode = {
+      type: "PaintTransform",
+      transform: {
+        xx: 1.0,
+        yx: 0.0,
+        xy: 0.0,
+        yy: 1.0,
+        dx: 0.0,
+        dy: 0.0,
+      },
+      paint: {
+        type: "PaintColrGlyph", // Use PaintColrGlyph so it draws the target's paint
+        glyph: glyphName,
+      },
+    };
+
+    // 4. Inject the new paint node into the active layers
+    await this.sceneController.editLayersAndRecordChanges((layerGlyphs) => {
+      for (const layerGlyph of Object.values(layerGlyphs)) {
+        // Ensure nested customData dictionaries exist
+        if (!layerGlyph.customData) {
+          layerGlyph.customData = {};
+        }
+        if (!layerGlyph.customData.colorv1) {
+          layerGlyph.customData.colorv1 = {};
+        }
+
+        const colorData = layerGlyph.customData.colorv1;
+
+        // Check if the glyph already has a paint graph
+        if (colorData.type) {
+          if (colorData.type === "PaintColrLayers") {
+            // It's already a layer stack; append the new node
+            if (!colorData.layers) colorData.layers = [];
+            colorData.layers.push(newPaintNode);
+          } else {
+            // It's a single node; wrap it in a layer stack
+            const existingPaint = JSON.parse(JSON.stringify(colorData)); // Deep copy
+
+            // Safely wipe the current object's keys to retain the reference pointer
+            for (const key in colorData) {
+              delete colorData[key];
+            }
+
+            // Reconstruct as a PaintColrLayers stack
+            colorData.type = "PaintColrLayers";
+            colorData.layers = [existingPaint, newPaintNode];
+          }
+        } else {
+          // No existing paint data, merge the new node directly into the empty object
+          Object.assign(colorData, newPaintNode);
+        }
+      }
+
+      // Return the translation key used in the Undo history panel
+      return translate("action.add-paint");
+    });
+  }
   async doAddAnchor() {
     const point = this.sceneController.selectedGlyphPoint(this.contextMenuPosition);
     const { anchor: tempAnchor } = await this.doAddEditAnchorDialog(undefined, point);
