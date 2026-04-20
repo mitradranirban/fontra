@@ -1,0 +1,34 @@
+{
+"name": "a",
+"sources": [
+{
+"name": "",
+"layerName": "202ed5cd",
+"locationBase": "202ed5cd"
+}
+],
+"layers": {
+"202ed5cd": {
+"glyph": {
+"xAdvance": 500,
+"customData": {
+"colorv1": {
+"paint": {
+"glyph": "A",
+"type": "PaintColrGlyph"
+},
+"transform": {
+"dx": 0,
+"dy": 0,
+"xx": 1,
+"xy": 0,
+"yx": 0,
+"yy": 1
+},
+"type": "PaintTransform"
+}
+}
+}
+}
+}
+}

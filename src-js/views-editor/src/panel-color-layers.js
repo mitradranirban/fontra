@@ -783,7 +783,10 @@ export default class ColorLayersPanel extends Panel {
           }
         }
 
-        const fillPaint = layer;
+        const fillPaint =
+          layer.type === "PaintGlyph" || layer.type === "PaintVarGlyph"
+            ? layer.paint ?? layer
+            : layer;
         const normalType = normalizePaintType(fillPaint?.type ?? layer.type);
         this._pushParamFields(
           formContents,
