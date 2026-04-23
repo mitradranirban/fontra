@@ -3,7 +3,7 @@ import { collectGlyphNames } from "./changes.js";
 import { getGlyphInfoFromCodePoint, getGlyphInfoFromGlyphName } from "./glyph-data.js";
 import { ObservableController } from "./observable-object.js";
 import { getShaper } from "./shaper.js";
-import { consolidateCalls, scheduleCalls } from "./utils.js";
+import { consolidateCalls, filterObject, scheduleCalls } from "./utils.js";
 import { piecewiseLinearMap } from "./var-model.js";
 
 export class ShaperController {
@@ -169,7 +169,8 @@ export class ShaperController {
     const features = await this.fontController.getFeatures();
     const conditionalSubstitutions = prepareConditionalSubstitutions(
       await this.fontController.getConditionalSubstitutions(),
-      this.fontController.fontAxes
+      this.fontController.fontAxes,
+      this.fontController.glyphMap
     );
 
     const glyphClasses = await this.getGlyphClasses();
@@ -187,6 +188,7 @@ export class ShaperController {
           })),
         glyphClasses,
         conditionalSubstitutions: [conditionalSubstitutions],
+        compileDebg: true,
       });
     } catch (e) {
       console.error(e);
@@ -317,7 +319,7 @@ function ensureNotdef(glyphOrder) {
   glyphOrder.unshift(".notdef");
 }
 
-function prepareConditionalSubstitutions(substitutions, fontAxes) {
+function prepareConditionalSubstitutions(substitutions, fontAxes, glyphMap) {
   const axesByName = Object.fromEntries(fontAxes.map((axis) => [axis.name, axis]));
   const mapFuncs = Object.fromEntries(
     fontAxes.map((axis) => {
@@ -345,7 +347,10 @@ function prepareConditionalSubstitutions(substitutions, fontAxes) {
           })
         )
       ),
-      substitutions,
+      filterObject(
+        substitutions,
+        (glyph1, glyph2) => glyph1 in glyphMap && glyph2 in glyphMap
+      ),
     ]),
   };
 }
