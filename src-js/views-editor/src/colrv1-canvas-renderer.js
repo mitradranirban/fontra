@@ -166,7 +166,7 @@ export function renderCOLRv1(
 // Clip glyph collector
 // ---------------------------------------------------------------------------
 
-function _collectClipGlyphs(paint, result = new Set()) {
+export function _collectClipGlyphs(paint, result = new Set()) {
   if (!paint) return result;
   switch (paint.type) {
     case "PaintGlyph":

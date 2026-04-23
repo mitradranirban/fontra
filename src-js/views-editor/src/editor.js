@@ -89,6 +89,7 @@ import {
 } from "@fontra/core/localization.js";
 import { subVectors } from "@fontra/core/vector.js";
 import { ViewController } from "@fontra/core/view-controller.js";
+import { collectReferencedGlyphs } from "./colrv1-utils.js";
 import CharactersGlyphsPanel from "./panel-characters-glyphs.js";
 import ColorLayersPanel from "./panel-color-layers.js";
 import DesignspaceNavigationPanel from "./panel-designspace-navigation.js";
@@ -338,6 +339,12 @@ export class EditorController extends ViewController {
         "action.add-component",
         { topic },
         () => this.doAddComponent(),
+        () => this.canEditGlyph()
+      );
+      registerAction(
+        "action.add-paint",
+        { topic },
+        () => this.doAddPaint(),
         () => this.canEditGlyph()
       );
 
@@ -1413,6 +1420,7 @@ export class EditorController extends ViewController {
     this.glyphEditContextMenuItems = [];
 
     this.glyphEditContextMenuItems.push({ actionIdentifier: "action.add-component" });
+    this.glyphEditContextMenuItems.push({ actionIdentifier: "action.add-paint" });
     this.glyphEditContextMenuItems.push({ actionIdentifier: "action.add-anchor" });
     this.glyphEditContextMenuItems.push({ actionIdentifier: "action.add-guideline" });
     this.glyphEditContextMenuItems.push({
@@ -2304,7 +2312,85 @@ export class EditorController extends ViewController {
       return translate("action.add-component");
     });
   }
+  async doAddPaint() {
+    const glyphName = await this.runGlyphSearchDialog(
+      translate("action.add-paint"),
+      translate("dialog.add"),
+      true
+    );
+    if (!glyphName) return;
 
+    const baseGlyph = await this.fontController.getGlyph(glyphName);
+    if (!baseGlyph) return;
+
+    const varGlyphController =
+      await this.sceneController.sceneModel.getSelectedVariableGlyphController();
+    const varGlyph = varGlyphController?.glyph;
+    const defaultSource =
+      varGlyph?.sources?.find((s) => !s.inactive && !s.locationBase) ??
+      varGlyph?.sources?.[0];
+    const layerName = defaultSource?.layerName;
+    const existingColorV1 =
+      varGlyph?.layers?.[layerName]?.glyph?.customData?.["colorv1"];
+
+    if (!existingColorV1?.type) {
+      await dialog(
+        translate("action.add-paint.no-v1-layers.title"),
+        translate("action.add-paint.no-v1-layers.message"),
+        [{ title: translate("dialog.okay"), isDefaultButton: true }]
+      );
+      return;
+    }
+
+    const newPaintNode = {
+      type: "PaintGlyph",
+      glyph: glyphName,
+      paint: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
+    };
+
+    await this.sceneController.editGlyphAndRecordChanges((varGlyph) => {
+      const defaultSource =
+        varGlyph.sources?.find((s) => !s.inactive && !s.locationBase) ??
+        varGlyph.sources?.[0];
+      const layerName = defaultSource?.layerName;
+      const layerGlyph = varGlyph.layers?.[layerName]?.glyph;
+      if (!layerGlyph) return;
+
+      if (!layerGlyph.customData) {
+        layerGlyph.customData = {};
+      }
+
+      const colorv1 = layerGlyph.customData["colorv1"];
+
+      let newColorV1;
+      if (colorv1?.type === "PaintColrLayers") {
+        newColorV1 = {
+          ...colorv1,
+          layers: [...(colorv1.layers ?? []), newPaintNode],
+        };
+      } else if (colorv1?.type) {
+        newColorV1 = {
+          type: "PaintColrLayers",
+          layers: [colorv1, newPaintNode],
+        };
+      } else {
+        newColorV1 = {
+          type: "PaintColrLayers",
+          layers: [newPaintNode],
+        };
+      }
+
+      layerGlyph.customData["colorv1"] = newColorV1;
+      layerGlyph.customData["fontra.colrv1.referencedGlyphs"] =
+        collectReferencedGlyphs(newColorV1);
+
+      if (varGlyph.customData?.["colorv1"]) {
+        delete varGlyph.customData["colorv1"];
+      }
+
+      return translate("action.add-paint");
+    });
+  }
   async doAddAnchor() {
     const point = this.sceneController.selectedGlyphPoint(this.contextMenuPosition);
     const { anchor: tempAnchor } = await this.doAddEditAnchorDialog(undefined, point);

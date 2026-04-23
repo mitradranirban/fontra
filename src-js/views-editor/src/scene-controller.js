@@ -62,9 +62,9 @@ import { isLocationAtDefault } from "@fontra/core/var-model.js";
 import { VarPackedPath, packContour } from "@fontra/core/var-path.js";
 import * as vector from "@fontra/core/vector.js";
 import { dialog, message } from "@fontra/web-components/modal-dialog.js";
+import { _collectClipGlyphs, getPaintGraph } from "./colrv1-canvas-renderer.js";
 import { EditBehaviorFactory } from "./edit-behavior.js";
 import { SceneModel } from "./scene-model.js";
-
 export class SceneController {
   constructor(
     fontController,
@@ -623,10 +623,11 @@ export class SceneController {
               pg.varGlyph?.customData;
 
             if (!customData) continue;
-            const colrData = customData["colorv1"];
+            const colrData = getPaintGraph(customData);
             if (!colrData) continue;
 
-            const clipGlyphs = _collectClipGlyphsFromPaint(colrData);
+            const clipGlyphs = _collectClipGlyphs(colrData);
+
             const explicit = customData["fontra.colrv1.referencedGlyphs"] ?? [];
             const allRefs = new Set([...clipGlyphs, ...explicit]);
 

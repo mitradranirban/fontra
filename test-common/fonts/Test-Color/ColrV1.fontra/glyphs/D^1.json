@@ -69,12 +69,12 @@
 "colorStops": [
 {
 "alpha": 1,
-"paletteIndex": 0,
+"paletteIndex": 2,
 "stopOffset": 0
 },
 {
 "alpha": 1,
-"paletteIndex": 1,
+"paletteIndex": 0,
 "stopOffset": 1
 }
 ]

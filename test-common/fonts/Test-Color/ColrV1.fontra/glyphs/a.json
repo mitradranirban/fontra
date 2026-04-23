@@ -1,0 +1,68 @@
+{
+"name": "a",
+"sources": [
+{
+"name": "",
+"layerName": "202ed5cd",
+"locationBase": "202ed5cd"
+}
+],
+"layers": {
+"202ed5cd": {
+"glyph": {
+"xAdvance": 500,
+"customData": {
+"colorv1": {
+"layers": [
+{
+"paint": {
+"glyph": "A",
+"paint": {
+"alpha": 1,
+"paletteIndex": 0,
+"type": "PaintSolid"
+},
+"type": "PaintGlyph"
+},
+"transform": {
+"dx": -251,
+"dy": 259,
+"xx": 0.5,
+"xy": 0,
+"yx": 0,
+"yy": 0.5
+},
+"type": "PaintTransform"
+},
+{
+"paint": {
+"glyph": "D",
+"paint": {
+"alpha": 1,
+"paletteIndex": 0,
+"type": "PaintSolid"
+},
+"type": "PaintGlyph"
+},
+"transform": {
+"dx": 250,
+"dy": -250,
+"xx": 0.5,
+"xy": 0,
+"yx": 0,
+"yy": 0.5
+},
+"type": "PaintTransform"
+}
+],
+"type": "PaintColrLayers"
+},
+"fontra.colrv1.referencedGlyphs": [
+"A",
+"D"
+]
+}
+}
+}
+}
+}

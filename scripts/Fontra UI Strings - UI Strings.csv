@@ -1,0 +1,461 @@
+Go to Documentation,key,,,,,,,,,,,
+Language in English,,English,Simplified Chinese,Japanese,Korean,French,German,Spanish,Dutch,Amharic,Traditional Chinese,Filipino
+Language in Language,,English,简体中文,日本語,한국인,Français,Deutsch,Español,Nederlands,አማርኛ,繁體中文,Tagalog
+Language code,,en,zh-CN,ja,ko,fr,de,es,nl,am,zh-TW,tl
+Development Status,,done,beta,beta,,beta,wip,,wip,,beta,beta
+,action-topics.designspace-navigation,Designspace Navigation,Designspace 导航,Designspaceナビゲーション,,Navigation du Designspace,-,Navegación en Designspace,Designspace Navigatie,,Designspace 導覽,Nabigasyon sa Designspace
+,action-topics.export-as,Export as,导出为…,出力…,,Exporter sous,Exportieren als,Exportar como,Exporteer als,,匯出為…,I-export bilang
+,action-topics.glyph-editor-appearance,Glyph editor appearance,字形编辑器外观,グリフエディター表示,,Glyphe édition apparence,Glyph Editor Ansicht,Apariencia del editor de Glifo,Glyph editor uiterlijk,,字形編輯器外觀,Hitsura ng editor ng Glyph
+,action-topics.menu.edit,Edit,编辑,編集,,Édition,Bearbeiten,Editar,Wijzig,,編輯,I-edit
+,action-topics.menu.file,File,文件,ファイル,,Fichier,Datei,,Archief,,檔案,File
+,action-topics.menu.glyph,Glyph,字形,グリフ,,Glyphe,-,Glifo,,,字形,Glyph
+,action-topics.menu.view,View,视图,表示,,Affichage,Ansicht,Ver,Weergave,,檢視,Tingnan
+duplicate,action-topics.reference-font,Reference font,参考字体,リファレンスフォント,,Fonte de référence,Referenz-Font,Referenciar Fuente,Referentiefont,,參考字型,Font ng sanggunian
+,action-topics.selection-transformations,Selection Transformations,变形工具,変形,,Transformation de la sélection,Selektion transformieren,,Selectie transformaties ,,變形工具,Mga Pagbabago sa Pagpili
+,action-topics.sidebars,Sidebars,侧栏,サイドバー,,Barres latérales,Seitenleisten,,Zijbalken,,側邊欄,Mga Sidebar
+,action-topics.tools,Tools,工具,ツール,,Outils,Werkzeuge,Herramientas,Gereedschappen,,工具,Mga Kagamitan
+,action.add-anchor,Add Anchor,添加锚点,アンカーを追加,,Ajouter une ancre,Anker hinzufügen,Añadir Ancla,Voeg anker toe,,新增錨點,Magdagdag ng Angkla
+,action.add-component,Add Component,添加部件,コンポーネントを追加,,Ajouter un composant,Komponente hinzufügen,Añadir Componente,Voeg component toe,,新增部件,Magdagdag ng Bahagi
+,action.add-guideline,Add Guideline,添加参考线,ガイドラインを追加,,Ajouter un guide,Hilfslinie hinzufügen,Añadir Guía,Voeg hulplijn toe,,新增參考線,Magdagdag ng Gabay
+,action.add-guideline-between-points,Add Guideline Between Points,在两点间添加参考线,,,,,Añadir Guía Entre Puntos,,,在兩點間新增參考線,Magdagdag ng Gabay sa Pagitan ng mga Puntos
+,action.break-contour,Break Contour,断开轮廓,パスを切り離す,,Ouvrir le contour,Kontur öffnen,Abrir Contorno,Breek contour,,斷開輪廓,Hugis ng Paghihiwalay
+,action.break-contour.plural,Break Contours,断开轮廓,パスを切り離す,,Ouvrir les contours,Konturen öffnen,Abrir Contornos,,,斷開輪廓,Mga Contour ng Break
+,action.close-contour,Close %0 Contour,闭合轮廓,%0パスを閉じる,,Fermer %0 contour,%0 Kontur schließen,Cerrar %0 Contorno,Sluit %0 contour,,閉合輪廓,Isara ang %0 Contour
+,action.close-contour.plural,Close %0 Contours,闭合 %0 个轮廓,%0パスを閉じる,,Fermer %0 contours,%0 Konturen schließen,Cerrar %0 Contornos,Sluit %0 contouren,,閉合 %0 個輪廓,Isara ang %0 na mga Contour
+,action.copy,Copy,复制,コピー,,Copier,Kopieren,Copiar,Kopiëer,,複製,Kopyahin
+,action.cut,Cut,剪切,カット,,Couper,Ausschneiden,Cortar,Snij,,剪下,Gupitin
+,action.decompose-component,Decompose %0 Component,释放部件,%0 を分解,,Décomposer %0 composant,%0 Komponente auflösen,Descomponer %0 componente ,%0 component ontleden,,釋放部件,I-decompose ang %0 na Bahagi
+,action.decompose-component.plural,Decompose %0 Components,释放 %0 个部件,%0 を分解,,Décomposer %0 composants,%0 Komponenten auflösen,Descomponer %0 componentes ,%0 componenten ontleden,,釋放 %0 個部件,Buwagin ang %0 na mga Bahagi
+,action.delete,Delete,删除,削除,,Supprimer,Enfernen,Borrar,Verwijder,,刪除,Burahin
+,action.delete-glyph,Delete Glyph,删除字形,グリフを削除,,Supprimer le glyphe,Glyph entfernen,Borrar Glifo,Verwijder glyph,,刪除字形,Burahin ang Glyph
+,action.delete-selection,Delete Selection,删除选中,選択範囲を削除,,Supprimer la sélection,Auswahl entfernen,Borrar Selección,Verwijder selectie,,刪除選取,Burahin ang Pinili
+,action.edit-anchor,Edit Anchor,编辑锚点,アンカーを編集,,Éditer l'ancre,Anker bearbeiten,Editar Ancla,,,編輯錨點,I-edit ang Anchor
+WIP,action.edit-background-image,Edit Background Image,编辑背景图片,背景画像を編集,,Éditer l'image d'arrière plan,Hintergrund-Bild bearbeiten,Editar Imagen de Fondo,,,編輯背景圖片,I-edit ang Larawan sa Background
+,action.edit-guideline,Edit Guideline,编辑参考线,ガイドラインを編集,,Éditer le guide,Hilfslinie bearbeiten,Editar Guía,,,編輯參考線,I-edit ang Gabay
+,action.export-as.designspace,Designspace + UFO (*.designspace),-,-,-,-,-,-,-,,-,-
+,action.export-as.fontra,Fontra (*.fontra),-,-,-,-,-,-,-,,-,-
+,action.export-as.glyphs,Glyphs (*.glyphs),-,-,-,-,-,-,-,,-,-
+,action.export-as.otf,OpenType (*.otf),-,-,-,-,-,-,-,,-,-
+,action.export-as.rcjk,RCJK (*.rcjk),-,-,-,-,-,-,-,,-,-
+,action.export-as.ttf,TrueType (*.ttf),-,-,-,-,-,-,-,,-,-
+,action.export-as.ufo,UFO (*.ufo),-,-,-,-,-,-,-,,-,-
+,action.export-as.woff2,Webfont (*.woff2),-,-,-,-,-,-,-,,-,-
+,action.glyph.add-background-image,Add background image...,添加背景图片…,背景画像を追加…,,Ajouter une image d'arrière plan,Hintergrundbild hinzufügen,Añadir imagen de fondo...,,,新增背景圖片…,Magdagdag ng larawan sa background...
+,action.glyph.add-source,Add source...,添加源…,ソースを追加…,,Ajouter une source…,Source hinzufügen...,Añadir source...,Voeg source toe...,,新增源…,Magdagdag ng pinagmulan...
+,action.glyph.delete-source,Delete source...,删除源…,ソースを削除…,,Supprimer la source…,Source entfernen...,Eliminar source...,Verwijder source...,,刪除源…,Burahin ang pinagmulan...
+,action.glyph.edit-glyph-axes,Edit glyph axes...,编辑字形参数轴…,グリフの補完軸を編集…,,Éditer les axes du glyphe…,Glyph-Achse bearbeiten...,Editar eje de glifo...,Wijzig glyph assen...,,編輯字形參數軸…,I-edit ang mga gliph ax...
+,action.join-contours,Join Contours,合并轮廓,パスを連結,,Joindre les contours,Konturen verbinden,Unir Contornos,Verbind contouren,,合併輪廓,Sumali sa Mga Contour
+,action.lock-background-images,Lock Background Images,锁定背景图片,背景画像をロック,,Vérouiller les images d'arrière plan,Hintergrundbild sperren,Bloquear Imágenes de Fondo,,,鎖定背景圖片,I-lock ang mga Larawan sa Background
+,action.lock-guideline,Lock Guideline,锁定参考线,ガイドラインをロック,,Vérouiller le guide,Hilfslinie sperren,Bloquear,,,鎖定參考線,Gabay sa Pag-lock
+,action.lock-guideline.plural,Lock Guidelines,锁定参考线,ガイドラインをロック,,Vérouiller les guides,Hilfslinien sperren,Bloquear Guías,Vergrendel hulplijnen,,鎖定參考線,Mga Alituntunin sa Pag-lock
+,action.nudge-selection,nudge selection,微移,選択範囲のキー移動,,décallage de la séléction,Stups-Auswahl,Desplazar selección,,,微調,pagpili ng siko
+,action.paste,Paste,粘贴,ペースト,,Coller,Einfügen,Pegar,Plak,,貼上,I-paste
+,action.redo,Redo,重做,やり直す,,Revenir,Wiederholen,Revertir,Opnieuw,,重做,Gawing muli
+,action.reverse-contour,Reverse Contour Direction,反转轮廓方向,パスの方向を逆転,,Inverser la direction du contour,Kontur-Richtung umkehren,Invertir Dirección del Contorno,Keer contour richting om,,反轉輪廓方向,Baliktarin na Direksyon ng Kontur
+,action.select-all,Select All,全选,全てを選択,,Tout sélectionner,Alle auswählen,Seleccionar Todo,Selecteer alles,,全選,Piliin Lahat
+,action.select-none,Select None,取消选择,選択を取り消す,,Désélectionner,Auswahl aufheben,,Selecteer niets,,取消選取,Pumili ng Wala
+,action.set-contour-start,Set Start Point,设置起点,開始点に設定,,Définir comme point de départ,Startpunkt setzen,Convertir en Primer Nodo,Maak startpunt,,設定起點,Itakda ang Simulang Punto
+,action.undo,Undo,撤销,取り消す,,Annuler,Widerrufen,Deshacer,Herstel,,復原,I-undo
+,action.unlock-background-images,Unlock Background Images,解锁背景图片,背景画像のロックを解除,,Dévérouiller les images d'arrière plan,Hintergrundbild entsperren,Desbloquear Imagen de Fondo,,,解鎖背景圖片,I-unlock ang mga Larawan sa Background
+,action.unlock-guideline,Unlock Guideline,解锁参考线,ガイドラインのロックを解除,,Dévérouiller le guide,Hilfslinie entsperren,Desbloquear Guía,,,解鎖參考線,Gabay sa Pag-unlock
+,action.unlock-guideline.plural,Unlock Guidelines,解锁参考线,ガイドラインのロックを解除,,Dévérouiller les guides,Hilfslinien entsperren,Desbloquear Guías,,,解鎖參考線,Mga Alituntunin sa Pag-unlock
+,anchor.labels.name,Name,名称,名前,,Nom,-,Nombre,,,名稱,Pangalan
+,application-settings.clipboard.title,Clipboard,剪贴板导出格式,クリップボード,,Presse-papier,Zwischenablage,Portapapeles,Klembord,,剪貼簿,Clipboard
+,application-settings.display-language.status.beta,beta,试用版,ベータ版,,-,Beta,Beta,beta,,搶鮮版,beta
+,application-settings.display-language.status.wip,work in progress,开发中,作業中,,travail en cours,In Arbeit,trabajo en progreso,in ontwikkeling,,開發中,trabahong isinasagawa
+Untranslated!,application-settings.display-language.title,Display Language,-,-,,-,-,-,-,,-,-
+"Currently unused, but good to have",application-settings.display-language.title.translated,Display Language,显示语言,表示言語,,Langue utilisée,Anzeigesprache,Mostrar Lenguaje,Weergavetaal,,顯示語言,Wika ng Pagpapakita
+,application-settings.editor-behavior.title,Editor Behavior,编辑器行为,エディターの挙動,,Comportement de l'éditeur,Editor-Verhalten,Comportamiento del Editor,Editor gedrag,,編輯器行為,Pag-uugali ng Editor
+,application-settings.plugins-manager.title,Plugin Manager,插件管理器,プラグインマネージャー,,Gestionnaire de plugins,-,-,-,,擴充功能管理器,Tagapamahala ng Plugin
+,application-settings.server-info.title,Server info,服务器信息,サーバー情報,,Information du serveur,Server Info,Información del Servidor,-,,伺服器資訊,Impormasyon ng server
+,application-settings.shortcuts.title,Shortcuts,快捷键,キーボードショートカット,,Racourcis clavier,Tastaturkurzbefehle,Atajos,Snelkoppelingen,,快速鍵,Mga Shortcut
+,application-settings.theme-settings.title,Theme settings,主题设置,テーマ設定,,Paramètres des thèmes,Design-Einstellungen,Ajustes del Tema,Thema-instellingen,,主題設定,Mga setting ng tema
+,axes.add,Add new axis,添加新参数轴,新しい補完軸を追加,,Ajouter un nouvel axe,Neue Achse hinzufügen,Añadir nuevo eje,Voeg nieuwe as toe,,加入新參數軸,Magdagdag ng bagong aksis
+,axes.axis-values,Axis values,参数轴数值,補完軸の座標,,Valeur de l'axe,Achsen Werte,Valores de eje,As waarden,,參數軸數值,Mga halaga ng aksis
+,axes.create,New axis,新建参数轴,新しい補完軸,,Nouvel axe,Neue Achse,Nuevo eje,Nieuwe as,,新增參數軸,Bagong aksis
+,axes.delete-axis,Delete axis,删除参数轴,補完軸を削除,,Supprimer l'axe,Achse entfernen,Eliminar eje,Verwijder as,,刪除參數軸,Burahin ang aksis
+,axes.mapping-graph,Mapping graph,映射图,マッピンググラフ,,Graphique du mapping,Mapping-Grafik,,Mapping grafiek,,對應圖,Graph ng pagmamapa
+,axes.mapping-list,Mapping list,映射列表,マッピングリスト,,Liste du mapping,Mapping-Liste,,Mapping lijst,,對應清單,Listahan ng pagmamapa
+,axes.mapping.source,Source,源,ソース,,-,-,-,-,,源,Pinagmulan
+,axes.mapping.user,User,用户,ユーザー,,Utilisateur,Benutzer,Usuario,-,,使用者,Gumagamit
+,axes.mapping.values.elidable,Elidable,可忽略,名称の省略,,-,Übersehbar,,-,,可忽略,Maaasahan
+,axes.mapping.values.linked,Linked,已链接,スタイルリンク,,Lié,Verknüpft,Enlazado,-,,已連結,Naka-link
+,axes.mapping.values.max,Max,最大值,最大値,,-,-,-,-,,最大值,Pinakamataas
+,axes.mapping.values.min,Min,最小值,最小値,,-,-,-,-,,最小值,Minuto
+,axes.mapping.values.name,Name,名称,名称,,Nom,-,Nombre,Naam,,名稱,Pangalan
+,axes.mapping.values.value,Value,数值,値,,Valeur,Wert,Valores,Waarde,,數值,Halaga
+,axes.names,Names,命名,補完軸名,,Noms,Namen,Nombres,Namen,,命名,Mga Pangalan
+,axes.names.name,Name,名称,名称,,Nom,-,Nombre,Naam,,名稱,Pangalan
+,axes.names.ot-tag,OT tag,OT 标签,OTタグ,,-,OT-Tag,-,-,,OT 標籤,Tag na OT
+,axes.names.ui-name,UI name,显示名称,UI名,,-,UI Name,-,-,,顯示名稱,Pangalan ng UI
+,axes.new,New axis...,新建参数轴…,補完軸を追加…,,Nouvel axe…,Neue Achse...,Nuevo eje...,Nieuwe as...,,新增參數軸…,Bagong aksis...
+,axes.preset,Axis presets,参数轴预设,補完軸プリセット,,Préréglage d'axe,Achsen Voreinstellungen,Preajustes del eje,Standaard assen,,參數軸預設,Mga preset ng axis
+,axes.preset.italic,Italic,斜体,-,,Italique,Kursiv,Itálica,Cursief,,斜體,Italiko
+,axes.preset.optical-size,Optical size,视觉尺寸,-,,Corps optique,Optische Größe,Peso Óptico,Optische grootte,,視覺尺寸,Sukat ng optika
+,axes.preset.slant,Slant,倾斜角度,-,,Penché,,Inclinado,Hellingshoek,,傾斜角度,Pahilig
+,axes.preset.weight,Weight,字重,-,,Graisse,Gewicht,Peso,Gewicht,,字重,Timbang
+,axes.preset.width,Width,字宽,-,,Largeur,Weite,Ancho,Breedte,,字寬,Lapad
+,axes.range,Range,范围,補完軸の範囲,,-,Bereich,Rango,Bereik,,範圍,Saklaw
+,axes.range.axis-type,Axis type,参数轴类型,補完軸の種類,,Type d'axe,Achsen Art,Tipo de Eje,As type,,參數軸類型,Uri ng aksis
+,axes.range.axis-type.continuous,Continuous,连续,連続,,Continue,Fortlaufend,Continuo,Doorlopend,,連續,Tuloy-tuloy
+,axes.range.axis-type.discrete,Discrete,离散,分離,,Discret,Unterbrochen,Discreto,Discreet,,離散,Diskreto
+,axes.range.default,Default,默认值,デフォルト値,,Défaut,-,Predeterminado,Standaard,,預設值,Default
+,axes.range.maxium,Maximum,最大值,最大値,,Maximum,-,Máximo,Maximum,,最大值,Pinakamataas
+,axes.range.minimum,Minimum,最小值,最小値,,Minimum,-,Mínimo,Minimum,,最小值,Pinakamababa
+,axes.range.values,Values,可选值,値,,Valeurs,Werte,Valores,Waarden,,可選值,Mga Halaga
+,axes.reorder,Reorder axes,将参数轴重新排序,補完軸の並び替え,,Réordonner les axes,Achsen umsortieren,Re ordenar ejes,,,重新排序參數軸,Muling ayusin ang mga axe
+,axes.title,Axes,参数轴,補完軸,,Axes,Achsen,Ejes,Assen,,參數軸,Mga Palakol
+,axes.undo.add,add axis %0,添加参数轴 %0,補完軸%0を追加,,ajouter l'axe %0,Achse %0 hinzufügen,,,,新增參數軸 %0,idagdag ang aksis %0
+,axes.undo.delete,delete axis %0,删除参数轴 %0,補完軸%0を削除,,supprimer l'axe %0,Achse %0 entfernen,,,,刪除參數軸 %0,burahin ang aksis %0
+,axes.undo.edit,edit axis %0,编辑参数轴 %0,補完軸%0を編集,,éditer l'axe %0,Achse %0 bearbeiten,,,,編輯參數軸 %0,i-edit ang aksis %0
+,background-image.labels.colorize,Colorize,填色,彩色,,Coloriser,Färbung,Colorear,,,填色,Kulayan
+,background-image.labels.opacity,Opacity,透明度,透明度,,Transparence,Transparenz,Opacidad,,,透明度,Kadiliman
+WIP,backgroundImage.labels.color,Color,颜色,カラー,,Coleur,Farbe,Color,,,顏色,Kulay
+,canvas.clean-view-and-hand-tool,Clean View and Hand Tool,预览与拖拽工具,塗りのプレビューと手のひらツール,,Prévisualisation et outil de déplacement,Ungehinderte Sicht und Hand Werkzeug,,Schone weergave en Hand gereedschap,,預覽及拖曳工具,Malinis na Pananaw at Kagamitan sa Kamay
+,cross-axis-mapping.axis-participates,"When checked, this axis participates in the mapping",选中后，该参数轴参与映射,チェックすると、この補完軸がマッピング内で有効になります,,"Si coché, l'axe participera au mapping","Wenn markiert, dann ist diese Achse teil des Mappings",,,,勾選後，此參數軸參與對應,"Kapag nasuri, ang aksis na ito ay nakikilahok sa pagmamapa"
+,cross-axis-mapping.delete,Delete cross-axis mapping,删除跨轴映射,交差補完軸マッピングを削除,,,Achsübergreifendes Mapping entfernen,,,,刪除跨軸對應,Burahin ang cross-axis mapping
+,cross-axis-mapping.description,Description,描述,説明,,-,Bezeichnung,,,,說明,Paglalarawan
+,cross-axis-mapping.groupDescription,Group description,分组描述,グループ説明,,Description de groupe,Gruppen Bezeichnung,,,,群組說明,Paglalarawan ng grupo
+,cross-axis-mapping.header.inputLocation,Input Location,输入位置,入力ロケーション,,Localisation d'entrée ,-,,,,輸入位置,Lokasyon ng Pag-input
+,cross-axis-mapping.header.outputLocation,Output Location,输出位置,出力ロケーション,,Localisation de sortie,-,,,,輸出位置,Lokasyon ng Paglabas
+,cross-axis-mapping.new,New cross-axis mapping,新建跨轴映射,新しい交差補完軸マッピングを追加,,,Neues achsübergreifendes Mapping erstellen,,,,新增跨軸對應,Bagong pagmamapa ng cross-axis
+,cross-axis-mapping.title,Cross-axis mapping,跨轴映射,交差補完軸マッピング,,,Achsübergreifendes Mapping,,,,跨軸對應,Pagmamapa ng cross-axis
+,cross-axis-mapping.undo.add,add cross-axis mapping,添加跨轴映射,交差補完軸マッピングを追加,,,achsübergreifendes Mapping hinzufügen,,,,新增跨軸對應,magdagdag ng cross-axis mapping
+,cross-axis-mapping.undo.delete,delete cross-axis mapping,删除跨轴映射,交差補完軸マッピングを削除,,,achsübergreifendes Mapping entfernen,,,,刪除跨軸對應,burahin ang cross-axis mapping
+,cross-axis-mapping.undo.reorder,reorder cross-axis mapping,将跨轴映射重新排序,交差補完軸マッピングの並べ替え,,,achsübergreifendes Mapping umsortieren,,,,重新排序跨軸對應,muling ayusin ang cross-axis mapping
+,designspace-navigation.edit-all-compatible-sources,Edit all compatible sources,编辑所有匹配的源,全ての互換性があるソースを編集,,Éditer toutes les sources compatibles,Bearbeite alle kompatiblen Sourcen,,Wijzig alle compatibele sources,,編輯所有相容的源,I-edit ang lahat ng katugmang mapagkukunan
+,development-status-definitions.add,add status definition %0,添加状态标签 %0,ステータスラベル%0を追加,,Ajouter un statut %0,Status-Definition %0 hinzufügen,,,,加入狀態標籤 %0,magdagdag ng kahulugan ng katayuan %0
+,development-status-definitions.button.new,New status definition,新的标签,新しいステータスラベルを定義,,Nouveau statut,Neue Status-Definition,,,,新增狀態標籤,Bagong kahulugan ng katayuan
+,development-status-definitions.dialog.cannot-edit-status-definition.title,Can’t edit status definition value,无法编辑标签,ステータスラベルの値を編集できませんでした。,,Le statut n'est pas éditable,Status-Definition kann nicht bearbeitet werden,,,,無法編輯狀態標籤,Hindi ma-edit ang value ng kahulugan ng status
+,development-status-definitions.label.is-default,Is Default,设为默认,デフォルト,,Est défaut,Ist Default,,,,設為預設,Ay Default
+,development-status-definitions.title,Status definitions,开发状态颜色标签设置,ステータスラベルの定義,,Définition des statuts,Status-Definitionen,,Statusdefinities,,開發狀態顏色標籤設定,Mga kahulugan ng katayuan
+,development-status-definitions.tooltip.color,Specify the color for this status definition,指定标签颜色,このステータスラベルにカラーを指定,,Définir la couleur pour ce statut,Definiere die Farbe für die Status-Definition,,,,指定狀態標籤顏色,Tukuyin ang kulay para sa kahulugan ng katayuang ito
+,development-status-definitions.tooltip.delete,Delete status definition,删除标签,ステータスラベルを削除,,Supprimer le statut,Status-Definition entfernen,,,,刪除狀態標籤,Burahin ang kahulugan ng katayuan
+,development-status-definitions.tooltip.is-default,"If checked, this status will be used as a fallback when a source status is not set",选中后，未设置开发状态的源会默认使用该标签,チェックすると、ソースにステータスラベルが設定されていなかった場合このステータスラベルがフォールバックとして使用されます。,,"Si coché, ce statut sera utilisé comme valeur de défault quand le status d'une source n'est pas définit","Wenn ausgewählt, wird diese Status-Definition als Default benutzt",,,,勾選後，未設定開發狀態的源會預設使用此標籤,"Kung may tsek, gagamitin ang status na ito bilang fallback kapag hindi nakatakda ang status ng pinagmulan"
+,development-status-definitions.undo.change,change status definition,更改状态标签,ステータスラベルの定義を変更,,Changer le statut,Status-Definition ändern,,,,變更狀態標籤,kahulugan ng pagbabago ng katayuan
+,development-status-definitions.undo.change-is-default,change status definition isDefault,更改状态标签默认设置,デフォルトのステータスラベルの定義を変更,,,Ist Default' ändern von Status-Definition,,,,變更狀態標籤預設設定,baguhin ang kahulugan ng katayuan ayDefault
+,development-status-definitions.undo.delete,delete status definition %0,删除状态标签 %0,ステータスラベル%0を削除,,Supprimer le status %0,Status-Definition %0 entfernen,,,,變更狀態標籤 %0,burahin ang kahulugan ng katayuan %0
+,development-status-definitions.warning.positive-number,Value must be a positive number.,数值必须为正数。,値は正の数値である必要があります。,,La valeur doit être un nombre positif.,Wert muss eine positive Nummer sein.,,,,數值必須為正數。,Dapat positibong numero ang halaga.
+,dialog.add,Add,添加,追加,,Ajouter,Hinzufügen,,Voeg toe,,新增,Idagdag
+,dialog.cancel,Cancel,取消,キャンセル,,Annuler,Abbrechen,,Annuleren,,取消,Kanselahin
+,dialog.cant-create-glyph.title,Can’t create glyph “%0”,无法添加字形 “%0”,グリフ“%0”を作成できませんでした。,,Ne peut pas créer le glyphe «%0»,Kann Glyphen “%0” nicht erstellen,,,,無法建立字形「%0」,Hindi makagawa ng glyph na “%0”
+,dialog.cant-edit-glyph.content,The font is read-only.,该字体为只读文件,このフォントは読み取り専用です。,,La fonte est en lecture seule,Der Font ist schreibgeschützt.,,,,此字型檔為唯讀。,Read-only ang font.
+,dialog.cant-edit-glyph.content.location-not-at-source,The location is not at a source.,当前位置不是一个源。,現在の補完軸の値はソースと異なります。,,La localisation n'est pas sur une source,Die Location ist nicht bei einer Source.,,,,目前位置不是一個源。,Ang lokasyon ay wala sa isang pinagmumulan.
+,dialog.cant-edit-glyph.content.location-not-at-source-for-glyphs,The location is not at a source for the following glyphs: %0,以下字形的当前位置不是一个源：%0,,,,,,,,以下字形的目前位置不是一個源：%0,Ang lokasyon ay wala sa pinagmulan para sa mga sumusunod na glyph: %0
+,dialog.cant-edit-glyph.content.locked-glyph,The glyph is locked.,该字形已被锁定。,このグリフはロックされています。,,Le glyphe est vérouillé,Der Glyph ist gesperrt.,,,,此字形已鎖定。,Naka-lock ang gliph.
+,dialog.cant-edit-kerning.title,Can’t edit kerning,无法编辑字偶距,,,,,,,,無法編輯字偶距,Hindi ma-edit ang kerning
+,dialog.cant-edit-sidebearings.title,Can’t edit sidebearings,无法编辑字边距,,,,,,,,無法編輯字邊距,Hindi ma-edit ang mga sidebearing
+,dialog.cant-edit-glyph.title,Can’t edit glyph “%0”,无法编辑字形 “%0”,グリフ“%0”を編集できませんでした。,,Ne peut pas éditer le glyphe «%0»,Kann Glyphen “%0” nicht bearbeiten,,,,無法編輯字形「%0」,Hindi ma-edit ang gliph na “%0”
+,dialog.create,Create,创建,作成,,Créer,Erstellen,,Creëer,,建立,Gumawa
+,dialog.create-new-glyph.body,"Click ""Create"" if you want to create a new glyph named ""%0""%1.","如果你想创建一个新的字形 ""%0""%1，请点击 ""创建""。",グリフ名“%0”%1を作成する場合、“作成”をクリックしてください。,,"Cliquez «Créer» si vous voulez créer un nouveau glyphe nommé  ""%0""%1.","Klicke ""Erstellen"" um einen neuen Glyphen hinzuzufügen mit dem Namen ""%0""%1.",,"Klik ""Creëer"" om een nieuwe glyph ""%0"" te maken%1.",,如果您想建立一個新的字形「%0」%1，請點選「建立」。,"I-click ang ""Gumawa"" kung gusto mong lumikha ng bagong gliph na pinangalanang ""%0""%1."
+Note the leading space!,dialog.create-new-glyph.body.2," for character ""%0"" (%1)","为字符 ""%0"" (%1)",文字“%0”(%1),, pour le caractère «%0» (%1)," für das Zeichen ""%0"" (%1)",," voor karakter ""%0"" (%1)",,為字元「%0」（%1）,"para sa karakter na ""%0"" (%1)"
+,dialog.create-new-glyph.title,"Create a new glyph ""%0""?","创建新字形 ""%0""？",新しいグリフ“%0”を作成しますか？,,Créer un nouveau glyphe «%0» ?,"Einen neuen Glyphen ""%0"" erstellen?",,"Creëer een nieuwe glyph ""%0""?",,建立新的字形「%0」嗎？,"Gumawa ng bagong gliph na ""%0""?"
+,dialog.delete,Delete,删除,削除,,Supprimer,Entfernen,,,,刪除,Burahin
+,dialog.delete-current-glyph.title,"Are you sure you want to delete glyph ""%0"" from the font project?","你确定要将字形 ""%0"" 从当前项目中删除吗？",フォントプロジェクトからグリフ“%0”を削除しますか？,,Êtes vous sur de vouloir supprimer le glyph «%0» de la fonte ?,"Bist du sicher, dass du den Glyphen ""%0"" entfernen willst vom Font-Projekt?",,,,您確定要將字形「%0」自目前專案中刪除嗎？,"Sigurado ka bang gusto mong burahin ang glyph na ""%0"" mula sa font project?"
+,dialog.edit,Edit,编辑,編集,,Édition,Bearbeiten,,Wijzig,,編輯,I-edit
+,dialog.find-glyphs-that-use.button.add-to-text,Add to text,添加至文本,テキストに追加,,Ajouter au texte,Zum Text hinzufügen,,,,加入文字欄位,Idagdag sa teksto
+,dialog.find-glyphs-that-use.button.copy-names,Copy names,复制名称,名称をコピー,,Copier les noms,Namen kopieren,,,,複製名稱,Kopyahin ang mga pangalan
+,dialog.find-glyphs-that-use.title,Glyphs that use glyph '%0' as a component,搜索使用 ”%0“ 作为部件的字形,グリフ“%0”をコンポーネントとして使用しているグリフ,,Glyphes qui utilisent le glyphe %0 comme composant,"Glyphen, die '%0' als Komponente nutzen",,,,搜尋使用「%0」作為部件的字形,Mga glyph na gumagamit ng glyph na '%0' bilang bahagi
+,dialog.glyphs.search,Search glyphs,搜索字形,グリフを検索,,Chercher des glyphes,Glyphen suchen,,Zoek glyphs,,搜尋字形,Maghanap ng mga glyph
+,dialog.okay,Okay,确认,了解,,-,-,,,,確定,Sige
+,dialog.paste-whole-glyph.content.add,Add to the current glyph (match layers),添加至当前字形（对应图层）,現在のグリフに追加する（レイヤーを合わせる）,,,Zum aktuellen Glyphen hinzufügen (match Layer),,,,加入目前字形（對應圖層）,Idagdag sa kasalukuyang glyph (itugma ang mga layer)
+,dialog.paste-whole-glyph.content.question,What would you like to do with the glyph on the clipboard?,你想如何处理剪切板中的字形？,クリップボードのグリフで何を行いますか？,,Que voulez vous faire avec le glyphe dans le presse papier ?,Was willst du mit dem Glyphen in der Zwischenablage machen?,,,,您想如何處理剪貼簿中的字形？,Ano ang gusto mong gawin sa glyph na nasa clipboard?
+,dialog.paste-whole-glyph.content.replace,Replace the current glyph,替换当前字形,現在のグリフを置き換える,,Remplacer le glyphe actuel,Den aktuellen Glyphen ersetzten,,,,取代目前字形,Palitan ang kasalukuyang gliph
+,dialog.paste-whole-glyph.title,You are about to paste an entire glyph,你即将粘贴整个字形,グリフ全体をペースト,,Vous êtes sur le point de coller un glyphe en entier,Du bist dabei einen gesamten Glyphen zu übertragen,,,,您即將貼上整個字形,Ididikit mo na ang isang buong glyph
+,dialog.replace,Replace,替换,置き換え,,Remplacer,Ersetzen,,Vervang,,取代,Palitan
+,dialog.yes,Yes,确认,はい,,Oui,Ja,,,,確定,Oo
+,edit-tools-knife.undo.slice-glyph,slice glyph,切割字形,グリフのスライス,,Couper le glyphe,Glyph schneiden,,,,切割字形,hiwa ng glipo
+,edit-tools-pen.undo.add-points,add point(s),添加节点,ポイントの追加,,Ajouter un ou des point(s),Punkt(e) hinzufügen,,,,新增節點,magdagdag ng puntos
+,edit-tools-pen.undo.insert-handles,Insert Handles,插入手柄,ハンドルの挿入,,,Griffe einfügen,,,,插入控制點,Ipasok ang mga Hawakan
+,edit-tools-pen.undo.insert-point,Insert Point,插入节点,ポイントの挿入,,,Punkt einfügen,,,,插入節點,Ipasok ang Punto
+,edit-tools-pointer.transform.selection,Transform selection,变形,選択範囲の変形,,,Auswahl transformieren,,,,變形,Pagbabago ng pagpili
+,edit-tools-pointer.undo.drag-selection,drag selection,拖拽,選択範囲の移動,,déplacer la sélection,Auswahl bewegen,,,,拖曳,pagpili ng pag-drag
+,edit-tools-pointer.undo.drag-selection-and-connect-contours,drag selection and connect contours,拖拽并连接轮廓,選択範囲の移動とカウンターの接続,,déplacer la sélection et connecter les contours,Auswahl bewegen und Konturen verbinden,,,,拖曳並連上輪廓,i-drag ang seleksyon at ikonekta ang mga contour
+,edit-tools-pointer.undo.resize-selection,resize selection,改变尺寸,選択範囲の拡大縮小,,,Auswahl skalieren,,,,改變尺寸,baguhin ang laki ng napili
+,edit-tools-pointer.undo.rotate-selection,rotate selection,旋转,選択範囲の回転,,,Auswahl drehen,,,,旋轉,paikutin ang pagpili
+,edit-tools-pointer.undo.toggle-smooth,Toggle Smooth,切换平滑节点,ポイントをスムーズにする,,,"""smooth"" umschalten",,,,切換平滑節點,I-toggle ang Makinis
+,editor.hand-tool,Hand Tool,拖拽工具,手のひらツール,,Outil de déplacement,Hand Werkzeug,,Hand gereedchap,,拖曳工具,Kagamitang Pangkamay
+,editor.kerning-tool,Kerning Tool,字偶距调节工具,,,,,,,,字偶距調節工具,Kagamitan sa Kerning
+,editor.sidebearing-tool,Sidebearing Tool,字边距调节工具,,,,,,,,字邊距調節工具,Kagamitan sa Pag-sidebearing
+,editor.knife-tool,Knife Tool,切割工具,ナイフツール,,Outil couteau,Messer Werkzeug,,Mes gereedschap,,切割工具,Kagamitan sa Kutsilyo
+,editor.pen-tool,Pen Tool,钢笔工具,ペンツール,,Outil de dessin,Stift Werkzeug,,Pen gereedschap,,鋼筆工具,Kagamitan sa Panulat
+,editor.pen-tool-cubic,Pen Tool (cubic),钢笔工具（三次曲线）,ペンツール（三次ベジェ曲線）,,Outil de dessin (Cubique),Stift Werkzeug (kubisch),,Pen gereedschap (cubisch),,鋼筆工具（三次曲線）,Kagamitang Panulat (kubiko)
+,editor.pen-tool-quad,Pen Tool (quadratic),钢笔工具（二次曲线）,ペンツール（二次ベジェ曲線）,,Outil de dessin (Quadratique),Stift Werkzeug (quadratisch),,Pen gereedschap (quadratisch),,鋼筆工具（二次曲線）,Kagamitang Panulat (kuwadrado)
+,editor.pointer-tool,Pointer Tool,指针工具,選択ツール,,Outil de sélection,Pointer Werkzeug,,Pointer gereedschap,,游標工具,Kagamitang Pangturo
+,editor.pointer-tool-scale,Pointer Tool (Scaling edit tool behavior),指针工具（手柄同步缩放模式）,選択ツール（ナッジ拡大縮小）,,Outil de sélection (transformation à l'échelle),Pointer Werkzeug (skalierendes Editierverhalten),,Pointer gereedschap (schalend edit gedrag),,游標工具（縮放編輯工具行為）,Pointer Tool (Pag-uugali ng tool sa pag-edit ng scaling)
+,editor.pointer-tools,Pointer Tools,指针工具,選択ツール,,Outils de sélection,Pointer Werkzeuge,,,,游標工具,Mga Kagamitan sa Pointer
+,editor.power-ruler-tool,Power Ruler Tool,测量尺工具,パワー定規ツール,,Outil Power Ruler,Power Ruler Werkzeug,,Power Ruler gereedschap,,測量尺工具,Kagamitan sa Pinuno ng Kuryente
+,editor.shape-tool,Shape Tool,图形工具,シェイプツール,,Outil de forme,Form Werkzeug,,Vorm gereedschap,,形狀工具,Kagamitan sa Hugis
+,editor.shape-tool-ellipse,Ellipse Tool,椭圆工具,楕円ツール,,Outil ellipse,Ellipsen Werkzeug,,Ellips gereedschap,,橢圓工具,Kagamitang Ellipse
+,editor.shape-tool-rectangle,Rectangle Tool,矩形工具,長方形ツール,,Outil rectangle,Rechteck Werkzeug,,Rechthoek gereedschap,,矩形工具,Kagamitang Parihaba
+,font-info.copyright,Copyright,版权,著作権,,Copyright,-,,-,,著作權,Karapatang-ari
+,font-info.description,Description,描述,説明,,Description,Beschreibung,,Beschrijving,,簡介,Paglalarawan
+,font-info.designer,Designer,设计师,デザイナー,,-,-,,Ontwerper,,設計師,Disenyador
+,font-info.designer.url,Designer URL,设计师网址,デザイナーURL,,URL du designer,-,,Ontwerper URL,,設計師 URL,URL ng Disenyo
+,font-info.familyname,Family name,字体家族名称,ファミリー名,,Nom de famille,Familienname,,Familienaam,,字型家族名稱,Pangalan ng pamilya
+,font-info.licensedescription,License description,授权许可,ライセンス説明,,Description de la licence,Lizenz-Beschreibung,,Licensie beschrijving,,授權條款,Paglalarawan ng lisensya
+,font-info.licenseinfo.url,License info URL,授权许可网址,ライセンス情報URL,,URL de la licence,Lizenz-Info URL,,Licensie info URL,,授權條款 URL,URL ng impormasyon ng lisensya
+,font-info.manufacturer,Manufacturer,生产商,製造者,,Fabriquant,Hersteller,,Fabrikant,,製造商,Tagagawa
+,font-info.manufacturer.url,Manufacturer URL,生产商网址,製造者URL,,URL du fabriquant,Hersteller URL,,Fabrikant URL,,製造商 URL,URL ng Tagagawa
+,font-info.sampletext,Sample text,示例文本,サンプルテキスト,,Texte d'exemple,Beispiel-Text,,Voorbeeld tekst,,範例文字,Halimbawang teksto
+,font-info.title,Font Info,字体信息,フォント情報,,Informations de la fonte,-,,-,,字型資訊,Impormasyon ng Font
+,font-info.trademark,Trademark,商标,トレードマーク,,Trademark,-,,-,,商標,Trademark
+,font-info.upm,Units Per Em,UPM (Units Per eM),全角ユニット数（UPM）,,UPM (Units Per eM),UPM (Units Per eM),,,,UPM (Units Per eM),Mga Yunit Bawat Em
+,font-info.vendorid,Vendor ID,供应商 ID,ベンダーID,,Identifiant du vendeur,Hersteller ID,,-,,廠商 ID,ID ng Nagbebenta
+,font-info.version.major,Version Major,主要版本号,メジャーバージョン,,-,Hauptversionsnummer,,Versie major,,主要版本號,Bersyon Pangunahin
+,font-info.version.minor,Version Minor,次要版本号,マイナーバージョン,,-,Nebenversionsnummer,,Versie minor,,次要版本號,Bersyon Minor
+,font-overview.title,Font overview,字体概览,書体概要,,,,,,,字型概覽,Pangkalahatang-ideya ng font
+,guideline.labels.angle,Angle,角度,角度,,-,Neigung,,,,角度,Anggulo
+,guideline.labels.locked,Locked,已锁定,ロック,,Vérouillé,Gesperrt,,,,已鎖定,Naka-lock
+,guideline.labels.name,Name,名称,ガイド名,,Nom,-,,Naam,,名稱,Pangalan
+Currently not used,language.en,English,英语,英語,,Anglais,Englisch,,,,英文,Ingles
+Currently not used,language.zh-cn,Simplified Chinese,简体中文,中国語（簡体字）,,Chinois Simplifier,Chinesisch (vereinfacht),,,,簡體中文,Pinasimpleng Tsino
+,menubar.edit,Edit,编辑,編集,,Édition,Bearbeiten,,Wijzig,,編輯,I-edit
+,menubar.extensions,Extensions,扩展,拡張機能,,Extensions,Erweiterungen,,Extensies,,擴充功能,Mga Extension
+,menubar.file,File,文件,ファイル,,Fichier,Datei,,Archief,,檔案,File
+,menubar.file.export-as,Export as,导出为…,書き出し…,,Exporter sous,Exportieren als,,Exporteer als,,匯出為…,I-export bilang
+,menubar.file.new,New...,新建…,新規ファイル…,,Nouveau…,Neu...,,Nieuw...,,新增…,Bago...
+,menubar.file.open,Open...,打开…,開く…,,Ouvrir…,Öffnen...,,Open...,,開啟…,Buksan...
+,menubar.font,Font,字体,フォント,,Fonte,-,,-,,字型,Font
+,menubar.fontra.application-settings,Application Settings,应用设置,アプリケーション設定,,Paramètres de l'application,Programm-Einstellungen,,Applicatie instellingen,,應用程式設定,Mga Setting ng Aplikasyon
+,menubar.glyph,Glyph,字形,グリフ,,Glyphe,-,,-,,字形,Glyph
+,menubar.help,Help,帮助,ヘルプ,,Aide,Hilfe,,Help,,說明,Tulong
+,menubar.help.changelog,Latest changes,最新变更,Fontraアップデート履歴,,Derniers changements,Letzte Änderungen,,,,最新變更,Mga pinakabagong pagbabago
+,menubar.help.documentation,Documentation,说明文档,ドキュメンテーション,,Documentation,Dokumentation,,Documentatie,,說明文件,Dokumentasyon
+,menubar.help.homepage,Homepage,Fontra 主页,ホームページ,,Page d'accueil,-,,Thuispagina,,首頁,Homepage
+,menubar.view,View,视图,表示,,Affichage,Ansicht,,Weergave,,檢視,Tingnan
+,menubar.view.add-glyph-after-selected-glyph,Add glyph after selected glyph,在选中字形之后添加新字形,選択中のグリフの後ろにグリフを追加,,Ajouter un glyphe après le glyphe sélectionné,Glyphen hinzufügen (nach Auswahl) ,,Plaats glyph na de geselecteerde glyph,,在選取的字形後加入新字形,Magdagdag ng glyph pagkatapos ng napiling glyph
+,menubar.view.add-glyph-before-selected-glyph,Add glyph before selected glyph,在选中字形之前添加新字形,選択中のグリフの前にグリフを追加,,Ajouter un glyphe avant le glyphe sélectionné,Glyphen hinzufügen (vor Auswahl) ,,Plaats glyph vóór de geselecteerde glyph,,在選取的字形前加入新字形,Magdagdag ng glyph bago ang napiling glyph
+,menubar.view.find-glyphs-that-use,Find glyphs that use '%0',寻找使用了 '%0' 的字形,‘%0’を使用しているグリフを検索,,Trouver les glyphes qui utilisent «%0»,Finde Glyphen die '%0' benutzen,,Zoek glyphs die '%0' gebruiken,,搜尋使用「%0」的字形,Maghanap ng mga glyph na gumagamit ng '%0'
+,menubar.view.remove-selected-glyph-from-canvas,Remove selected glyph from canvas...,将选中字形从编辑区域中删除…,エディターから選択グリフを削除…,,Retirer le glyphe sélectionné du canvas...,Entferne ausgewählten Glyphen von der Zeichenfläche...,,Verwijder de geselecteerde glyph van het canvas...,,自編輯區域刪除選取的字形…,Alisin ang napiling glyph mula sa canvas
+,menubar.view.replace-selected-glyph-on-canvas,Replace selected glyph from canvas...,在编辑区域中替换选中字形…,選択中のグリフを別のグリフに切り替え…,,Remplacer le glyphe sélectionné du canvas...,Ersetze ausgewählten Glyphen auf der Zeichenfläche...,,Vervang de geselecteerde glyph op het canvas...,,於編輯區域取代選取的字形…,Palitan ang napiling glyph sa canvas
+,menubar.view.select-glyph-source-layer,Select glyph/source/layer,选择字形/源/图层,グリフ/ソース/レイヤーを選択,,,,,,,選取字形/源/圖層,Pumili ng glyph/pinagmulan/patong
+,menubar.view.select-next-glyph,Select next glyph,选择下一个字形,次のグリフを選択,,Sélectionner le prochain glyphe,Nächster Glyph,,,,選取下一個字形,Piliin ang susunod na gliph
+,menubar.view.select-next-source,Select next source,选择下一个源,次のソースを選択,,Sélectionner la source suivante ,Nächste Source,,Selecteer de volgende source,,選取下一個源,Piliin ang susunod na mapagkukunan
+,menubar.view.select-next-source-layer,Select next source layer,选择下一个源图层,次のソースレイヤーを選択,,,,,,,選取下一個源圖層,Piliin ang susunod na layer ng pinagmulan
+,menubar.view.select-previous-glyph,Select previous glyph,选择上一个字形,前のグリフを選択,,Sélectionner le glyphe précédente,Vorheriger Glyph,,,,選取上一個字形,Piliin ang nakaraang gliph
+,menubar.view.select-previous-source,Select previous source,选择上一个源,前のソースを選択,,Sélectionner la source précédente,Vorherige Source,,Selecteer de vorige source,,選取上一個源,Pumili ng nakaraang pinagmulan
+,menubar.view.select-previous-source-layer,Select previous source layer,选择上一个源图层,前のソースレイヤーを選択,,,,,,,選取上一個源圖層,Piliin ang nakaraang layer ng pinagmulan
+,menubar.window,Window,窗口,ウインドウ,,,,,,,視窗,Bintana
+,message.cancel-editing,Someone else made an edit just before you.,有人在你之前做了编辑。,他のユーザーがあなたの直前に操作を行いました。,,Quelqu'un d'autre a édité juste avant vous,Jemand anderes hat vor dir etwas geändert.,,,,有人在您之前做出了編輯。,May ibang nag-edit bago ka pa.
+,message.edit-has-been-reverted,The edit has been reverted.,编辑已被还原。,このグリフは前の状態に戻されました。,,L'édition a été annulé,Die Änderung wurde rückgängig gemacht.,,,,編輯已被復原。,Ibinalik na ang pag-edit.
+,message.glyph-could-not-be-saved,The glyph could not be saved.,该字形无法被保存。,このグリフは保存されません。,,Le glyphe n'a pas pu être enregistré,Glyph konnte nicht gespeichert werden.,,,,無法儲存字形。,Hindi mailigtas ang glyph.
+,plugin-manager.add-plugin-dialog.label.path,Plugin path:,插件路径：,プラグインのパス:,,,Plugin Pfad:,,,,擴充功能路徑：,Landas ng plugin:
+,plugin-manager.add-plugin-dialog.title,Add plugin,添加插件,プラグインを追加,,,Plugin hinzufügen,,,,新增擴充功能,Magdagdag ng plugin
+,plugin-manager.add-plugin-dialog.warning.title,Error,错误,エラー,,Erreur,Fehlermeldung,,,,錯誤,Mali
+,plugin-manager.title,Fontra plugins:,Fontra 插件：,Fontraプラグイン:,,Extensions de Fontra :,Fontra Plugins:,,,,Fontra 擴充功能：,Mga plugin ng Fontra:
+,plugin-manager.warning.fetching-error,An error occured when fetching the plugin.,获取插件时发生了错误。,プラグインを取得している間にエラーが発生しました。,,Une erreur est arrivée en récupérant l'extension,Ein Fehler trat auf beim laden des Plugins.,,,,取得擴充功能時發生錯誤。,Nagkaroon ng error noong kinukuha ang plugin.
+,plugin-manager.warning.not-found,Plugin not found.,无法找到插件。,プラグインが見つかりません。,,L'extension n'a pas été trouvé,Plugin nicht gefunden.,,,,無法找到擴充功能。,Hindi natagpuan ang plugin.
+,plugin-manager.warning.plugin-exists,Plugin exists.,插件已存在。,プラグインがすでに存在します。,,L'extension existe.,Plugin existiert bereits.,,,,擴充功能已經存在。,May plugin.
+,reference-font.select-next-reference-font,Select previous reference font,选择上一个参考字体,前のリファレンスフォントを選択,,Sélectionner la fonte de référence précédente,Vorheriger Referenz-Font,,,,選取上一個參考字型,Piliin ang dating font ng sanggunian
+,reference-font.select-previous-reference-font,Select next reference font,选择下一个参考字体,次のリファレンスフォントを選択,,Sélectionner la fonte de référence suivante,Nächster Referenz-Font,,,,選取下一個參考字型,Piliin ang susunod na font ng sanggunian
+,selection.none,(No selection),（未选择）,（選択なし）,,(Pas de sélection),(Keine Auswahl),,(Geen selectie),,（尚未選取）,(Walang pagpipilian)
+,shortcuts.dialog.reset-all.content,Are you sure you want to reset all shortcuts to their default settings?,你确定要将所有快捷键重置为默认设置吗？,全てのショートカットをデフォルトの割り当てにリセットしますか？,,Êtes-vous sûr de vouloir réinitialiser les racourcis clavier ?,"Bist du dir sicher, dass du alle Tastaturkurzbefehle zurücksetzen willst zu den Default-Einstellungen?",,,,您確定要將所有快速鍵重設為預設設定嗎？,Sigurado ka bang gusto mong i-reset ang lahat ng shortcut sa mga default na setting nito?
+,shortcuts.dialog.reset-all.title,Reset to default,重置为默认,デフォルトにリセット,,,Zurücksetzen zu 'Default',,,,重設成預設值,I-reset sa default
+,shortcuts.dialog.warning.title,Shortcuts warning,快捷键提醒,ショートカット警告,,,Tastaturkurzbefehl-Warnung,,,,快速鍵提醒,Babala sa mga shortcut
+,shortcuts.export,Export shortcuts,导出快捷键,ショートカットの書き出し,,Exporter les raccourcis clavier,Tastaturkurzbefehle exportieren,,,,匯出快速鍵,Mga shortcut sa pag-export
+,shortcuts.import,Import shortcuts,导入快捷键,ショートカットの読み込み,,Importer les raccourcis clavier,Tastaturkurzbefehle importieren,,,,匯入快速鍵,Mga shortcut sa pag-import
+,shortcuts.reset-all,Reset all shortcuts,重置所有快捷键,全てのショートカットをリセット,,Réinitialiser les raccourcis clavier,Alle Tastaturkurzbefehle zurücksetzen,,,,重設所有快速鍵,I-reset ang lahat ng shortcut
+,shortcuts.tooltip.clear,Clear,清除,クリア,,Vider,Entfernen,,,,清除,I-clear
+,shortcuts.tooltip.click-and-record,Click and record a shortcut,点击并记录一个快捷键,クリックしてショートカットを記録,,,Klicke und nehme ein Tastaturkurzbefehl auf,,,,點選並記錄快速鍵,Mag-click at mag-record ng shortcut
+,shortcuts.tooltip.reset-to-default,Reset to default,重置为默认,デフォルトにリセット,,,Zurücksetzen zu 'Default',,,,重設成預設值,I-reset sa default
+,shortcuts.warning.exists,Shortcut exists for: %0,快捷键已存在：%0,このショートカットはすでに使われています: %0,,Le raccourci clavier existe pour %0,Tastaturkurzbefehl existiert bereits für: %0,,,,快速鍵已存在：%0,May shortcut para sa: %0
+,sidebar.characters-glyphs,Input characters and output glyphs,输入字符及输出字形,,,,,,,,輸入字元及輸出字形,Mga karakter na input at mga glyph na output
+,sidebar.characters-glyphs.input-characters,Input characters,输入字符,,,,,,,,輸入字元,Mga karakter sa pag-input
+,sidebar.characters-glyphs.output-glyphs,Output glyphs,输出字形,,,,,,,,輸出字形,Mga output glyph
+,sidebar.characters-glyphs.shaping-debugger,Shaping debugger,,,,,,,,,,
+,sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip,Shaping debugger options, ,,,,,,,,,
+,sidebar.characters-glyphs.shaping-debugger.show-ineffective-items,Show ineffective items,,,,,,,,,,
+,sidebar.designspace-navigation,Designspace Navigation,Designspace 导航,Designspaceナビゲーション,,Navigation du designspace,-,,Designspace navigatie,,Designspace 導覽,Nabigasyon sa Designspace
+,sidebar.designspace-navigation.dialog.add-source.label.layer,Layer:,图层：,レイヤー名:,,,-,,,,圖層：,Patong:
+,sidebar.designspace-navigation.dialog.add-source.label.source-name,Source name:,源名称：,ソース名:,,Nom de source:,Source Name:,,,,源名稱：,Pangalan ng pinagmulan:
+,sidebar.designspace-navigation.dialog.add-source.ok-button-title,Add,添加,追加,,Ajouter,Hinzufügen,,,,新增,Idagdag
+,sidebar.designspace-navigation.dialog.add-source.title,Add source,添加源,ソースを追加,,Ajouter une source,Source hinzufügen,,,,新增源,Magdagdag ng pinagmulan
+,sidebar.designspace-navigation.dialog.delete-source.title,Delete source,删除源,ソースを削除,,Supprimer une source,Source entfernen,,,,刪除源,Burahin ang pinagmulan
+,sidebar.designspace-navigation.dialog.source-properties.ok-button-title,Done,完成,完了,,Finit,Fertig,,,,完成,Tapos na
+,sidebar.designspace-navigation.dialog.source-properties.title,Source properties,源属性,ソースのプロパティ,,Propriétés de la source,Source Eigenschaften,,,,源屬性,Mga katangian ng pinagmulan
+,sidebar.designspace-navigation.font-axes,Font axes,字体参数轴,フォントの補完軸,,Axes de la fonte,Font-Achsen,,Font assen,,字型參數軸,Mga axe ng font
+,sidebar.designspace-navigation.font-axes-view-options-button.tooltip,View options,查看选项,オプションを見る,,Options de vue,Optionen anzeigen,,,,檢視選項,Tingnan ang mga opsyon
+,sidebar.designspace-navigation.font-axes-view-options-menu.apply-cross-axis-mapping,Apply cross-axis mapping,应用跨轴映射,交差補完軸マッピングを適用,,,Achsübergreifendes Mapping anwenden,,,,套用跨軸對應,Ilapat ang cross-axis mapping
+,sidebar.designspace-navigation.font-axes-view-options-menu.apply-single-axis-mapping,Apply single-axis mapping,应用单轴映射,単一補完軸マッピングを適用,,,Einachsiges Mapping anwenden,,,,套用單軸對應,Ilapat ang pagmamapa ng iisang aksis
+,sidebar.designspace-navigation.font-axes-view-options-menu.show-effective-location,Show effective location,显示有效位置,有効な補完軸の値を表示,,,"effektive ""location"" anzeigen",,,,顯示有效位置,Ipakita ang epektibong lokasyon
+,sidebar.designspace-navigation.font-axes-view-options-menu.show-hidden-axes,Show hidden axes,显示隐藏参数轴,非表示の補完軸を表示,,Monter les axes cachés,Versteckte Achsen anzeigen,,,,顯示隱藏參數軸,Ipakita ang mga nakatagong axes
+,sidebar.designspace-navigation.font-axes.edit,Edit font axes,编辑字体参数轴,フォントの補完軸を編集,,Éditer les axes de la fonte,Font-Achsen bearbeiten ,,Wijzig font assen,,編輯字型參數軸,I-edit ang mga font axes
+,sidebar.designspace-navigation.font-axes.reset,Reset font axes,重置字体参数轴,フォントの補完軸をリセット,,Réinitialiser les axes de la fonte,Font-Achsen zurücksetzen,,Reset font assen,,重設字型參數軸,I-reset ang mga font axes
+,sidebar.designspace-navigation.glyph-axes,Glyph axes,字形参数轴,グリフの補完軸,,Axes du glyphe,Glyph-Achsen,,Glyph assen,,字形參數軸,Mga palakol ng Glyph
+,sidebar.designspace-navigation.glyph-axes.edit,Edit glyph axes,编辑字形参数轴,グリフの補完軸を編集,,Éditer les axes du glyphe,Glyph-Achsen bearbeiten,,Wijzig glyph assen,,編輯字形參數軸,I-edit ang mga axe ng glyph
+,sidebar.designspace-navigation.glyph-axes.reset,Reset glyph axes,重置字形参数轴,グリフの補完軸をリセット,,Réinitialiser les axes du glyphe,Glyph-Achsen zurücksetzen,,Reset glyph assen,,重設字形參數軸,I-reset ang mga axe ng glyph
+,sidebar.designspace-navigation.glyph-source-layers,Source layers,源图层,ソースレイヤー,,,,,,,源圖層,Mga layer ng pinagmulan
+,sidebar.designspace-navigation.glyph-sources,Glyph sources,字形源,グリフソース,,Sources du glyphe,Glyph-Sourcen,,Glyph sources,,字形源,Mga pinagmumulan ng Glyph
+,sidebar.designspace-navigation.glyph-sources.name,source name,源名称,ソース名,,nom de la source,Source Name,,sourcenaam,,源名稱,pangalan ng pinagmulan
+,sidebar.designspace-navigation.glyph-sources.status,status,标签,ラベル,,statut,Status,,status,,標籤,katayuan
+,sidebar.designspace-navigation.glyph-sources-sort-options,Sort options,排序选项,,,,,,,,排序,Mga opsyon sa pag-uuri
+,sidebar.designspace-navigation.glyph-sources-sort-options.by-axis-value,Sort by axis value,按参数轴数值排序,,,,,,,,依參數軸數值排序,Ayusin ayon sa halaga ng axis
+,sidebar.designspace-navigation.glyph-sources-sort-options.by-source-name,Sort by source name,按源名称排序,,,,,,,,依源名稱排序,Ayusin ayon sa pangalan ng pinagmulan
+,sidebar.designspace-navigation.glyph-sources-sort-options.no-sorting,Do not sort,不排序,,,,,,,,不排序,Huwag pagbukud-bukurin
+,sidebar.designspace-navigation.source-properties.undo,edit source properties,编辑源属性,ソースのプロパティを編集,,éditer les propriétés des sources,Source Eigenschaften bearbeiten,,,,編輯源屬性,i-edit ang mga katangian ng pinagmulan
+,sidebar.designspace-navigation.source.activate,activate %0,启用 %0,%0を有効にする,,activer %0,aktiviere %0,,,,啟用 %0,buhayin ang %0
+,sidebar.designspace-navigation.source.deactivate,deactivate %0,禁用 %0,%0を無効にする,,désactiver %0,deaktivere %0,,,,停用 %0,i-deactivate ang %0
+Note the leading space!,sidebar.designspace-navigation.undo.and-layer, and layer, 与图层,とレイヤー,, et source, und Layer,,,, 及圖層,at patong
+,sidebar.designspace-navigation.undo.delete-source,delete source%0,删除源%0,ソース%0を削除する,,supprimer,entferne Source%0,,,,刪除源%0,burahin ang pinagmulan%0
+,sidebar.designspace-navigation.warning.delete-associated-layer,Also delete associated layer %0,并删除关联的图层 %0,同様にレイヤー%0も削除,,,Auch den dazugehörigen Layer %0 entfernen,,,,並刪除關聯的圖層 %0,Burahin din ang kaugnay na layer %0
+,sidebar.designspace-navigation.warning.delete-source,Are you sure you want to delete source %0?,你确定要删除源 “%0” 吗？,ソース%0を削除しますか？,,Êtes-vous sûr de vouloir supprimer la source %0,"Bist du sicher, dass du Source %0 entfernen willst?",,,,您確定要刪除源 %0？,Sigurado ka bang gusto mong burahin ang pinagmulan %0?
+,sidebar.font-overview.font-source,Font source,字体源,フォントソース,,,,,,,字型源,Pinagmulan ng font
+,sidebar.glyph-note,Glyph Note,字形备忘,グリフノート,,Note du glyphe,Glyph-Notiz,,Glyph notitie,,字形附註,Tala ng Glyph
+,sidebar.glyph-note.glyph-note-for-glyph,Glyph Note for %0,%0 的字形备忘,%0のグリフノート,,Note du glyphe %0,Glyph-Notiz für %0,,,,%0 的字形附註,Tala ng Glyph para sa %0
+,sidebar.glyph-note.no-glyph-selected,(No glyph selected),（无选中字形）,（グリフが選択されていません）,,(aucun glyphe sélectionné),(keine Glyphe ausgewählt),,,,（尚未選取字形）,(Walang napiling glyph)
+,sidebar.glyph-note.undo.add,add glyph note,添加字形备忘,グリフノートを追加,,Ajouter des notes au glyphe,Glyph-Notiz hinzufügen,,,,新增字形附註,magdagdag ng glyph note
+,sidebar.glyph-note.undo.delete,delete glyph note,删除字形备忘,グリフノートを削除,,Supprimer les notes du glyphe,Glyph-Notiz entfernen,,,,刪除字形附註,burahin ang tala ng glyph
+,sidebar.glyph-note.undo.edit,edit glyph note,编辑字形备忘,グリフノートを編集,,Éditer les notes du glyphe,Glyph-Notiz bearbeiten,,,,編輯字形附註,i-edit ang glyph note
+Unused?,sidebar.glyph-search,Glyph Search,字形搜索,グリフ検索,,Chercher un glyphe,Glyph-Suche,,Zoek glyphs,,字形搜尋,Paghahanap ng Glyph
+,sidebar.glyphs.search,Search glyphs,搜索字形,グリフを検索,,Chercher des glyphes,Glyph-Suche,,Zoek glyphs,,搜尋字形,Maghanap ng mga glyph
+,sidebar.reference-font,Reference Font,参考字体,リファレンスフォント,,Fonte de référence,Referenz-Font,,Referentiefont,,參考字型,Font ng Sanggunian
+,sidebar.reference-font.custom-character,Custom character,自定义字符,表示するグリフ,,Caractère personnalisé,Benutzerdefiniertes Zeichen,,Custom karakter,,自訂字元,Pasadyang karakter
+,sidebar.reference-font.dialog.title, The following item can't be used as a reference font:,下列文件无法用作参考字体：,このファイルはリファレンスフォントとして使用できません:,,,Das folgende Element kann nicht als Referenz-Font verwendet werden:,,,,以下的項目無法用作參考字型：,Hindi maaaring gamitin ang sumusunod na item bilang font na sanggunian:
+,sidebar.reference-font.dialog.title.plural, The following items can't be used as a reference font:,下列文件无法用作参考字体：,これらのファイルはリファレンスフォントとして使用できません:,,,Die folgenden Elemente können nicht als Referenz-Font verwendet werden:,,,,以下的項目無法用作參考字型：,Ang mga sumusunod na aytem ay hindi maaaring gamitin bilang font na sanggunian:
+,sidebar.reference-font.file-name,file name,文件名称,ファイル名,,,Dateiname,,,,檔案名稱,pangalan ng file
+,sidebar.reference-font.info,"Drop one or more .ttf, .otf, .woff or .woff2 files in the field below",将一个或多个.ttf、.otf、.woff或.woff2字体文件拖放到下面的方框内,".ttf, .otf, .woffもしくは.woff2ファイルを下のフィールドにドロップしてください。",,"Déposer ci-dessous un ou plusieurs fichiers .ttf, .otf, .woff ou .woff2","Füge eine oder mehrere .ttf-, .otf-, .woff- oder .woff2-Dateien in das unten stehende Feld ein",,"Drop één of meer .ttf, .otf, .woff of .woff2 bestanden in het veld hieronder",,將一個或多個 .ttf、.otf、.woff 或是 .woff2 檔案拖曳至下方欄位內,"Maglagay ng isa o higit pang .ttf, .otf, .woff o .woff2 na mga file sa field sa ibaba"
+,sidebar.reference-font.language,Language,语言,言語,,Langues,Sprache,,Taal,,語言,Wika
+,sidebar.reference-font.warning.could-not-store,Could not store some reference fonts,无法储存部分参考字体,いくつかのリファレンスフォントを保持できませんでした。,,,Einige Referenz-Fonts konnten nicht gespeichert werden,,,,無法儲存部分參考字型,Hindi maiimbak ang ilang reference font
+,sidebar.related-glyphs,Related Glyphs & Characters,相关字形与字符,関連グリフ,,Glyphes et caractères en lien,Verwandte Glyphen & Zeichen,,Gerelateerde glyphs & karakters,,相關字形及字元,Mga Kaugnay na Glyph at Karakter
+,sidebar.related-glyphs.alternate-glyphs,Alternate glyphs,备用字形,グリフのオルタネート,,Glyphes alternatifs,Alternative Glyphen,,,,備用字形,Mga alternatibong glyph
+,sidebar.related-glyphs.character-decompose-with-character,Characters that decompose with this character,可释放为该字符的字符,このグリフの要素を含むグリフ,,,"Zeichen, die mit diesem Zeichen zerlegt werden",,,,可釋放為此字元的字元,Mga karakter na nabubulok kasama ng karakter na ito
+,sidebar.related-glyphs.character-decomposition,Character decomposition,字符组成,このグリフの構成,,Décomposition de caractère,Zeichen-Zerlegung,,,,字元組成,Paghihiwalay ng karakter
+,sidebar.related-glyphs.components-used-by-this-glyph,Components used by this glyph,该字形使用的部件,このグリフで使用されているコンポーネント,,Composants utilisés par ce glyphe,"Komponenten, benutzt von diesem Glyphen",,,,此字形使用的部件,Mga bahaging ginamit ng glyph na ito
+,sidebar.related-glyphs.glyphs-using-this-glyph-as-a-component,Glyphs using this glyph as a component,使用该字形作为部件的字形,このグリフをコンポーネントとして使用しているグリフ,,Glyphes utilisant ce glyphe comme composant,"Glyphen, die dieses Zeichen als Komponente nutzen",,,,使用此字形作為部件的字形,Mga glyph na gumagamit ng glyph na ito bilang isang bahagi
+,sidebar.related-glyphs.insert-after-selected-glyph,Insert after selected glyph,插入至选中字形之后,選択グリフの次に挿入,,Insérer après le glyph sélectionné,Nach ausgewähltem Glyphen einfügen,,,,於選取的字形後插入,Ipasok pagkatapos ng napiling glyph
+,sidebar.related-glyphs.insert-after-selected-glyph-and-select,Insert after selected glyph and select,插入至选中字形之后并选中,選択グリフの次に挿入して開く,,"Insérer après le glyphe sélectionné, et sélectionner",Nach ausgewähltem Glyphen einfügen und auswählen,,,,於選取的字形後插入並選取,Ipasok pagkatapos ng napiling glyph at piliin
+,sidebar.related-glyphs.insert-before-selected-glyph,Insert before selected glyph,插入至选中字形之前,選択グリフの前に挿入,,Insérer avant le glyph sélectionné,Vor ausgewähltem Glyphen einfügen,,,,於選取的字形前插入,Ipasok bago ang napiling glyph
+,sidebar.related-glyphs.insert-before-selected-glyph-and-select,Insert before selected glyph and select,插入至选中字形之前并选中,選択グリフの前に挿入して開く,,"Insérer avant le glyphe sélectionné, et sélectionner",Vor ausgewähltem Glyphen einfügen und auswählen,,,,於選取的字形前插入並選取,Ipasok bago ang napiling glyph at piliin
+,sidebar.related-glyphs.loading,(loading),（加载中）,（読み込み中）,,(chargement),(Laden),,,,（載入中）,(naglo-load)
+,sidebar.related-glyphs.no-glyph-selected,(No glyph selected),（无选中字形）,（グリフが選択されていません）,,(aucun glyphe sélectionné),(keine Glyphe ausgewählt),,,,（尚未選取字形）,(Walang napiling glyph)
+,sidebar.related-glyphs.no-related-glyphs-or-characters-were-found,(No related glyphs or characters were found),（未找到相关字形或字符）,（関連グリフが見つかりませんでした）,,,(keine verwandten Glyphen oder Zeichen wurden gefunden),,,,（未找到相關字形及字元）,(Walang natagpuang kaugnay na mga glyph o karakter)
+,sidebar.related-glyphs.related-glyphs,Related Glyphs,相关字形,関連グリフ,,Glyphes en rapport,Verwandte Glyphen,,,,相關字形,Mga Kaugnay na Glyph
+,sidebar.related-glyphs.replace-selected-glyph,Replace selected glyph,替换选中字形,選択しているグリフを置き換え,,Remplacer le glyph sélectionné,Ersetze ausgewählten Glyphen,,,,取代選取的字形,Palitan ang napiling glyph
+,sidebar.related-glyphs.title,Related Glyphs & Characters for %0,与 %0 相关的字形与字符,%0の関連グリフ,,Glyphes et caractères en lien pour %0,Verwandte Glyphen & Zeichen für %0,,Gerelateerde glyphs & karakters voor %0,,同 %0 相關的字形及字元,Mga Kaugnay na Glyph at Karakter para sa %0
+,sidebar.selection-info,Selection Info,选中信息,グリフの情報,,Information de la sélection,Auswahl-Info,,Selecie informatie,,選取資訊,Impormasyon sa Pagpili
+,sidebar.selection-info.advance-width,Advance width,字形宽度,グリフ幅,,Chasse,Breite,,Zetbreedte,,字形寬度,Lapad ng pagsulong
+,sidebar.selection-info.base-unicode,Base unicode,基础 Unicode,Unicode,,Unicode de base,Basis Unicode,,,,基礎 Unicode,Batayang unicode
+,sidebar.selection-info.component,Component #%0,部件 #%0,コンポーネント #%0,,Composant #%0,Komponente #%0,,-,,部件 #%0,Bahagi #%0
+,sidebar.selection-info.component.base-glyph,Base glyph,基础字形,グリフ名,,Glyphe de base,Basis-Glyph,,Basisglyph,,基礎字形,Glyph na base
+,sidebar.selection-info.component.center,Center,中心,中心座標,,Centre,Zentrum,,Middelpunt,,中心,Sentro
+,sidebar.selection-info.component.reset-axis-values,Reset axis values,重置参数轴数值,補完軸の値をリセット,,,Achsen-Werte zurücksetzen,,,,重設參數軸數值,I-reset ang mga halaga ng axis
+,sidebar.selection-info.component.reset-transformation,Reset transformation,重置变形,変形をリセット,,,Transformation zurücksetzen,,,,重設變形,I-reset ang pagbabago
+,sidebar.selection-info.component.rotation,Rotation,旋转,回転,,Rotation,Rotation,,Rotatie,,旋轉,Pag-ikot
+,sidebar.selection-info.component.scale,Scale,缩放,拡大縮小,,Échelle,Skalieren,,Schaal,,縮放,Iskala
+,sidebar.selection-info.component.skew,Skew,倾斜,傾斜,,Pencher,Neigung,,Schuinzetten,,傾斜,Pagkiling
+,sidebar.selection-info.component.transformation,Transformation,变形,変形,,Transformation,-,,Transformatie,,變形,Pagbabago
+,sidebar.selection-info.component.translate,Translate,平移,位置,,Déplacement,Verschiebung,,Translatie,,平移,Isalin
+,sidebar.selection-info.dialog.unlock-glyph.title,Are you sure you want to unlock glyph %0?,你确定要解锁字形 “%0” 吗？,%0のロックを解除しますか？,,Êtes-vous sûr de vouloir dévérouiller le glyphe %0 ?,"Bist du sicher, dass du den Glyphen %0 entsperren willst?",,,,您確定要解鎖字形「%0」嗎？,Sigurado ka bang gusto mong i-unlock ang glyph %0?
+,sidebar.selection-info.dimensions,Dimensions,尺寸,大きさ,,-,Dimensionen,,Dimensies,,尺寸,Mga Dimensyon
+,sidebar.selection-info.glyph-locking.tooltip.lock,Lock glyph,锁定字形,グリフのロック,,Vérouiller le glyphe,Glyph sperren,,,,鎖定字形,I-lock ang gliph
+,sidebar.selection-info.glyph-locking.tooltip.read-only,Glyph is read-only,字形为只读,読み取り専用グリフ,,Le glyph est en lecture seule,Glyph ist schreibgeschützt,,,,字形為唯讀,Ang Glyph ay read-only
+,sidebar.selection-info.glyph-locking.tooltip.unlock,Unlock glyph,解锁字形,グリフをロック解除,,Dévérouiller le glyphe,Glyph entsperren,,,,解鎖字形,I-unlock ang gliph
+,sidebar.selection-info.glyph-name,Glyph name,字形名称,グリフ名,,Nom du glyphe,Glyph-Name,,Glyphnaam,,字形名稱,Pangalan ng glipo
+,sidebar.selection-info.multi-source,Multi-source value changes are absolute,多源编辑参数轴值时使用绝对值,複数ソースの編集において、値を絶対値に揃える,,Valeurs absolues pour l'édition multiple de sources,Multi-Source-Werteänderungen sind absolut,,Wijzigingen in multi-source waarden zijn absoluut,,多源編輯參數軸值時使用絕對值,Ang mga pagbabago sa halaga ng maraming pinagmulan ay absolute
+,sidebar.selection-info.kern-group-l-r,Kern group L/R,字偶分组（左/右）,,,,,,,,字偶群組（左/右）,Grupong Kern L/R
+,sidebar.selection-info.sidebearings,Sidebearings,字边距,サイドベアリング,,Approches,Glyph-Rand,,Marges,,字邊距,Mga sidebearing
+,sidebar.selection-info.title,Glyph info,字形信息,グリフ情報,,Informations du glyphe,Glyph-Info,,Glyphinformatie,,字形資訊,Impormasyon sa Glyph
+,sidebar.selection-info.unicode,Unicode,-,-,,-,-,,,,-,-
+,sidebar.selection-transformation,Selection Transformation,变形工具,選択範囲の変形,,Transformation de la sélection,Auswahl-Transformation,,Selectie transformatie,,變形工具,Pagbabago ng Pagpili
+,sidebar.selection-transformation.align,Align Objects,对齐,整列,,Aligner les objets,Objekte ausrichten,,Objecten uitlijnen,,對齊,Ihanay ang mga Bagay
+,sidebar.selection-transformation.align.bottom,Align bottom,底部对齐,下に揃える,,Aligner en bas,Unten ausrichten,,Onder uitlijnen,,底部對齊,Ihanay ang ibaba
+,sidebar.selection-transformation.align.center,Align center,垂直居中对齐,左右中央に揃える,,Aligner au centre,Zentriert ausrichten,,Gecentreerd uitlijnen,,垂直居中對齊,Ihanay sa gitna
+,sidebar.selection-transformation.align.left,Align left,左对齐,左に揃える,,Aligner à gauche,Links ausrichten,,Links uitlijnen,,左對齊,Ihanay pakaliwa
+,sidebar.selection-transformation.align.middle,Align middle,水平居中对齐,上下中央に揃える,,Aligner au milieu,Mittig ausrichten,,In het midden uitlijnen,,水平居中對齊,Ihanay ang gitna
+,sidebar.selection-transformation.align.right,Align right,右对齐,右に揃える,,Aligner à droite,Rechts ausrichten,,Rechts uitlijnen,,右對齊,Ihanay pakanan
+,sidebar.selection-transformation.align.top,Align top,顶部对齐,上に揃える,,Aligner en haut,Oben ausrichten,,Boven uitlijnen,,頂部對齊,I-align ang itaas
+,sidebar.selection-transformation.distribute,Distribute Objects,分布部件,等間隔に分布,,Distribuer les objets,Objekte verteilen,,Objecten verdelen,,分布部件,Ipamahagi ang mga Bagay
+,sidebar.selection-transformation.distribute.distance-in-units,Distance in units,距离,オブジェクト間の距離,,Distance en unités,Abstand in Units,,,,距離,Distansya sa mga yunit
+,sidebar.selection-transformation.distribute.horizontally,Distribute horizontally,水平分布,水平分布,,Distribuer horizontalement,Horizontal verteilen,,Horizontaal verdelen,,水平分布,Ipamahagi nang pahalang
+,sidebar.selection-transformation.distribute.vertically,Distribute vertically,垂直分布,垂直分布,,Distribuer verticalement,Vertikal verteilen,,Verticaal verdelen,,垂直分布,Ipamahagi nang patayo
+,sidebar.selection-transformation.flip,Flip,翻转,反転,,Retourner,Spiegeln,,Omdraaien,,翻轉,I-flip
+,sidebar.selection-transformation.flip.horizontally,Flip Horizontally,垂直翻转,左右反転,,Retourner horizontalement,Horizontal spiegeln,,Horizontaal omdraaien,,垂直翻轉,I-flip nang Pahalang
+,sidebar.selection-transformation.flip.vertically,Flip Vertically,水平翻转,上下反転,,Retourner verticalement,Vertikal spiegeln,,Verticaal omdraaien,,水平翻轉,I-flip nang Patayo
+,sidebar.selection-transformation.move,Move,平移,移動,,Déplacer,Bewegen,,Verplaats,,平移,Ilipat
+,sidebar.selection-transformation.origin,Origin,原点,原点,,Origine,Ursprung,,Oorsprong,,原點,Pinagmulan
+,sidebar.selection-transformation.origin.bottom.center,Origin bottom center,原点为下侧中心,原点を中央下に設定,,Origine en bas au centre,Ursprung unten zentriert,,Oorsprong beneden centrum,,原點為下側中心,Sentrong ibabang pinagmulan
+,sidebar.selection-transformation.origin.bottom.left,Origin bottom left,原点为左下角,原点を左下に設定,,Origine en bas à gauche,Ursprung unten links,,Oorsprong beneden links,,原點為左下角,Pinagmulan sa kaliwang ibaba
+,sidebar.selection-transformation.origin.bottom.right,Origin bottom right,原点为右下角,原点を右下に設定,,Origine en bas à droite,Ursprung unten rechts,,Oorsprong beneden rechts,,原點為右下角,Pinagmulan sa kanang ibaba
+,sidebar.selection-transformation.origin.middle.center,Origin middle center,原点为中央,原点を中央に設定,,Origine au milieu au centre,Ursprung mittig zentriert,,Oorsprong midden centrum,,原點為正中心,Pinagmulang gitnang sentro
+,sidebar.selection-transformation.origin.middle.left,Origin middle left,原点为左侧中心,原点を中央左に設定,,Origine au milieu à gauche,Ursprung mittig links,,Oorsprong midden links,,原點為左側中心,Pinagmulan gitnang kaliwa
+,sidebar.selection-transformation.origin.middle.right,Origin middle right,原点为右侧中心,原点を中央右に設定,,Origine au milieu à droite,Ursprung mittig rechts,,Oorsprong midden rechts,,原點為右側中心,Pinagmulan gitnang kanan
+,sidebar.selection-transformation.origin.top.center,Origin top center,原点为上侧中心,原点を中央上に設定,,Origine en haut au centre,Ursprung oben zentriert,,Oorsprong boven centrum,,原點為上側中心,Pinagmulan sa itaas na gitna
+,sidebar.selection-transformation.origin.top.left,Origin top left,原点为左上角,原点を左上に設定,,Origine en haut à gauche,Ursprung oben links,,Oorsprong boven links,,原點為左上角,Pinagmulan sa kaliwang itaas
+,sidebar.selection-transformation.origin.top.right,Origin top right,原点为右上角,原点を右上に設定,,Origine en haut à droite,Ursprung oben rechts,,Oorsprong boven rechts,,原點為右上角,Pinagmulan sa kanang itaas
+,sidebar.selection-transformation.path-operations,Path Operations,轮廓编辑指令,パスオペレーション,,Opération sur les contours,Pfad-Anwendungen,,Padbewerkingen,,輪廓編輯指令,Mga Operasyon sa Landas
+,sidebar.selection-transformation.path-operations.exclude,Exclude contours,轮廓差集,重なっている部分を抜く,,Exclure les contours,Konturen ausschließen,,Contouren uitsluiten,,輪廓差集,Ibukod ang mga contour
+,sidebar.selection-transformation.path-operations.intersect,Intersect contours,轮廓交集,重なっている部分のみを残す,,Intersecter les contours,Konturen schneiden,,Contouren doorsnede,,輪廓交集,Magtagpo ng mga contour
+,sidebar.selection-transformation.path-operations.subtract,Subtract contours,减去顶层,前面オブジェクトで型抜き,,Soustraire les contours,Konturen subtrahieren,,Contouren aftrekken,,減去頂層,Magbawas ng mga contour
+,sidebar.selection-transformation.path-operations.union,Remove overlaps,合并轮廓,オブジェクトを合体,,Enlever les superpositions,Überlappungen entfernen,,Verwijder overlappingen,,合併輪廓,Alisin ang mga overlap
+,sidebar.selection-transformation.rotate,Rotate,旋转,回転,,Rotation,Drehen,,Roteer,,旋轉,I-rotate
+,sidebar.selection-transformation.scale,Scale,缩放,拡大縮小,,Échelle,Skalieren,,Schaal,,縮放,Iskala
+,sidebar.selection-transformation.skew,Skew,倾斜,傾斜,,Pencher,Neigen,,Schuizetten,,傾斜,Pagkiling
+duplicate,sidebar.selection-transformation.title,Transformation,变形,変形,,Transformation,-,,Transformatie,,變形,Pagbabago
+,sidebar.text-entry,Text Entry,文本,エディターテキスト,,Saisie de texte,Text-Eingabe,,Tekstinvoer,,文字欄位,Pagpasok ng Teksto
+,sidebar.user-settings,User Settings,用户设置,ユーザー設定,,Paramètres de l'utilisateur,Benutzer-Einstellungen,,Gebruikersinstellingen,,使用者設定,Mga Setting ng Gumagamit
+,sidebar.user-settings.clipboard,Clipboard export format,剪贴板导出格式,クリップボード出力フォーマット,,Format d'export du presse-papier,Export-Format für die Zwischenablage,,Klembord export format,,剪貼簿匯出格式,Format ng pag-export ng clipboard
+,sidebar.user-settings.component.nodes,Component nodes and handles,部件节点与手柄,コンポーネントのノードとハンドル,,Points et poignés du composant,Komponenten Punkte und Griffe,,Nodes en handles voor componenten,,部件節點及控制點,Mga node at handle ng bahagi
+,sidebar.user-settings.experimental,Experimental features,实验性功能,実験的な機能,,Expérimentations,Experimentelle Funktionen,,Experimentele features,,實驗性功能,Mga tampok na pang-eksperimento
+duplicate,sidebar.user-settings.glyph,Glyph editor appearance,字形编辑器外观,グリフエディターの表示設定,,Glyphe,Glyph-Editor Ansicht,,Glyph editor uiterlijk,,字形編輯器外觀,Hitsura ng editor ng Glyph
+,sidebar.user-settings.glyph.anchornames,Anchor names,锚点名称,アンカー名を表示,,Noms des ancres,Anker Namen,,Ankernamen,,錨點名稱,Mga pangalan ng angkla
+,sidebar.user-settings.glyph.background-image,Background image,背景图片,背景画像を表示,,Image d'arrière plan,Hintergrund-Bild,Imagen de Fondo,,,背景圖片,Larawan sa background
+,sidebar.user-settings.glyph.baseline,Baseline,基线,ベースラインを表示,,Ligne de base,Grundlinie,,Basislijn,,基線,Baseline
+,sidebar.user-settings.glyph.cjkframe,CJK Design Frame,汉字字面框,CJKデザインフレームを表示,,Grille de design CJK,CJK Design Rahmen,,-,,漢字字面框,Disenyo ng Frame ng CJK
+,sidebar.user-settings.glyph.component,Component names and indices,部件名称与序号,コンポーネント名とシェイプの順番を表示,,Noms et index des composants,Komponenten-Namen und -Indexe,,Component namen en indexen,,部件名稱及序號,Mga pangalan at indeks ng bahagi
+,sidebar.user-settings.glyph.contour,Contour indices,轮廓序号,シェイプの順番を表示,,Index des contours,Kontur-Indexe,,Contour indexen,,輪廓序號,Mga indeks ng contour
+,sidebar.user-settings.glyph.coordinates,Coordinates,坐标,ポイントの座標を表示,,Coordonnées,Koordinaten,,Coordinaten,,座標,Mga Koordinado
+,sidebar.user-settings.glyph.dragcrosshair,Drag crosshair,拖拽时显示辅助线,ドラッグ中、水平垂直の補助線を表示,,Croix de sélection,Fadenkreuz-Bewegung,,Sleep kruisdraad,,拖曳時顯示輔助線,I-drag ang crosshair
+,sidebar.user-settings.glyph.dragghostpath,Drag “ghost” path,拖拽时显示原始轮廓,ドラッグ中、“ゴースト”パス（移動前のパス）を表示,,Afficher la position avant édition,"""Gespänster""-Pfad-Bewegung",,"Sleep ""ghost"" pad",,拖曳時顯示原始輪廓,"I-drag ang landas na ""multo"""
+,sidebar.user-settings.glyph.kerning,Kerning,字偶距调节,,,,,,,,字偶距調節,Kerning
+,sidebar.user-settings.glyph.kerning-tool,Kerning (tool),字偶距调节（工具）,,,,,,,,字偶距調節（工具）,Kerning (kagamitan)
+,sidebar.user-settings.glyph.lockicon,Glyph lock icon for non-editing glyphs,非编辑字形的锁定图标,ロックされたグリフにアイコンを表示,,Icône verrouillée du glyphe pour les glyphes non édités,Glyph-Schloss-Symbol für nicht editierende Glyphen,,Glyph slot icoon voor overige glyphs,,非編輯字形的鎖定圖示,Icon ng lock ng glyph para sa mga glyph na hindi nag-eedit
+,sidebar.user-settings.glyph.point.index,Point indices,节点序号,ポイントの順番を表示,,Index des points,Punkt-Indexe,,Punt indexen,,節點序號,Mga indeks ng punto
+duplicate,sidebar.user-settings.glyph.powerruler,Power Ruler,测量尺,パワー定規を表示,,-,-,,-,,測量尺,Pinuno ng Kapangyarihan
+duplicate,sidebar.user-settings.glyph.referencefont,Reference font,参考字体,リファレンスフォントを表示,,Fonte de référence,Referenz-Font,,Referentiefont,,參考字型,Font ng sanggunian
+,sidebar.user-settings.glyph.sidebearings,Sidebearings for non-editing glyphs,非编辑字形的字边距,非編集中のグリフのサイドベアリングを表示,,Approches pour les glyphes non édités,Glyph-Rand für nicht editierende Glyphen,,Breedtes voor overige glyphs,,非編輯字形的字邊距,Mga sidebearing para sa mga glyph na hindi nag-eedit
+,sidebar.user-settings.glyph.sidebearings-tool,Sidebearings (tool),字边距调节（工具）,,,,,,,,字邊距調節（工具）,Mga sidebearing (kagamitan)
+,sidebar.user-settings.glyph.statuscolor,Development status color,开发状态颜色标签,開発ステータスカラーを表示,,Couleurs des statuts de développement,Entwicklungsstatus Farbe,,Onwikkelingsstatuskleur,,開發狀態顏色標籤,Kulay ng katayuan ng pag-unlad
+,sidebar.user-settings.glyph.upmgrid,Units-per-em grid,UPM 网格,UPMグリッドを表示,,Grille UPM (Units-per-em),UPM-Raster (Units-per-em),,-,,UPM 網格,Grid ng mga yunit-bawat-em
+,sidebar.user-settings.guidelines,Guidelines,参考线,ガイドラインを表示,,Guides,Hilfslinien,Guías,,,參考線,Mga Alituntunin
+duplicate,sidebar.user-settings.language,Display language,显示语言,表示言語,,Langue utilisée,Anzeigesprache,,Weergavetaal,,顯示語言,Wika ng pagpapakita
+,sidebar.user-settings.line-metrics,Line metrics,度量线,縦方向のメトリクスを表示,,,Zeilen Metriken,,,,度量線,Mga sukatan ng linya
+duplicate,sidebar.user-settings.server,Server info,服务器信息,サーバー情報,,Information du serveur,Server Info,,Server informatie,,伺服器資訊,Impormasyon ng server
+duplicate,sidebar.user-settings.theme,Theme settings,主题设置,カラーテーマ設定,,Paramètres des thèmes,Design-Einstellungen,,Thema instellingen,,主題設定,Mga setting ng tema
+,sidebar.user-settings.theme.auto,Automatic (use OS setting),自动（使用操作系统设置）,自動（OSの設定に従う）,,Automatique (utiliser les paramètre de l'OS),Automatisch (benutzt OS Einstellungen),,Automatisch (gebruik OS instelling),,自動（使用作業系統設定）,Awtomatiko (gamitin ang setting ng OS)
+,sidebar.user-settings.theme.dark,Dark,暗色,ダーク,,Sombre,Dunkel,,Donker,,暗色,Madilim
+,sidebar.user-settings.theme.light,Light,亮色,ライト,,Clair,Hell,,Licht,,亮色,Liwanag
+,sources.button.go-to-nearest-source,Go to nearest source,前往最近的源,最も値が近いソースに移動,,Aller à la source la plus proche,Zur nächsten Source,,,,移至最近的源,Pumunta sa pinakamalapit na mapagkukunan
+,sources.button.new-font-source,New font source...,新建字体源…,新しいフォントソース…,,Nouvelle source de la fonte…,Neue Font Source...,,,,新增字型源…,Bagong pinagmulan ng font...
+,sources.button.new-glyph-source,New source,新建源,新しいソース,,Nouvelle source,Neue Source,,,,新增源,Bagong pinagmulan
+,sources.dialog.add-source.label.source-name,Source name,源名称,ソース名,,Nom de la source,Source Name,,,,源名稱,Pangalan ng pinagmulan
+,sources.dialog.add-source.title,Add font source,添加字体源,フォントソースを追加,,Ajouter une source à la fonte,Font Source hinzufügen,,,,加入字型源,Magdagdag ng pinagmulan ng font
+,sources.dialog.cannot-edit-source.title,Can’t edit font source,无法编辑字体源,フォントソースを編集できません。,,,Font Source kann nicht bearbeitet werden,,,,無法編輯字型源,Hindi ma-edit ang pinagmulan ng font
+,sources.labels.ascender,Ascender,上升部,アセンダー,,Ascendante,Oberlänge,,,,上升部,Ascender
+,sources.labels.baseline,Baseline,基线,ベースライン,,Line de base,Grundlinie,,,,基線,Baseline
+,sources.labels.cap-height,Cap Height,大写字高,キャップハイト,,Hauteur des capitales,Versal-Höhe,,,,大寫字高,Taas ng Takip
+,sources.labels.descender,Descender,下降部,ディセンダー,,Descendante,Unterlänge,,,,下降部,Bumababa
+,sources.labels.general,General,普通,一般,,Générale,Allgemeines,,,,一般,Heneral
+,sources.labels.is-sparse,Is Sparse,次要,中間マスター,,,,,,,是否為稀疏,Kakaunti
+,sources.labels.italic-angle,Italic Angle,意大利体角度,イタリック角度,,Angle de l'Italique,Neigung,,,,義大利體角度,Anggulong Italiko
+,sources.labels.line-metrics,Line metrics,度量线,メトリクス,,,Zeilen Metriken,,,,度量線,Mga sukatan ng linya
+,sources.labels.location,Location,位置,補完軸上の座標,,Localisation,-,,,,位置,Lokasyon
+,sources.labels.name,Name,名称,ソース名,,Nom,-,,,,名稱,Pangalan
+,sources.labels.x-height,x-Height,x字高,xハイト,,Hauteur d'x,x-Höhe,,,,x字高,x-Taas
+,sources.title,Sources,源,ソース,,Sources,Sourcen,,Sources,,源,Mga Pinagmumulan
+,sources.tooltip.delete-source,Delete source,删除源,ソースを削除,,Supprimer la source,Source entfernen,,,,刪除源,Burahin ang pinagmulan
+,sources.undo.delete,delete source %0,删除源 %0,ソース%0を削除,,Supprimer la source %0,%0 Source entfernen,,,,刪除源 %0,burahin ang pinagmulan %0
+,sources.untitled-source,Untitled source,未命名源,名称未設定のソース,,Source sans titre,Unbenannte Source,,,,未命名源,Walang pamagat na pinagmulan
+,sources.warning.empty-source-name,The source name must not be empty,不可将源名称留空,ソース名を入力してください。,,La source ne doit pas être vide,Der Source-Name darf nicht leer sein,,,,源名稱不可以是空白,Hindi dapat blangko ang pangalan ng pinagmulan
+,sources.warning.interpolation-incompatibility,The source has an interpolation incompatibility,该源含有不匹配的轮廓或部件,ソースのマスター互換性が非互換です。,,La source a une incompatibilité d'interpolation,Die Source hat eine Interpolations-Inkompatibilität,,,,此源含有不相容的輪廓或部件,Ang pinagmulan ay may hindi pagkakatugma sa interpolasyon
+,sources.warning.unique-location,The source location must be unique,不可与其他源的位置重合,ソースの補完軸上の座標は他のソースと異なる必要があります。,,La localisation de la source doit être unique,Die Location muss einzigartig sein,,,,不可同其他源的位置重合,Dapat na natatangi ang lokasyon ng pinagmulan
+,sources.warning.unique-source-name,The source name must be unique,不可与其他源重名,ソース名は他のソースと異なる必要があります。,,Le nom de source doit être unique,Der Source-Name muss einzigartig sein,,,,不可同其他源重名,Dapat na natatangi ang pangalan ng pinagmulan
+,toggle-fullscreen,Toggle Fullscreen,切换全屏,フルスクリーンを切り替え,,Plein écran,Vollbild einschalten,Cambiar a pantalla completa,Schakel volledig scherm,,切換全螢幕,I-toggle ang Fullscreen
+,warning.entry-exists,"%0 exists already, please use a different value.",%0 已存在，请使用不同的数值。,%0はすでに存在しているため、他の値を使用してください。,,"%0 existe déjà, veuillez utiliser une valeur différente.","%0 existiert bereits, bitte verwende einen anderen Wert.","%0 ya existe, por favor usa un valor diferente.",,,%0 已存在，請使用不同的數值。,"Mayroon nang %0, mangyaring gumamit ng ibang halaga."
+,warning.must-be-number,The %0 value must be a number,%0 数值必须为数字,%0の値は数値である必要があります。,,La valeur %0 doit être un nombre,Der Wert %0 muss eine Zahl sein,El valor de %0 debe ser un número,,,%0 數值必須為數字,Ang halagang %0 ay dapat isang numero
+,warning.name-must-be-unique,The name must be unique,不可与其他名称重名,名前は他と異なる必要があります。,,Le nom doit être unique,Der Name muss einzigartig sein,El nombre debe ser único,,,不可同其他名稱重名,Dapat na kakaiba ang pangalan
+,warning.name-must-not-be-empty,The name must not be empty,不可将名称留空,名前を入力してください。,,Le nom ne doit pas être vide,Der Name darf nicht leer sein,El nombre no debe estar vacio,,,名稱不可以是空白,Hindi dapat blangko ang pangalan
+,zoom-fit-selection,Zoom To Fit Selection,缩放到选区,選択オブジェクトに合わせて拡大縮小,,Zoom sur la séléction,Zoom an Auswahl anpassen,Encuadrar Selección,Zoom naar de selectie,,縮放到選取區域,Pagpili ng Zoom To Fit
+,zoom-in,Zoom In,放大,拡大,,Zoom avant,Einzoomen,Acercar,Zoom in,,放大,Mag-zoom In
+,zoom-out,Zoom Out,缩小,縮小,,Zoomer arrière,Auszoomen,Alejar,Zoom uit,,縮小,Mag-zoom out
+,opentype-feature-code.title,Features,OpenType 特性,,,,-,,,,OpenType 特性,Mga Tampok
