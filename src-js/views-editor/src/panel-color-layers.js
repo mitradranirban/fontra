@@ -144,15 +144,7 @@ const PAINT_PARAM_SCHEMA = {
     { key: "dx", label: "dx", pairWith: "dy", sourceKey: "transform" },
     { key: "dy", label: "dy", paired: true, sourceKey: "transform" },
   ],
-  PaintComposite: [
-    {
-      key: "compositeMode",
-      label: "color-layers.composite-mode",
-      min: 0,
-      max: 27,
-      integer: true,
-    },
-  ],
+  PaintComposite: [],
 };
 
 const normalizePaintType = (t) => t?.replace(/^PaintVar/, "Paint") ?? t;
@@ -226,7 +218,27 @@ function makeVaryToggle(rawVal, layerIdx, paramKey, panel) {
     ]
   );
 }
+function collectReferencedGlyphs(paint, found = new Set()) {
+  if (!paint || typeof paint !== "object") return [...found];
 
+  if (typeof paint.glyph === "string" && paint.glyph.trim() !== "") {
+    found.add(paint.glyph);
+  }
+
+  // Recurse into all known child paint properties
+  for (const key of ["paint", "sourcePaint", "backdropPaint"]) {
+    if (paint[key]) collectReferencedGlyphs(paint[key], found);
+  }
+
+  // Recurse into layers arrays
+  if (Array.isArray(paint.layers)) {
+    for (const layer of paint.layers) {
+      collectReferencedGlyphs(layer, found);
+    }
+  }
+
+  return [...found];
+}
 // ---------------------------------------------------------------------------
 // Variable helpers
 // ---------------------------------------------------------------------------
@@ -271,13 +283,13 @@ export default class ColorLayersPanel extends Panel {
             if (i !== layerIdx) return l;
             return { ...l, glyph: value };
           });
-          await this.writeV1Paint({ ...this.currentPaint, layers: newLayers });
+          await this._writeV1Paint({ ...this.currentPaint, layers: newLayers });
         } else if (
           this.currentPaint.type === "PaintGlyph" ||
           this.currentPaint.type === "PaintColrGlyph" ||
           this.currentPaint.type === "PaintVarGlyph"
         ) {
-          await this.writeV1Paint({ ...this.currentPaint, glyph: value });
+          await this._writeV1Paint({ ...this.currentPaint, glyph: value });
         }
         return;
       }
@@ -318,11 +330,11 @@ export default class ColorLayersPanel extends Panel {
 
             return l;
           });
-          await this.writeV1Paint({ ...this.currentPaint, layers: newLayers });
+          await this._writeV1Paint({ ...this.currentPaint, layers: newLayers });
         }
         // If the root object itself is a PaintTransform (Case 2)
         else if (this.currentPaint.paint) {
-          await this.writeV1Paint({
+          await this._writeV1Paint({
             ...this.currentPaint,
             paint: { ...this.currentPaint.paint, glyph: value },
           });
@@ -401,6 +413,38 @@ export default class ColorLayersPanel extends Panel {
           paramKey,
           newKfs
         );
+        return;
+      }
+
+      if (tag === "v1CompositeChildParam") {
+        const [layerIdx, childKey, paramKey] = rest;
+        const layers = this._currentPaint.layers ?? [];
+        const newLayers = layers.map((layer, i) => {
+          if (i !== layerIdx) return layer;
+          const fill = layer.paint != null ? layer.paint : layer;
+          const updatedFill = {
+            ...fill,
+            [childKey]: { ...fill[childKey], [paramKey]: value },
+          };
+          return layer.paint != null ? { ...layer, paint: updatedFill } : updatedFill;
+        });
+        await this._writeV1Paint({ ...this._currentPaint, layers: newLayers });
+        return;
+      }
+
+      if (tag === "v1CompositeChildGlyph") {
+        const [layerIdx, childKey] = rest;
+        const layers = this._currentPaint.layers ?? [];
+        const newLayers = layers.map((layer, i) => {
+          if (i !== layerIdx) return layer;
+          const fill = layer.paint != null ? layer.paint : layer;
+          const updatedFill = {
+            ...fill,
+            [childKey]: { ...fill[childKey], glyph: value },
+          };
+          return layer.paint != null ? { ...layer, paint: updatedFill } : updatedFill;
+        });
+        await this._writeV1Paint({ ...this._currentPaint, layers: newLayers });
         return;
       }
       if (tag === "v1FillPaintType") {
@@ -482,8 +526,9 @@ export default class ColorLayersPanel extends Panel {
             type: "PaintTransform",
             transform: { xx: 1, yx: 0, xy: 0, yy: 1, dx: 0, dy: 0 },
             paint: {
-              type: "PaintColrGlyph",
+              type: "PaintGlyph",
               glyph: "",
+              paint: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
             },
           },
           PaintComposite: {
@@ -494,8 +539,20 @@ export default class ColorLayersPanel extends Panel {
           },
         };
         const newFillPaint = defaults[value] ?? { type: value };
+        const TOPLEVEL_TYPES = [
+          "PaintTransform",
+          "PaintTranslate",
+          "PaintRotate",
+          "PaintSkew",
+          "PaintScale",
+          "PaintComposite",
+        ];
         const newLayers = layers.map((l, i) =>
-          i === layerIdx ? { ...l, paint: newFillPaint } : l
+          i === layerIdx
+            ? TOPLEVEL_TYPES.includes(value)
+              ? newFillPaint
+              : { ...l, paint: newFillPaint }
+            : l
         );
         await this._writeV1Paint({ ...this._currentPaint, layers: newLayers });
         return;
@@ -626,11 +683,13 @@ export default class ColorLayersPanel extends Panel {
         let layerLabel = "";
 
         if (layer.type === "PaintGlyph" || layer.type === "PaintVarGlyph") {
-          const glyphName = layer.glyph ?? "?";
-          layerLabel = `${i}: PaintGlyph "${glyphName}"`;
+          layerLabel = `${i}: PaintGlyph "${layer.glyph ?? "?"}"`;
         } else if (layer.type === "PaintColrGlyph") {
-          const glyphName = layer.glyph ?? "?";
-          layerLabel = `${i}: PaintColrGlyph "${glyphName}"`;
+          layerLabel = `${i}: PaintColrGlyph "${layer.glyph ?? "?"}"`;
+        } else if (normalizePaintType(layer.type) === "PaintTransform") {
+          layerLabel = `${i}: PaintTransform${
+            layer.paint?.glyph ? ` → "${layer.paint.glyph}"` : ""
+          }`;
         } else {
           layerLabel = `${i}: ${layer.type ?? "Paint"}`;
         }
@@ -750,7 +809,15 @@ export default class ColorLayersPanel extends Panel {
                           PaintTransform: {
                             type: "PaintTransform",
                             transform: { xx: 1, yx: 0, xy: 0, yy: 1, dx: 0, dy: 0 },
-                            paint: { type: "PaintColrGlyph", glyph: "" },
+                            paint: {
+                              type: "PaintGlyph",
+                              glyph: "",
+                              paint: {
+                                type: "PaintSolid",
+                                paletteIndex: 0,
+                                alpha: 1.0,
+                              },
+                            },
                           },
                           PaintComposite: {
                             type: "PaintComposite",
@@ -767,9 +834,35 @@ export default class ColorLayersPanel extends Panel {
                             },
                           },
                         };
-                        const newFillPaint = defaults[pt] ?? { type: pt };
+                        const TOPLEVEL_TYPES = [
+                          "PaintTransform",
+                          "PaintTranslate",
+                          "PaintRotate",
+                          "PaintSkew",
+                          "PaintScale",
+                          "PaintComposite",
+                        ];
+                        let newFillPaint = defaults[pt] ?? { type: pt };
+                        if (TOPLEVEL_TYPES.includes(pt)) {
+                          // Carry over the existing glyph reference into the nested PaintGlyph
+                          const existingGlyph = layer.glyph ?? layer.paint?.glyph ?? "";
+                          if (
+                            existingGlyph &&
+                            newFillPaint.paint?.type === "PaintGlyph"
+                          ) {
+                            newFillPaint = {
+                              ...newFillPaint,
+                              paint: { ...newFillPaint.paint, glyph: existingGlyph },
+                            };
+                          }
+                        }
                         const newLayers = (this._currentPaint.layers ?? []).map(
-                          (l, idx) => (idx === i ? { ...l, paint: newFillPaint } : l)
+                          (l, idx) =>
+                            idx === i
+                              ? TOPLEVEL_TYPES.includes(pt)
+                                ? newFillPaint
+                                : { ...l, paint: newFillPaint }
+                              : l
                         );
                         await this._writeV1Paint({
                           ...this._currentPaint,
@@ -938,6 +1031,7 @@ export default class ColorLayersPanel extends Panel {
     if (
       fillPaint.paint &&
       (fillPaint.paint.type === "PaintColrGlyph" ||
+        fillPaint.paint.type === "PaintVarGlyph" ||
         fillPaint.paint.type === "PaintGlyph")
     ) {
       formContents.push({
@@ -949,24 +1043,24 @@ export default class ColorLayersPanel extends Panel {
     }
     // --- NEW PAINT COMPOSITE UI BLOCK ---
     else if (fillPaint.type === "PaintComposite") {
-      // 1. Composite Mode Dropdown/Number
+      // compositeMode — backend sends a string like "srcin", "srcover", "multiply"
       formContents.push({
-        type: "edit-number",
+        type: "edit-text",
         key: JSON.stringify(["v1Param", layerIdx, "compositeMode"]),
-        label: "Composite Mode (0-27)", // e.g. 3 = SRC_OVER, 23 = MULTIPLY
-        value: fillPaint.compositeMode ?? 3,
-        integer: true,
-        minValue: 0,
-        maxValue: 27,
+        label: "Composite Mode",
+        value: String(fillPaint.compositeMode ?? "srcover"),
       });
 
-      // 2. Source Paint (Usually the color or gradient)
-      formContents.push({ type: "header", label: "Source Paint" });
+      // ── Source Paint ──────────────────────────────────────────────
       const sourcePaint = fillPaint.sourcePaint ?? {
         type: "PaintSolid",
         paletteIndex: 0,
         alpha: 1.0,
       };
+      formContents.push({
+        type: "header",
+        label: `Source Paint [${sourcePaint.type ?? "?"}]`,
+      });
 
       if (sourcePaint.type === "PaintSolid") {
         formContents.push({
@@ -998,6 +1092,7 @@ export default class ColorLayersPanel extends Panel {
         });
       } else if (
         sourcePaint.type === "PaintGlyph" ||
+        sourcePaint.type === "PaintVarGlyph" ||
         sourcePaint.type === "PaintColrGlyph"
       ) {
         formContents.push({
@@ -1006,14 +1101,32 @@ export default class ColorLayersPanel extends Panel {
           label: "Source Glyph",
           value: sourcePaint.glyph ?? "",
         });
+      } else if (sourcePaint.type === "PaintColrLayers") {
+        // PaintColrLayers is a compound paint — show layer count as read-only info
+        const layerCount = sourcePaint.layers?.length ?? 0;
+        formContents.push({
+          type: "text",
+          value: `PaintColrLayers (${layerCount} layer${
+            layerCount !== 1 ? "s" : ""
+          }) — edit in paint graph`,
+        });
+      } else {
+        // Fallback for any other paint type — show type name
+        formContents.push({
+          type: "text",
+          value: `${sourcePaint.type ?? "unknown"} — edit in paint graph`,
+        });
       }
 
-      // 3. Backdrop Paint (Usually the underlying glyph shape)
-      formContents.push({ type: "header", label: "Backdrop Paint" });
+      // ── Backdrop Paint ────────────────────────────────────────────
       const backdropPaint = fillPaint.backdropPaint ?? {
         type: "PaintColrGlyph",
         glyph: "",
       };
+      formContents.push({
+        type: "header",
+        label: `Backdrop Paint [${backdropPaint.type ?? "?"}]`,
+      });
 
       if (backdropPaint.type === "PaintSolid") {
         formContents.push({
@@ -1045,6 +1158,7 @@ export default class ColorLayersPanel extends Panel {
         });
       } else if (
         backdropPaint.type === "PaintGlyph" ||
+        backdropPaint.type === "PaintVarGlyph" ||
         backdropPaint.type === "PaintColrGlyph"
       ) {
         formContents.push({
@@ -1053,10 +1167,22 @@ export default class ColorLayersPanel extends Panel {
           label: "Backdrop Glyph",
           value: backdropPaint.glyph ?? "",
         });
+      } else if (backdropPaint.type === "PaintColrLayers") {
+        const layerCount = backdropPaint.layers?.length ?? 0;
+        formContents.push({
+          type: "text",
+          value: `PaintColrLayers (${layerCount} layer${
+            layerCount !== 1 ? "s" : ""
+          }) — edit in paint graph`,
+        });
+      } else {
+        formContents.push({
+          type: "text",
+          value: `${backdropPaint.type ?? "unknown"} — edit in paint graph`,
+        });
       }
     }
   }
-
   _pushArrayParamFields(formContents, fieldDef, targetObj, layerIdx, palette) {
     const source = fieldDef.sourceKey ? targetObj?.[fieldDef.sourceKey] : targetObj;
     const arrayData = source?.[fieldDef.key] ?? [];
@@ -1201,15 +1327,19 @@ export default class ColorLayersPanel extends Panel {
     const TRANSFORM_MATRIX_KEYS = ["xx", "yx", "xy", "yy", "dx", "dy"];
     const layers = (paint.layers ?? []).map((layer, i) => {
       if (i !== layerIndex) return layer;
-      const fillPaint = layer.paint != null ? layer.paint : layer;
+      const layerIsTransform = normalizePaintType(layer.type) === "PaintTransform";
+      const fillPaint = !layerIsTransform && layer.paint != null ? layer.paint : layer;
       const isTransformMatrixKey =
-        TRANSFORM_MATRIX_KEYS.includes(key) && fillPaint.type === "PaintTransform";
+        TRANSFORM_MATRIX_KEYS.includes(key) &&
+        normalizePaintType(fillPaint.type) === "PaintTransform";
       const updatedFill = isTransformMatrixKey
         ? { ...fillPaint, transform: { ...fillPaint.transform, [key]: value } }
         : { ...fillPaint, [key]: value };
-      return layer.paint != null ? { ...layer, paint: updatedFill } : updatedFill;
+      return !layerIsTransform && layer.paint != null
+        ? { ...layer, paint: updatedFill }
+        : updatedFill;
     });
-    await this.writeV1Paint({ ...paint, layers });
+    await this._writeV1Paint({ ...paint, layers });
   }
 
   async _setV1FieldKeyframes(glyphName, paint, layerIndex, field, newKeyframes) {
@@ -1318,10 +1448,8 @@ export default class ColorLayersPanel extends Panel {
     await this._writeV1Paint({ ...paint, layers });
   }
 
-  // Restoration logic for panel-color-layers.js
   async _writeV1Paint(newPaint) {
     await this.sceneController.editGlyphAndRecordChanges((varGlyph) => {
-      // 1. Find the specific layer the user is actually looking at/editing
       const defaultSource =
         varGlyph.sources?.find((s) => !s.inactive && !s.locationBase) ??
         varGlyph.sources?.[0];
@@ -1329,12 +1457,11 @@ export default class ColorLayersPanel extends Panel {
       const layerGlyph = varGlyph.layers?.[layerName]?.glyph;
 
       if (layerGlyph) {
-        // 2. SUCCESS: Write to the nested location (C.json style)
         if (!layerGlyph.customData) layerGlyph.customData = {};
         layerGlyph.customData[COLRV1_KEY] = newPaint;
+        layerGlyph.customData["fontra.colrv1.referencedGlyphs"] =
+          collectReferencedGlyphs(newPaint);
 
-        // 3. CLEANUP: Delete the "LLM-simplified" root data so it doesn't
-        // confuse the compiler or the tool later.
         if (varGlyph.customData?.[COLRV1_KEY]) {
           delete varGlyph.customData[COLRV1_KEY];
         }

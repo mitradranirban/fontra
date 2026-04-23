@@ -10,23 +10,23 @@
 "layers": {
 "202ed5cd": {
 "glyph": {
-"xAdvance": 500,
+"xAdvance": 1000,
 "customData": {
 "colorv1": {
+"layers": [
+{
+"angle": 0,
 "paint": {
-"glyph": "A",
-"type": "PaintColrGlyph"
+"alpha": 1,
+"paletteIndex": 0,
+"type": "PaintSolid"
 },
-"transform": {
-"dx": 0,
-"dy": 0,
-"xx": 1,
-"xy": 0,
-"yx": 0,
-"yy": 1
-},
-"type": "PaintTransform"
+"type": "PaintRotate"
 }
+],
+"type": "PaintColrLayers"
+},
+"fontra.colrv1.referencedGlyphs": []
 }
 }
 }

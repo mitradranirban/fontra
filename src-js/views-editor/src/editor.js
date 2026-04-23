@@ -2312,79 +2312,65 @@ export class EditorController extends ViewController {
     });
   }
   async doAddPaint() {
-    // 1. Prompt the user to select a glyph
     const glyphName = await this.runGlyphSearchDialog(
       translate("action.add-paint"),
       translate("dialog.add"),
       true
     );
+    if (!glyphName) return;
 
-    if (!glyphName) {
-      return;
-    }
-
-    // 2. Fetch the referenced glyph to ensure it exists
     const baseGlyph = await this.fontController.getGlyph(glyphName);
-    if (!baseGlyph) {
+    if (!baseGlyph) return;
+
+    // Check BEFORE entering editGlyphAndRecordChanges — read current state first
+    const varGlyphController =
+      await this.sceneController.sceneModel.getSelectedVariableGlyphController();
+    const varGlyph = varGlyphController?.glyph;
+    const defaultSource =
+      varGlyph?.sources?.find((s) => !s.inactive && !s.locationBase) ??
+      varGlyph?.sources?.[0];
+    const layerName = defaultSource?.layerName;
+    const existingColorV1 =
+      varGlyph?.layers?.[layerName]?.glyph?.customData?.["colorv1"];
+
+    if (!existingColorV1?.type) {
+      await dialog(
+        translate("action.add-paint.no-v1-layers.title"),
+        translate("action.add-paint.no-v1-layers.message"),
+        [{ title: translate("dialog.okay"), isDefaultButton: true }]
+      );
       return;
     }
 
-    // 3. Create the new paint node using the strict renderer schema
     const newPaintNode = {
-      type: "PaintTransform",
-      transform: {
-        xx: 1.0,
-        yx: 0.0,
-        xy: 0.0,
-        yy: 1.0,
-        dx: 0.0,
-        dy: 0.0,
-      },
-      paint: {
-        type: "PaintColrGlyph", // Use PaintColrGlyph so it draws the target's paint
-        glyph: glyphName,
-      },
+      type: "PaintGlyph",
+      glyph: glyphName,
+      paint: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
     };
 
-    // 4. Inject the new paint node into the active layers
-    await this.sceneController.editLayersAndRecordChanges((layerGlyphs) => {
-      for (const layerGlyph of Object.values(layerGlyphs)) {
-        // Ensure nested customData dictionaries exist
-        if (!layerGlyph.customData) {
-          layerGlyph.customData = {};
-        }
-        if (!layerGlyph.customData.colorv1) {
-          layerGlyph.customData.colorv1 = {};
-        }
+    // Now enter the sync mutation callback — no await needed inside
+    await this.sceneController.editGlyphAndRecordChanges((varGlyph) => {
+      const defaultSource =
+        varGlyph.sources?.find((s) => !s.inactive && !s.locationBase) ??
+        varGlyph.sources?.[0];
+      const layerName = defaultSource?.layerName;
+      const layerGlyph = varGlyph.layers?.[layerName]?.glyph;
+      if (!layerGlyph) return;
 
-        const colorData = layerGlyph.customData.colorv1;
+      const colorv1 = layerGlyph.customData?.["colorv1"];
 
-        // Check if the glyph already has a paint graph
-        if (colorData.type) {
-          if (colorData.type === "PaintColrLayers") {
-            // It's already a layer stack; append the new node
-            if (!colorData.layers) colorData.layers = [];
-            colorData.layers.push(newPaintNode);
-          } else {
-            // It's a single node; wrap it in a layer stack
-            const existingPaint = JSON.parse(JSON.stringify(colorData)); // Deep copy
-
-            // Safely wipe the current object's keys to retain the reference pointer
-            for (const key in colorData) {
-              delete colorData[key];
-            }
-
-            // Reconstruct as a PaintColrLayers stack
-            colorData.type = "PaintColrLayers";
-            colorData.layers = [existingPaint, newPaintNode];
-          }
-        } else {
-          // No existing paint data, merge the new node directly into the empty object
-          Object.assign(colorData, newPaintNode);
-        }
+      if (colorv1?.type === "PaintColrLayers") {
+        layerGlyph.customData["colorv1"] = {
+          ...colorv1,
+          layers: [...(colorv1.layers ?? []), newPaintNode],
+        };
+      } else if (colorv1?.type) {
+        layerGlyph.customData["colorv1"] = {
+          type: "PaintColrLayers",
+          layers: [colorv1, newPaintNode],
+        };
       }
 
-      // Return the translation key used in the Undo history panel
       return translate("action.add-paint");
     });
   }
