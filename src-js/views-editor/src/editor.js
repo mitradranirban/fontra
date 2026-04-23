@@ -89,6 +89,7 @@ import {
 } from "@fontra/core/localization.js";
 import { subVectors } from "@fontra/core/vector.js";
 import { ViewController } from "@fontra/core/view-controller.js";
+import { collectReferencedGlyphs } from "./colrv1-utils.js";
 import CharactersGlyphsPanel from "./panel-characters-glyphs.js";
 import ColorLayersPanel from "./panel-color-layers.js";
 import DesignspaceNavigationPanel from "./panel-designspace-navigation.js";
@@ -2322,7 +2323,6 @@ export class EditorController extends ViewController {
     const baseGlyph = await this.fontController.getGlyph(glyphName);
     if (!baseGlyph) return;
 
-    // Check BEFORE entering editGlyphAndRecordChanges — read current state first
     const varGlyphController =
       await this.sceneController.sceneModel.getSelectedVariableGlyphController();
     const varGlyph = varGlyphController?.glyph;
@@ -2348,7 +2348,6 @@ export class EditorController extends ViewController {
       paint: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
     };
 
-    // Now enter the sync mutation callback — no await needed inside
     await this.sceneController.editGlyphAndRecordChanges((varGlyph) => {
       const defaultSource =
         varGlyph.sources?.find((s) => !s.inactive && !s.locationBase) ??
@@ -2357,18 +2356,36 @@ export class EditorController extends ViewController {
       const layerGlyph = varGlyph.layers?.[layerName]?.glyph;
       if (!layerGlyph) return;
 
-      const colorv1 = layerGlyph.customData?.["colorv1"];
+      if (!layerGlyph.customData) {
+        layerGlyph.customData = {};
+      }
 
+      const colorv1 = layerGlyph.customData["colorv1"];
+
+      let newColorV1;
       if (colorv1?.type === "PaintColrLayers") {
-        layerGlyph.customData["colorv1"] = {
+        newColorV1 = {
           ...colorv1,
           layers: [...(colorv1.layers ?? []), newPaintNode],
         };
       } else if (colorv1?.type) {
-        layerGlyph.customData["colorv1"] = {
+        newColorV1 = {
           type: "PaintColrLayers",
           layers: [colorv1, newPaintNode],
         };
+      } else {
+        newColorV1 = {
+          type: "PaintColrLayers",
+          layers: [newPaintNode],
+        };
+      }
+
+      layerGlyph.customData["colorv1"] = newColorV1;
+      layerGlyph.customData["fontra.colrv1.referencedGlyphs"] =
+        collectReferencedGlyphs(newColorV1);
+
+      if (varGlyph.customData?.["colorv1"]) {
+        delete varGlyph.customData["colorv1"];
       }
 
       return translate("action.add-paint");

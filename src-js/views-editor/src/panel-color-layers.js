@@ -3,8 +3,8 @@
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { Form } from "@fontra/web-components/ui-form.js";
+import { collectReferencedGlyphs, setNestedGlyphOnLayer } from "./colrv1-utils.js";
 import Panel from "./panel.js";
-
 const PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes";
 const CUSTOM_DATA_KEY = "colorLayerMapping";
 const COLRV1_KEY = "colorv1";
@@ -218,27 +218,7 @@ function makeVaryToggle(rawVal, layerIdx, paramKey, panel) {
     ]
   );
 }
-function collectReferencedGlyphs(paint, found = new Set()) {
-  if (!paint || typeof paint !== "object") return [...found];
 
-  if (typeof paint.glyph === "string" && paint.glyph.trim() !== "") {
-    found.add(paint.glyph);
-  }
-
-  // Recurse into all known child paint properties
-  for (const key of ["paint", "sourcePaint", "backdropPaint"]) {
-    if (paint[key]) collectReferencedGlyphs(paint[key], found);
-  }
-
-  // Recurse into layers arrays
-  if (Array.isArray(paint.layers)) {
-    for (const layer of paint.layers) {
-      collectReferencedGlyphs(layer, found);
-    }
-  }
-
-  return [...found];
-}
 // ---------------------------------------------------------------------------
 // Variable helpers
 // ---------------------------------------------------------------------------
@@ -298,47 +278,18 @@ export default class ColorLayersPanel extends Panel {
         const [layerIdx] = rest;
 
         if (this.currentPaint.layers) {
-          const newLayers = this.currentPaint.layers.map((l, i) => {
-            if (i !== layerIdx) return l;
-
-            // If l is PaintGlyph and l.paint is PaintTransform, the nested glyph is at l.paint.paint
-            if (
-              l.paint &&
-              l.paint.paint &&
-              (l.paint.paint.type === "PaintGlyph" ||
-                l.paint.paint.type === "PaintColrGlyph" ||
-                l.paint.paint.type === "PaintVarGlyph")
-            ) {
-              return {
-                ...l,
-                paint: {
-                  ...l.paint,
-                  paint: { ...l.paint.paint, glyph: value },
-                },
-              };
-            }
-
-            // If l itself is the PaintTransform, the nested glyph is directly at l.paint
-            if (
-              l.paint &&
-              (l.paint.type === "PaintGlyph" ||
-                l.paint.type === "PaintColrGlyph" ||
-                l.paint.type === "PaintVarGlyph")
-            ) {
-              return { ...l, paint: { ...l.paint, glyph: value } };
-            }
-
-            return l;
-          });
-          await this._writeV1Paint({ ...this.currentPaint, layers: newLayers });
+          const newLayers = this.currentPaint.layers.map((layer, i) =>
+            i !== layerIdx ? layer : setNestedGlyphOnLayer(layer, value)
+          );
+          await this.writeV1Paint({ ...this.currentPaint, layers: newLayers });
+          return;
         }
-        // If the root object itself is a PaintTransform (Case 2)
-        else if (this.currentPaint.paint) {
-          await this._writeV1Paint({
-            ...this.currentPaint,
-            paint: { ...this.currentPaint.paint, glyph: value },
-          });
+
+        if (normalizePaintType(this.currentPaint.type) === "PaintTransform") {
+          await this.writeV1Paint(setNestedGlyphOnLayer(this.currentPaint, value));
+          return;
         }
+
         return;
       }
       if (tag === "colorIndex") {
