@@ -480,3 +480,17 @@ async def test_fire_variable_colrv1(fontPath):
     assert isinstance(regions, list) and len(regions) > 0
     regionAxes = regions[0][0]  # First region, first axis
     assert set(regionAxes) == {"startCoord", "peakCoord", "endCoord"}
+
+
+async def test_os2_version1():
+    # https://github.com/fontra/fontra/issues/2548
+    fontPath = dataDir / "noto" / "NotoSans-Regular.subset.os2-version1.otf"
+    font = getFileSystemBackend(fontPath)
+    sources = await font.getSources()
+    assert len(sources) == 1
+    [source] = sources.values()
+    assert source.lineMetricsHorizontalLayout == {
+        "ascender": LineMetric(value=1069),
+        "baseline": LineMetric(value=0),
+        "descender": LineMetric(value=-293),
+    }

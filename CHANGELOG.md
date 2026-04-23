@@ -1,5 +1,25 @@
 # Changelog for Fontra
 
+## 2026-04-?? [version 2026.4.4]
+
+### New features
+
+- [Windows installer] Add option to add a desktop shortcut. [fontra-pak Issue 239](https://github.com/fontra/fontra-pak/issues/239), [fontra-pak PR 240](https://github.com/fontra/fontra-pak/pull/240)
+
+## 2026-04-15 [version 2026.4.3]
+
+### New features
+
+- [shaping debugger] Link lookups back to the feature source code, via the `Debg` table. [PR 2550](https://github.com/fontra/fontra/pull/2550)
+
+### Fixes
+
+- [opentype backend] When reading .ttf or .otf, don't error when the font has an older version of the OS/2 table. [Issue 2548](https://github.com/fontra/fontra/issues/2548), [PR 2549](https://github.com/fontra/fontra/pull/2549)
+
+## 2026-04-14 [version 2026.4.2]
+
+- [fontra-pak Windows] Add an .msi installer to the release assets. Contributed by Dr Anirban Mitra [fontra-pak Issue 209](https://github.com/fontra/fontra-pak/issues/209), [fontra-pak PR 238](https://github.com/fontra/fontra-pak/pull/238)
+
 ## 2026-04-08 [version 2026.4.1]
 
 ### New features
