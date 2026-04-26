@@ -1,0 +1,129 @@
+{
+"name": "b",
+"sources": [
+{
+"name": "",
+"layerName": "202ed5cd",
+"locationBase": "202ed5cd"
+}
+],
+"layers": {
+"202ed5cd": {
+"glyph": {
+"path": {
+"contours": [
+{
+"points": [
+{
+"x": 436,
+"y": 335.5,
+"smooth": true
+},
+{
+"x": 436,
+"y": 463.9062043285,
+"type": "cubic"
+},
+{
+"x": 358.5452617154,
+"y": 568,
+"type": "cubic"
+},
+{
+"x": 263,
+"y": 568,
+"smooth": true
+},
+{
+"x": 167.4547382846,
+"y": 568,
+"type": "cubic"
+},
+{
+"x": 90,
+"y": 463.9062043285,
+"type": "cubic"
+},
+{
+"x": 90,
+"y": 335.5,
+"smooth": true
+},
+{
+"x": 90,
+"y": 207.0937956715,
+"type": "cubic"
+},
+{
+"x": 167.4547382846,
+"y": 103,
+"type": "cubic"
+},
+{
+"x": 263,
+"y": 103,
+"smooth": true
+},
+{
+"x": 358.5452617154,
+"y": 103,
+"type": "cubic"
+},
+{
+"x": 436,
+"y": 207.0937956715,
+"type": "cubic"
+}
+],
+"isClosed": true
+}
+]
+},
+"xAdvance": 500,
+"customData": {
+"colorv1": {
+"layers": [
+{
+"backdropPaint": {
+"alpha": 1,
+"paletteIndex": 2,
+"type": "PaintSolid"
+},
+"compositeMode": "src_in",
+"sourcePaint": {
+"layers": [
+{
+"glyph": "b",
+"paint": {
+"alpha": 0.5,
+"paletteIndex": 2,
+"type": "PaintSolid"
+},
+"type": "PaintGlyph"
+},
+{
+"glyph": "a",
+"paint": {
+"alpha": 1,
+"paletteIndex": 2,
+"type": "PaintSolid"
+},
+"type": "PaintGlyph"
+}
+],
+"type": "PaintColrLayers"
+},
+"type": "PaintComposite"
+}
+],
+"type": "PaintColrLayers"
+},
+"fontra.colrv1.referencedGlyphs": [
+"b",
+"a"
+]
+}
+}
+}
+}
+}
