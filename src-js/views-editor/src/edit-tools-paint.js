@@ -1,15 +1,6 @@
 // edit-tools-paint.js
 // On-screen color-stop / gradient-handle editor for COLRv1 paint layers.
 // Mirrors the structure of edit-tools-shape.js (ShapeTool / BaseTool pattern).
-//
-// CHANGED: PaintToolColorStop + PaintToolGradientHandle merged into a single
-// UnifiedPaintTool.  The two sub-tools differed in exactly two ways:
-//   1. Cursor: "cell" (color-stop) vs "crosshair" (gradient-handle)
-//   2. Solid-badge handling: color-stop cycled paletteIndex, gradient-handle
-//      ignored solid hits entirely.
-// Both behaviours are now handled in one class:
-//   • Cursor is set dynamically based on what the pointer is hovering over.
-//   • handleDrag dispatches on hit.role instead of branching at the class level.
 
 import { BaseTool, shouldInitiateDrag } from "./edit-tools-base.js";
 import {
@@ -23,11 +14,24 @@ const COLRV1_KEY = "colorv1";
 const HANDLE_RADIUS = 8; // screen pixels
 const HIT_RADIUS = 12; // screen pixels – larger for easier picking
 
+// Paint types that are transform wrappers (the layer IS the paint, not layer.paint)
+const TRANSFORM_WRAPPER_TYPES = new Set([
+  "PaintTransform",
+  "PaintTranslate",
+  "PaintRotate",
+  "PaintRotateAroundCenter",
+  "PaintScale",
+  "PaintScaleAroundCenter",
+  "PaintScaleUniform",
+  "PaintScaleUniformAroundCenter",
+  "PaintSkew",
+  "PaintSkewAroundCenter",
+]);
+
 // ─── Top-level tool wrapper ────────────────────────────────────────────────────
 
 export class PaintTool {
   identifier = "paint-tool";
-  // Only one sub-tool now; keep the array so the framework still works.
   subTools = [UnifiedPaintTool];
 }
 
@@ -57,20 +61,53 @@ async function writeV1Paint(sceneController, newPaint) {
   });
 }
 
+/** Compute bounds from raw path coordinates when controlBounds is absent. */
+function boundsFromPath(path) {
+  const coords = path?.coordinates;
+  if (!coords?.length) return null;
+  let xMin = Infinity,
+    yMin = Infinity,
+    xMax = -Infinity,
+    yMax = -Infinity;
+  for (let i = 0; i < coords.length; i += 2) {
+    const x = coords[i],
+      y = coords[i + 1];
+    if (x < xMin) xMin = x;
+    if (x > xMax) xMax = x;
+    if (y < yMin) yMin = y;
+    if (y > yMax) yMax = y;
+  }
+  return xMin === Infinity ? null : { xMin, yMin, xMax, yMax };
+}
+
+/**
+ * Apply the PaintTransform 2×2+translation matrix to a child-space point.
+ *   x' = dx + xx*x + xy*y
+ *   y' = dy + yx*x + yy*y
+ */
+function applyMatrix({ xx = 1, yx = 0, xy = 0, yy = 1, dx = 0, dy = 0 }, x, y) {
+  return { x: dx + xx * x + xy * y, y: dy + yx * x + yy * y };
+}
+
 /**
  * Collect all draggable on-screen handles for a given paint graph.
- * Returns an array of { layerIdx, role, x, y }.
+ * glyphBoundsCache: Map<glyphName, bounds|null> — populated async by the tool.
+ * Returns an array of { layerIdx, role, x, y, [refX, refY, box] }.
  */
-function collectHandles(paint) {
+function collectHandles(paint, glyphBoundsCache) {
   const handles = [];
   if (!paint?.layers) return handles;
 
   paint.layers.forEach((layer, i) => {
-    const p = layer.paint ?? layer;
+    const isWrapper = TRANSFORM_WRAPPER_TYPES.has(
+      layer.type?.replace(/^PaintVar/, "Paint")
+    );
+    const p = isWrapper ? layer : layer.paint ?? layer;
     if (!p?.type) return;
 
     const t = p.type.replace(/^PaintVar/, "Paint");
 
+    // ── Gradient paint types ──────────────────────────────────────────────────
     if (t === "PaintLinearGradient") {
       handles.push({ layerIdx: i, role: "p0", x: p.x0 ?? 0, y: p.y0 ?? 0 });
       handles.push({ layerIdx: i, role: "p1", x: p.x1 ?? 0, y: p.y1 ?? 0 });
@@ -79,58 +116,216 @@ function collectHandles(paint) {
       handles.push({ layerIdx: i, role: "center0", x: p.x0 ?? 0, y: p.y0 ?? 0 });
       handles.push({ layerIdx: i, role: "center1", x: p.x1 ?? 0, y: p.y1 ?? 0 });
     } else if (t === "PaintSweepGradient") {
-      const cx = p.centerX ?? 0;
-      const cy = p.centerY ?? 0;
+      const cx = p.centerX ?? 0,
+        cy = p.centerY ?? 0;
       handles.push({ layerIdx: i, role: "sweepCenter", x: cx, y: cy });
-
-      // Add angle handles (display radius; does not affect gradient)
-      const SWEEP_HANDLE_RADIUS = 100;
+      const R = 100;
       const startRad = (p.startAngle ?? 0) * 180 * (Math.PI / 180);
       const endRad = (p.endAngle ?? 0.5) * 180 * (Math.PI / 180);
-
       handles.push({
         layerIdx: i,
         role: "sweepStart",
-        x: cx + SWEEP_HANDLE_RADIUS * Math.cos(startRad),
-        y: cy + SWEEP_HANDLE_RADIUS * Math.sin(startRad),
+        x: cx + R * Math.cos(startRad),
+        y: cy + R * Math.sin(startRad),
       });
       handles.push({
         layerIdx: i,
         role: "sweepEnd",
-        x: cx + SWEEP_HANDLE_RADIUS * Math.cos(endRad),
-        y: cy + SWEEP_HANDLE_RADIUS * Math.sin(endRad),
+        x: cx + R * Math.cos(endRad),
+        y: cy + R * Math.sin(endRad),
       });
     } else if (t === "PaintSolid") {
       handles.push({ layerIdx: i, role: "solid", x: 0, y: 0 });
+
+      // ── Transform paint types ─────────────────────────────────────────────────
+    } else if (t === "PaintTranslate") {
+      handles.push({ layerIdx: i, role: "translate", x: p.dx ?? 0, y: p.dy ?? 0 });
+    } else if (t === "PaintTransform") {
+      const mat = p.transform ?? { xx: 1, yx: 0, xy: 0, yy: 1, dx: 0, dy: 0 };
+      const { dx = 0, dy = 0 } = mat;
+
+      // Child glyph name is on p.paint (PaintTransform wraps a PaintGlyph)
+      const childName = p.paint?.glyph ?? p.paint?.paint?.glyph ?? null;
+      const bounds = glyphBoundsCache?.get(childName) ?? null;
+
+      if (bounds) {
+        // Place axis handles at transformed bbox corners — same approach as component tool.
+        // X-axis handle: top-right corner of child bbox
+        // Y-axis handle: top-left corner of child bbox (same top, different x)
+        const trX = bounds.xMax,
+          trY = bounds.yMax;
+        const blX = bounds.xMin,
+          blY = bounds.yMin;
+
+        const origin = applyMatrix(mat, 0, 0);
+        const xHandle = applyMatrix(mat, trX, trY);
+        const yHandle = applyMatrix(mat, blX, blY);
+
+        handles.push({ layerIdx: i, role: "xfm-origin", x: origin.x, y: origin.y });
+        handles.push({
+          layerIdx: i,
+          role: "xfm-scaleX",
+          x: xHandle.x,
+          y: xHandle.y,
+          refX: trX,
+          refY: trY,
+        });
+        handles.push({
+          layerIdx: i,
+          role: "xfm-scaleY",
+          x: yHandle.x,
+          y: yHandle.y,
+          refX: blX,
+          refY: blY,
+        });
+      } else {
+        // Bounds not yet loaded — use fallback unit arms; redraws when cache fills.
+        const FALLBACK = 200;
+        handles.push({ layerIdx: i, role: "xfm-origin", x: dx, y: dy });
+        handles.push({
+          layerIdx: i,
+          role: "xfm-scaleX",
+          x: dx + mat.xx * FALLBACK,
+          y: dy + mat.yx * FALLBACK,
+          refX: FALLBACK,
+          refY: 0,
+        });
+        handles.push({
+          layerIdx: i,
+          role: "xfm-scaleY",
+          x: dx + mat.xy * FALLBACK,
+          y: dy + mat.yy * FALLBACK,
+          refX: 0,
+          refY: FALLBACK,
+        });
+      }
+    } else if (t === "PaintRotate" || t === "PaintRotateAroundCenter") {
+      const cx = p.centerX ?? 0,
+        cy = p.centerY ?? 0;
+      const angleRad = (p.angle ?? 0) * Math.PI * 2; // COLR turns → radians
+      handles.push({ layerIdx: i, role: "rot-center", x: cx, y: cy });
+      handles.push({
+        layerIdx: i,
+        role: "rot-handle",
+        x: cx + 80 * Math.cos(angleRad),
+        y: cy + 80 * Math.sin(angleRad),
+      });
+    } else if (
+      t === "PaintScale" ||
+      t === "PaintScaleAroundCenter" ||
+      t === "PaintScaleUniform" ||
+      t === "PaintScaleUniformAroundCenter"
+    ) {
+      const cx = p.centerX ?? 0,
+        cy = p.centerY ?? 0;
+      handles.push({ layerIdx: i, role: "scale-center", x: cx, y: cy });
+      handles.push({
+        layerIdx: i,
+        role: "scale-x",
+        x: cx + (p.scaleX ?? p.scale ?? 1) * 60,
+        y: cy,
+      });
+      handles.push({
+        layerIdx: i,
+        role: "scale-y",
+        x: cx,
+        y: cy + (p.scaleY ?? p.scale ?? 1) * 60,
+      });
+    } else if (t === "PaintSkew" || t === "PaintSkewAroundCenter") {
+      const cx = p.centerX ?? 0,
+        cy = p.centerY ?? 0;
+      handles.push({ layerIdx: i, role: "skew-center", x: cx, y: cy });
+      handles.push({
+        layerIdx: i,
+        role: "skew-x",
+        x: cx + 60,
+        y: cy + Math.tan((p.xSkewAngle ?? 0) * Math.PI) * 60,
+      });
     }
   });
 
   return handles;
 }
 
-/** Map a handle role to its paint parameter keys. */
-const ROLE_KEY_MAP = {
-  p0: { xKey: "x0", yKey: "y0" },
-  p1: { xKey: "x1", yKey: "y1" },
-  p2: { xKey: "x2", yKey: "y2" },
-  center0: { xKey: "x0", yKey: "y0" },
-  center1: { xKey: "x1", yKey: "y1" },
-  sweepCenter: { xKey: "centerX", yKey: "centerY" },
-  sweepStart: { angleKey: "startAngle" },
-  sweepEnd: { angleKey: "endAngle" },
-  r0: { xKey: "x0", yKey: "y0" }, // r0 handle at (x0 + r0, y0)
-  r1: { xKey: "x1", yKey: "y1" }, // r1 handle at (x1 + r1, y1)
+// ─── Role dispatch maps ────────────────────────────────────────────────────────
+
+/**
+ * Roles where commit writes directly to xKey/yKey on fillPaint (or a nested
+ * sub-object when `nested` is set).
+ */
+const DIRECT_ROLE_MAP = {
+  "p0": { xKey: "x0", yKey: "y0" },
+  "p1": { xKey: "x1", yKey: "y1" },
+  "p2": { xKey: "x2", yKey: "y2" },
+  "center0": { xKey: "x0", yKey: "y0" },
+  "center1": { xKey: "x1", yKey: "y1" },
+  "sweepCenter": { xKey: "centerX", yKey: "centerY" },
+  "r0": { xKey: "x0", yKey: "y0" },
+  "r1": { xKey: "x1", yKey: "y1" },
+  "translate": { xKey: "dx", yKey: "dy" },
+  "rot-center": { xKey: "centerX", yKey: "centerY" },
+  "scale-center": { xKey: "centerX", yKey: "centerY" },
+  "skew-center": { xKey: "centerX", yKey: "centerY" },
+  "xfm-origin": { nested: "transform", xKey: "dx", yKey: "dy" },
 };
+
+/** Roles where commit computes an angle from the pointer vector to a center. */
+const ANGLE_ROLE_MAP = {
+  "sweepStart": { angleKey: "startAngle" },
+  "sweepEnd": { angleKey: "endAngle" },
+  "rot-handle": { angleKey: "angle" },
+};
+
+/** Roles that need fully custom commit logic (not covered by the two maps above). */
+const CUSTOM_ROLES = new Set([
+  "scale-x",
+  "scale-y",
+  "skew-x",
+  "xfm-scaleX",
+  "xfm-scaleY",
+]);
+
 // ─── Unified paint tool ────────────────────────────────────────────────────────
 
 export class UnifiedPaintTool extends BaseTool {
   iconPath = "/images/paintbrush.svg";
   identifier = "paint-tool-unified";
 
+  /** Map<glyphName, bounds|null> — populated async, invalidated on glyphChanged. */
+  _glyphBoundsCache = new Map();
+  /** Set<glyphName> — guards against concurrent duplicate fetches. */
+  _glyphBoundsFetching = new Set();
+
+  // ── Lifecycle ────────────────────────────────────────────────────────────────
+
+  activate() {
+    super.activate?.();
+    this._glyphBoundsCache.clear();
+    this._glyphBoundsFetching.clear();
+
+    // Invalidate and refetch bounds every time the glyph changes so handles
+    // always reflect the current child glyph shape.
+    this._onGlyphChanged = () => {
+      this._glyphBoundsCache.clear();
+      this._glyphBoundsFetching.clear();
+      this._prefetchAllChildBounds();
+    };
+    this.sceneController.addEventListener("glyphChanged", this._onGlyphChanged);
+
+    // Prefetch on activation for glyphs already in the scene.
+    this._prefetchAllChildBounds();
+  }
+
+  deactivate() {
+    super.deactivate();
+    this.sceneController.removeEventListener("glyphChanged", this._onGlyphChanged);
+    delete this.sceneModel.paintToolHandles;
+    delete this.sceneModel.paintToolHighlight;
+    this.canvasController.requestUpdate();
+  }
+
   // ── Cursor ──────────────────────────────────────────────────────────────────
-  // "cell"      when hovering a solid-badge  (former ColorStop behaviour)
-  // "crosshair" when hovering a gradient handle (former GradientHandle behaviour)
-  // "default"   when not editing or no hit
+
   setCursor(hit = null) {
     if (!this.sceneModel.selectedGlyph?.isEditing) {
       this.canvasController.canvas.style.cursor = "default";
@@ -138,10 +333,21 @@ export class UnifiedPaintTool extends BaseTool {
     }
     if (hit?.role === "solid") {
       this.canvasController.canvas.style.cursor = "cell";
+    } else if (hit?.role === "translate" || hit?.role === "xfm-origin") {
+      this.canvasController.canvas.style.cursor = "move";
+    } else if (hit?.role === "rot-handle") {
+      this.canvasController.canvas.style.cursor = "alias";
+    } else if (
+      hit?.role?.startsWith("xfm-scale") ||
+      hit?.role === "scale-x" ||
+      hit?.role === "scale-y"
+    ) {
+      this.canvasController.canvas.style.cursor = "nwse-resize";
+    } else if (hit?.role === "skew-x") {
+      this.canvasController.canvas.style.cursor = "col-resize";
     } else if (hit) {
       this.canvasController.canvas.style.cursor = "crosshair";
     } else {
-      // No handle under pointer – use a neutral editing cursor.
       this.canvasController.canvas.style.cursor = "default";
     }
   }
@@ -157,9 +363,6 @@ export class UnifiedPaintTool extends BaseTool {
   }
 
   // ── Drag / Click ─────────────────────────────────────────────────────────────
-  // Dispatches on hit.role:
-  //   "solid"  → cycle paletteIndex (former ColorStop exclusive behaviour)
-  //   anything else → drag gradient handle (both tools could do this)
 
   async handleDrag(eventStream, initialEvent) {
     if (!this.sceneModel.selectedGlyph?.isEditing) {
@@ -171,41 +374,31 @@ export class UnifiedPaintTool extends BaseTool {
     if (!hit) return;
 
     if (hit.role === "solid") {
-      // Click on solid badge → cycle paletteIndex (shift = backwards)
       await this._cyclePaletteIndex(hit.layerIdx, initialEvent.shiftKey ? -1 : 1);
-      // Drain remaining events so the framework doesn't hang.
       for await (const _ev of eventStream) {
         break;
       }
       return;
     }
 
-    // Gradient / sweep handle drag
     await this.dragHandle(hit, eventStream, initialEvent);
-  }
-
-  // ── Lifecycle ────────────────────────────────────────────────────────────────
-
-  deactivate() {
-    super.deactivate();
-    delete this.sceneModel.paintToolHandles;
-    delete this.sceneModel.paintToolHighlight;
-    this.canvasController.requestUpdate();
   }
 
   // ── Internals ────────────────────────────────────────────────────────────────
 
   _getHandles() {
     const paint = getV1Paint(this.sceneController);
-    return paint ? collectHandles(paint) : [];
+    return paint ? collectHandles(paint, this._glyphBoundsCache) : [];
   }
 
-  /** Convert a pointer event to glyph-space coordinates. */
   _glyphPoint(event) {
     return this.sceneController.selectedGlyphPoint(event);
   }
 
-  /** Hit-test all handles; return the nearest within HIT_RADIUS or null. */
+  glyphPoint(event) {
+    return this.sceneController.selectedGlyphPoint(event);
+  }
+
   _hitTest(event) {
     const pt = this._glyphPoint(event);
     if (pt.x === undefined) return null;
@@ -217,9 +410,7 @@ export class UnifiedPaintTool extends BaseTool {
     let best = null,
       bestDist = Infinity;
     for (const h of handles) {
-      const dx = h.x - pt.x,
-        dy = h.y - pt.y;
-      const dist = Math.hypot(dx, dy);
+      const dist = Math.hypot(h.x - pt.x, h.y - pt.y);
       if (dist < threshold && dist < bestDist) {
         best = h;
         bestDist = dist;
@@ -227,16 +418,69 @@ export class UnifiedPaintTool extends BaseTool {
     }
     return best;
   }
-  glyphPoint(event) {
-    return this.sceneController.selectedGlyphPoint(event);
-  }
+
   _updateHighlight(event) {
     const hit = this._hitTest(event);
     this.sceneModel.paintToolHighlight = hit;
     this.sceneModel.paintToolHandles = this._getHandles();
-    this.setCursor(hit); // dynamic cursor based on what's under the pointer
+    this.setCursor(hit);
     this.canvasController.requestUpdate();
   }
+
+  // ── Async bounds prefetch ────────────────────────────────────────────────────
+
+  /**
+   * Walk all paint layers in the current glyph and prefetch bounds for every
+   * child glyph referenced by a PaintTransform.
+   */
+  _prefetchAllChildBounds() {
+    const paint = getV1Paint(this.sceneController);
+    if (!paint?.layers) return;
+
+    for (const layer of paint.layers) {
+      const t = layer.type?.replace(/^PaintVar/, "Paint");
+      if (t === "PaintTransform") {
+        const childName = layer.paint?.glyph ?? layer.paint?.paint?.glyph ?? null;
+        if (childName) this._prefetchChildGlyphBounds(childName);
+      }
+    }
+  }
+
+  /**
+   * Async-fetch controlBounds for a named glyph and store in the cache.
+   * On completion triggers a handle redraw so handles snap to real positions.
+   * Protected against concurrent duplicate fetches via _glyphBoundsFetching.
+   */
+  async _prefetchChildGlyphBounds(glyphName) {
+    if (!glyphName) return;
+    if (this._glyphBoundsCache.has(glyphName)) return; // already cached
+    if (this._glyphBoundsFetching.has(glyphName)) return; // in flight
+
+    this._glyphBoundsFetching.add(glyphName);
+    try {
+      const varGlyph = await this.sceneController.fontController.getGlyph(glyphName);
+      const defaultSource =
+        varGlyph?.sources?.find((s) => !s.inactive && !s.locationBase) ??
+        varGlyph?.sources?.[0];
+      const layerGlyph = varGlyph?.layers?.[defaultSource?.layerName]?.glyph;
+      const path = layerGlyph?.path;
+      const bounds = path?.controlBounds ?? boundsFromPath(path);
+
+      // Store result — null means "glyph exists but has no path" — prevents
+      // repeated fetches for glyphs that will never have bounds.
+      this._glyphBoundsCache.set(glyphName, bounds ?? null);
+
+      // Redraw with real bounds
+      this.sceneModel.paintToolHandles = this._getHandles();
+      this.canvasController.requestUpdate();
+    } catch (_e) {
+      this._glyphBoundsCache.set(glyphName, null);
+    } finally {
+      this._glyphBoundsFetching.delete(glyphName);
+    }
+  }
+
+  // ── Drag handle ──────────────────────────────────────────────────────────────
 
   async dragHandle(hit, eventStream, initialEvent) {
     const initialPt = this.glyphPoint(initialEvent);
@@ -246,24 +490,66 @@ export class UnifiedPaintTool extends BaseTool {
     if (!paint) return;
 
     const layer = paint.layers[hit.layerIdx];
-    const fillPaint = layer.paint ?? layer;
-    const keys = ROLE_KEY_MAP[hit.role]; // Note: your underscore naming
+    const isWrapper = TRANSFORM_WRAPPER_TYPES.has(
+      layer.type?.replace(/^PaintVar/, "Paint")
+    );
+    const fillPaint = isWrapper ? layer : layer.paint ?? layer;
+
+    // ── Branch A: angle handles ──────────────────────────────────────────────
+    if (ANGLE_ROLE_MAP[hit.role]) {
+      for await (const event of eventStream) {
+        const pt = this.glyphPoint(event);
+        if (pt.x === undefined) continue;
+        this.sceneModel.paintToolDragPreview = {
+          layerIdx: hit.layerIdx,
+          role: hit.role,
+          x: hit.x + (pt.x - initialPt.x),
+          y: hit.y + (pt.y - initialPt.y),
+        };
+        this.canvasController.requestUpdate();
+      }
+      const preview = this.sceneModel.paintToolDragPreview;
+      if (preview) {
+        await this.commitHandleDrag(hit, preview.x, preview.y, paint);
+        delete this.sceneModel.paintToolDragPreview;
+      }
+      this.canvasController.requestUpdate();
+      return;
+    }
+
+    // ── Branch B: custom commit roles ────────────────────────────────────────
+    if (CUSTOM_ROLES.has(hit.role)) {
+      for await (const event of eventStream) {
+        const pt = this.glyphPoint(event);
+        if (pt.x === undefined) continue;
+        this.sceneModel.paintToolDragPreview = {
+          layerIdx: hit.layerIdx,
+          role: hit.role,
+          x: hit.x + (pt.x - initialPt.x),
+          y: hit.y + (pt.y - initialPt.y),
+        };
+        this.canvasController.requestUpdate();
+      }
+      const preview = this.sceneModel.paintToolDragPreview;
+      if (preview) {
+        await this.commitHandleDrag(hit, preview.x, preview.y, paint);
+        delete this.sceneModel.paintToolDragPreview;
+      }
+      this.canvasController.requestUpdate();
+      return;
+    }
+
+    // ── Branch C: direct xKey/yKey ───────────────────────────────────────────
+    const keys = DIRECT_ROLE_MAP[hit.role];
     if (!keys) return;
 
-    // For angle handles: preview relative to ORIGINAL handle position
-    let previewBaseX = hit.x;
-    let previewBaseY = hit.y;
-
-    if (keys.xKey && keys.yKey) {
-      // Direct position handles (p0/p1/etc)
-      previewBaseX = fillPaint[keys.xKey] ?? 0;
-      previewBaseY = fillPaint[keys.yKey] ?? 0;
-    }
+    const source = keys.nested ? fillPaint[keys.nested] ?? {} : fillPaint;
+    const previewBaseX = source[keys.xKey] ?? 0;
+    const previewBaseY = source[keys.yKey] ?? 0;
 
     for await (const event of eventStream) {
       const pt = this.glyphPoint(event);
       if (pt.x === undefined) continue;
-
       this.sceneModel.paintToolDragPreview = {
         layerIdx: hit.layerIdx,
         role: hit.role,
@@ -272,8 +558,6 @@ export class UnifiedPaintTool extends BaseTool {
       };
       this.canvasController.requestUpdate();
     }
-
-    // Commit final position
     const preview = this.sceneModel.paintToolDragPreview;
     if (preview) {
       await this.commitHandleDrag(hit, preview.x, preview.y, paint);
@@ -281,59 +565,133 @@ export class UnifiedPaintTool extends BaseTool {
     }
     this.canvasController.requestUpdate();
   }
-  async commitHandleDrag(hit, newX, newY, paint) {
-    const keys = ROLE_KEY_MAP[hit.role];
-    if (!keys) return console.warn("No keys for role:", hit.role);
 
+  // ── Commit handle drag ───────────────────────────────────────────────────────
+
+  async commitHandleDrag(hit, newX, newY, paint) {
     const layers = paint.layers.map((layer, i) => {
       if (i !== hit.layerIdx) return layer;
-      const fillPaint = layer.paint ?? layer;
 
-      if (keys.angleKey) {
-        // COMPUTE ANGLE FROM VECTOR TO CENTER
-        const cx = fillPaint.centerX ?? 0;
-        const cy = fillPaint.centerY ?? 0;
+      const isWrapper = TRANSFORM_WRAPPER_TYPES.has(
+        layer.type?.replace(/^PaintVar/, "Paint")
+      );
+      const fillPaint = isWrapper ? layer : layer.paint ?? layer;
+
+      const pack = (nfp) =>
+        isWrapper ? nfp : layer.paint ? { ...layer, paint: nfp } : nfp;
+
+      // ── Branch A: angle ──────────────────────────────────────────────────
+      const angleEntry = ANGLE_ROLE_MAP[hit.role];
+      if (angleEntry) {
+        const cx = fillPaint.centerX ?? 0,
+          cy = fillPaint.centerY ?? 0;
         const angleRad = Math.atan2(newY - cy, newX - cx);
-        // COLRv1 format: (radians → degrees → /180)
-        const angleColr = (angleRad * 180) / Math.PI / 180;
-
-        const newFillPaint = { ...fillPaint, [keys.angleKey]: angleColr };
-        return layer.paint ? { ...layer, paint: newFillPaint } : newFillPaint;
-      } else if (keys.xKey && keys.yKey) {
-        // EXISTING: Direct position/radius handles
-        const newFillPaint = {
-          ...fillPaint,
-          [keys.xKey]: Math.round(newX),
-          [keys.yKey]: Math.round(newY),
-        };
-        return layer.paint ? { ...layer, paint: newFillPaint } : newFillPaint;
+        const angleTurns = angleRad / (Math.PI * 2);
+        const value =
+          hit.role === "rot-handle"
+            ? angleTurns
+            : Math.max(-1, Math.min(1, angleTurns));
+        return pack({ ...fillPaint, [angleEntry.angleKey]: value });
       }
 
-      console.warn("Unhandled handle type:", hit.role);
-      return layer;
+      // ── Branch B: custom ─────────────────────────────────────────────────
+      if (hit.role === "scale-x") {
+        const ARM = 60;
+        return pack({ ...fillPaint, scaleX: (newX - (fillPaint.centerX ?? 0)) / ARM });
+      }
+      if (hit.role === "scale-y") {
+        const ARM = 60;
+        return pack({ ...fillPaint, scaleY: (newY - (fillPaint.centerY ?? 0)) / ARM });
+      }
+      if (hit.role === "skew-x") {
+        const cx = fillPaint.centerX ?? 0,
+          cy = fillPaint.centerY ?? 0;
+        const angle = Math.atan2(newY - cy, newX - cx) / Math.PI;
+        return pack({ ...fillPaint, xSkewAngle: Math.max(-0.5, Math.min(0.5, angle)) });
+      }
+
+      if (hit.role === "xfm-scaleX" || hit.role === "xfm-scaleY") {
+        const t = fillPaint.transform ?? { xx: 1, yx: 0, xy: 0, yy: 1, dx: 0, dy: 0 };
+
+        // Each axis handle carries the child-space reference point (refX, refY)
+        // at which it was placed. Reconstruct the matrix column from:
+        //   newX = dx + xx*refX + xy*refY   (X col)
+        //   newY = dy + yx*refX + yy*refY   (X col)
+        // or the Y column equivalently.
+        //
+        // Solving for the column via least-squares (ref·ref denominator):
+        //   col = (ref · (newPos - origin)) / |ref|²
+        const refX = hit.refX ?? (hit.role === "xfm-scaleX" ? 200 : 0);
+        const refY = hit.refY ?? (hit.role === "xfm-scaleY" ? 200 : 0);
+        const relX = newX - t.dx;
+        const relY = newY - t.dy;
+        const denom = refX * refX + refY * refY || 1;
+
+        if (hit.role === "xfm-scaleX") {
+          // Solves the X column: [xx, yx]
+          // newX - dx = xx*refX + xy*refY  →  dot with [refX,refY] / |ref|²
+          // Because xy*refY part from the other column: we only move the X arm,
+          // so set xx and yx holding xy/yy constant.
+          const xx = (relX * refX + relY * refY) / denom;
+          const yx = (relY * refX - relX * refY) / denom;
+          return pack({ ...fillPaint, transform: { ...t, xx, yx } });
+        } else {
+          // Solves the Y column: [xy, yy]
+          const xy = (relX * refX + relY * refY) / denom;
+          const yy = (relY * refX - relX * refY) / denom;
+          return pack({ ...fillPaint, transform: { ...t, xy, yy } });
+        }
+      }
+
+      // ── Branch C: direct xKey/yKey ───────────────────────────────────────
+      const keys = DIRECT_ROLE_MAP[hit.role];
+      if (!keys) {
+        console.warn("Unhandled handle role:", hit.role);
+        return layer;
+      }
+      if (keys.nested) {
+        const sub = fillPaint[keys.nested] ?? {};
+        return pack({
+          ...fillPaint,
+          [keys.nested]: {
+            ...sub,
+            [keys.xKey]: Math.round(newX),
+            [keys.yKey]: Math.round(newY),
+          },
+        });
+      }
+      return pack({
+        ...fillPaint,
+        [keys.xKey]: Math.round(newX),
+        [keys.yKey]: Math.round(newY),
+      });
     });
 
     await writeV1Paint(this.sceneController, { ...paint, layers });
+    // glyphChanged fires here → _onGlyphChanged → bounds cache invalidated →
+    // _prefetchAllChildBounds → handles redrawn with fresh bbox-derived positions.
   }
+
+  // ── Palette cycling ──────────────────────────────────────────────────────────
 
   async _cyclePaletteIndex(layerIdx, delta) {
     const paint = getV1Paint(this.sceneController);
     if (!paint) return;
 
-    const fontCustomData = this.fontController?.customData ?? {};
     const palette =
-      fontCustomData["com.github.googlei18n.ufo2ft.colorPalettes"]?.[0] ?? [];
+      (this.fontController?.customData ?? {})[
+        "com.github.googlei18n.ufo2ft.colorPalettes"
+      ]?.[0] ?? [];
     const maxIdx = Math.max(0, palette.length - 1);
 
     const layers = paint.layers.map((layer, i) => {
       if (i !== layerIdx) return layer;
-      const fillPaint = layer.paint ?? layer;
-      const current = fillPaint.paletteIndex ?? 0;
+      const fp = layer.paint ?? layer;
+      const current = fp.paletteIndex ?? 0;
       const next = (((current + delta) % (maxIdx + 1)) + (maxIdx + 1)) % (maxIdx + 1);
-      if (layer.paint != null) {
-        return { ...layer, paint: { ...layer.paint, paletteIndex: next } };
-      }
-      return { ...layer, paletteIndex: next };
+      return layer.paint != null
+        ? { ...layer, paint: { ...layer.paint, paletteIndex: next } }
+        : { ...layer, paletteIndex: next };
     });
 
     await writeV1Paint(this.sceneController, { ...paint, layers });
@@ -342,8 +700,6 @@ export class UnifiedPaintTool extends BaseTool {
 }
 
 // ─── Visualization layer ───────────────────────────────────────────────────────
-// Unchanged from the original – draws handles, dashed connector lines, and
-// diamond badges for PaintSolid layers.
 
 registerVisualizationLayerDefinition({
   identifier: "fontra.painttool.handles",
@@ -357,6 +713,11 @@ registerVisualizationLayerDefinition({
     lineColor: "#0008",
     solidBadge: "#FFD700",
     highlightRing: "#FF4500",
+    transformBox: "#FF8C00", // orange  – PaintTransform axis arms
+    rotateArc: "#9370DB", // purple  – PaintRotate arc
+    scaleArm: "#32CD32", // green   – PaintScale arms
+    skewArm: "#FF6347", // tomato  – PaintSkew arm
+    translateCross: "#00CED1", // teal    – PaintTranslate crosshair
   },
   colorsDarkMode: {
     handleFill: "#00BFFF",
@@ -364,8 +725,13 @@ registerVisualizationLayerDefinition({
     lineColor: "#FFF6",
     solidBadge: "#FFD700",
     highlightRing: "#FF6347",
+    transformBox: "#FF8C00",
+    rotateArc: "#9370DB",
+    scaleArm: "#32CD32",
+    skewArm: "#FF6347",
+    translateCross: "#00CED1",
   },
-  draw: (context, positionedGlyph, parameters, model, controller) => {
+  draw: (context, positionedGlyph, parameters, model, _controller) => {
     const handles = model.paintToolHandles;
     if (!handles?.length) return;
 
@@ -380,17 +746,31 @@ registerVisualizationLayerDefinition({
         : h
     );
 
-    // Draw connecting lines between gradient handle pairs
+    // Group handles by layer index for connector-line drawing
     const byLayer = {};
     for (const h of effectiveHandles) {
       (byLayer[h.layerIdx] ??= []).push(h);
     }
+
+    // ── Dashed connector lines for gradient handles ────────────────────────
     context.save();
     context.setLineDash([4, 4]);
     context.strokeStyle = parameters.lineColor;
     context.lineWidth = parameters.strokeWidth;
     for (const group of Object.values(byLayer)) {
-      const gradient = group.filter((h) => h.role !== "solid");
+      const gradient = group.filter(
+        (h) =>
+          !h.role.startsWith("xfm-") &&
+          h.role !== "solid" &&
+          h.role !== "translate" &&
+          h.role !== "rot-center" &&
+          h.role !== "rot-handle" &&
+          h.role !== "scale-center" &&
+          h.role !== "scale-x" &&
+          h.role !== "scale-y" &&
+          h.role !== "skew-center" &&
+          h.role !== "skew-x"
+      );
       if (gradient.length >= 2) {
         context.beginPath();
         context.moveTo(gradient[0].x, gradient[0].y);
@@ -402,7 +782,99 @@ registerVisualizationLayerDefinition({
     }
     context.restore();
 
-    // Draw each handle
+    // ── Transform-type shape indicators ───────────────────────────────────
+    context.save();
+    context.lineWidth = parameters.strokeWidth;
+
+    for (const group of Object.values(byLayer)) {
+      // PaintTranslate – crosshair
+      const tHandle = group.find((h) => h.role === "translate");
+      if (tHandle) {
+        const S = 10;
+        context.setLineDash([]);
+        context.strokeStyle = parameters.translateCross;
+        context.beginPath();
+        context.moveTo(tHandle.x - S, tHandle.y);
+        context.lineTo(tHandle.x + S, tHandle.y);
+        context.moveTo(tHandle.x, tHandle.y - S);
+        context.lineTo(tHandle.x, tHandle.y + S);
+        context.stroke();
+      }
+
+      // PaintRotate – dashed hint circle + radial arm
+      const rotCenter = group.find((h) => h.role === "rot-center");
+      const rotHandle = group.find((h) => h.role === "rot-handle");
+      if (rotCenter && rotHandle) {
+        context.setLineDash([4, 4]);
+        context.strokeStyle = parameters.rotateArc;
+        context.beginPath();
+        context.arc(rotCenter.x, rotCenter.y, 80, 0, Math.PI * 2);
+        context.stroke();
+        context.setLineDash([]);
+        context.beginPath();
+        context.moveTo(rotCenter.x, rotCenter.y);
+        context.lineTo(rotHandle.x, rotHandle.y);
+        context.stroke();
+      }
+
+      // PaintScale – solid arms from center to each scale handle
+      const scaleCenter = group.find((h) => h.role === "scale-center");
+      const scaleX = group.find((h) => h.role === "scale-x");
+      const scaleY = group.find((h) => h.role === "scale-y");
+      if (scaleCenter && (scaleX || scaleY)) {
+        context.setLineDash([]);
+        context.strokeStyle = parameters.scaleArm;
+        context.beginPath();
+        if (scaleX) {
+          context.moveTo(scaleCenter.x, scaleCenter.y);
+          context.lineTo(scaleX.x, scaleX.y);
+        }
+        if (scaleY) {
+          context.moveTo(scaleCenter.x, scaleCenter.y);
+          context.lineTo(scaleY.x, scaleY.y);
+        }
+        context.stroke();
+      }
+
+      // PaintSkew – dashed arm to skew handle
+      const skewCenter = group.find((h) => h.role === "skew-center");
+      const skewX = group.find((h) => h.role === "skew-x");
+      if (skewCenter && skewX) {
+        context.setLineDash([2, 3]);
+        context.strokeStyle = parameters.skewArm;
+        context.beginPath();
+        context.moveTo(skewCenter.x, skewCenter.y);
+        context.lineTo(skewX.x, skewX.y);
+        context.stroke();
+      }
+
+      // PaintTransform – origin + two axis arms + closed parallelogram corner
+      const xfmOrigin = group.find((h) => h.role === "xfm-origin");
+      const xfmScaleX = group.find((h) => h.role === "xfm-scaleX");
+      const xfmScaleY = group.find((h) => h.role === "xfm-scaleY");
+      if (xfmOrigin && xfmScaleX && xfmScaleY) {
+        context.setLineDash([]);
+        context.strokeStyle = parameters.transformBox;
+        context.beginPath();
+        // X arm
+        context.moveTo(xfmOrigin.x, xfmOrigin.y);
+        context.lineTo(xfmScaleX.x, xfmScaleX.y);
+        // Y arm
+        context.moveTo(xfmOrigin.x, xfmOrigin.y);
+        context.lineTo(xfmScaleY.x, xfmScaleY.y);
+        // Close the parallelogram
+        context.moveTo(xfmScaleX.x, xfmScaleX.y);
+        context.lineTo(
+          xfmScaleX.x + (xfmScaleY.x - xfmOrigin.x),
+          xfmScaleX.y + (xfmScaleY.y - xfmOrigin.y)
+        );
+        context.lineTo(xfmScaleY.x, xfmScaleY.y);
+        context.stroke();
+      }
+    }
+    context.restore();
+
+    // ── Draw each handle dot / badge ───────────────────────────────────────
     for (const h of effectiveHandles) {
       const isHighlighted =
         highlight && h.layerIdx === highlight.layerIdx && h.role === highlight.role;
@@ -418,7 +890,6 @@ registerVisualizationLayerDefinition({
       }
 
       if (h.role === "solid") {
-        // Diamond badge for PaintSolid layers
         context.beginPath();
         context.moveTo(h.x, h.y - r);
         context.lineTo(h.x + r, h.y);
@@ -436,7 +907,6 @@ registerVisualizationLayerDefinition({
       context.strokeStyle = parameters.handleStroke;
       context.lineWidth = parameters.strokeWidth;
       context.stroke();
-
       context.restore();
     }
   },
