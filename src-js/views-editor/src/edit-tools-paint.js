@@ -28,14 +28,14 @@ const TRANSFORM_WRAPPER_TYPES = new Set([
   "PaintSkewAroundCenter",
 ]);
 
-// ─── Top-level tool wrapper ────────────────────────────────────────────────────
+// ─── Top-level tool wrapper ───────────────────────────────────────────────────
 
 export class PaintTool {
   identifier = "paint-tool";
   subTools = [UnifiedPaintTool];
 }
 
-// ─── Shared helpers ────────────────────────────────────────────────────────────
+// ─── Shared helpers ───────────────────────────────────────────────────────────
 
 /** Return the COLRv1 paint object from the current glyph instance, or null. */
 function getV1Paint(sceneController) {
@@ -81,9 +81,9 @@ function boundsFromPath(path) {
 }
 
 /**
- * Apply the PaintTransform 2×2+translation matrix to a child-space point.
- *   x' = dx + xx*x + xy*y
- *   y' = dy + yx*x + yy*y
+ * Apply the PaintTransform 2x2+translation matrix to a child-space point.
+ * x' = dx + xx*x + xy*y
+ * y' = dy + yx*x + yy*y
  */
 function applyMatrix({ xx = 1, yx = 0, xy = 0, yy = 1, dx = 0, dy = 0 }, x, y) {
   return { x: dx + xx * x + xy * y, y: dy + yx * x + yy * y };
@@ -92,7 +92,7 @@ function applyMatrix({ xx = 1, yx = 0, xy = 0, yy = 1, dx = 0, dy = 0 }, x, y) {
 /**
  * Collect all draggable on-screen handles for a given paint graph.
  * glyphBoundsCache: Map<glyphName, bounds|null> — populated async by the tool.
- * Returns an array of { layerIdx, role, x, y, [refX, refY, box] }.
+ * Returns an array of { layerIdx, role, x, y, [refX, refY] }.
  */
 function collectHandles(paint, glyphBoundsCache) {
   const handles = [];
@@ -107,7 +107,7 @@ function collectHandles(paint, glyphBoundsCache) {
 
     const t = p.type.replace(/^PaintVar/, "Paint");
 
-    // ── Gradient paint types ──────────────────────────────────────────────────
+    // ── Gradient paint types ────────────────────────────────────────────────
     if (t === "PaintLinearGradient") {
       handles.push({ layerIdx: i, role: "p0", x: p.x0 ?? 0, y: p.y0 ?? 0 });
       handles.push({ layerIdx: i, role: "p1", x: p.x1 ?? 0, y: p.y1 ?? 0 });
@@ -137,29 +137,20 @@ function collectHandles(paint, glyphBoundsCache) {
     } else if (t === "PaintSolid") {
       handles.push({ layerIdx: i, role: "solid", x: 0, y: 0 });
 
-      // ── Transform paint types ─────────────────────────────────────────────────
+      // ── Transform paint types ───────────────────────────────────────────────
     } else if (t === "PaintTranslate") {
       handles.push({ layerIdx: i, role: "translate", x: p.dx ?? 0, y: p.dy ?? 0 });
     } else if (t === "PaintTransform") {
       const mat = p.transform ?? { xx: 1, yx: 0, xy: 0, yy: 1, dx: 0, dy: 0 };
-      const { dx = 0, dy = 0 } = mat;
-
-      // Child glyph name is on p.paint (PaintTransform wraps a PaintGlyph)
       const childName = p.paint?.glyph ?? p.paint?.paint?.glyph ?? null;
       const bounds = glyphBoundsCache?.get(childName) ?? null;
 
       if (bounds) {
-        // Place axis handles at transformed bbox corners — same approach as component tool.
-        // X-axis handle: top-right corner of child bbox
-        // Y-axis handle: top-left corner of child bbox (same top, different x)
-        const trX = bounds.xMax,
-          trY = bounds.yMax;
-        const blX = bounds.xMin,
-          blY = bounds.yMin;
-
+        const w = bounds.xMax - bounds.xMin;
+        const h = bounds.yMax - bounds.yMin;
         const origin = applyMatrix(mat, 0, 0);
-        const xHandle = applyMatrix(mat, trX, trY);
-        const yHandle = applyMatrix(mat, blX, blY);
+        const xHandle = applyMatrix(mat, w, 0);
+        const yHandle = applyMatrix(mat, 0, h);
 
         handles.push({ layerIdx: i, role: "xfm-origin", x: origin.x, y: origin.y });
         handles.push({
@@ -167,42 +158,41 @@ function collectHandles(paint, glyphBoundsCache) {
           role: "xfm-scaleX",
           x: xHandle.x,
           y: xHandle.y,
-          refX: trX,
-          refY: trY,
+          ref: w,
         });
         handles.push({
           layerIdx: i,
           role: "xfm-scaleY",
           x: yHandle.x,
           y: yHandle.y,
-          refX: blX,
-          refY: blY,
+          ref: h,
         });
       } else {
-        // Bounds not yet loaded — use fallback unit arms; redraws when cache fills.
         const FALLBACK = 200;
-        handles.push({ layerIdx: i, role: "xfm-origin", x: dx, y: dy });
+        const origin = applyMatrix(mat, 0, 0);
+        const xHandle = applyMatrix(mat, FALLBACK, 0);
+        const yHandle = applyMatrix(mat, 0, FALLBACK);
+
+        handles.push({ layerIdx: i, role: "xfm-origin", x: origin.x, y: origin.y });
         handles.push({
           layerIdx: i,
           role: "xfm-scaleX",
-          x: dx + mat.xx * FALLBACK,
-          y: dy + mat.yx * FALLBACK,
-          refX: FALLBACK,
-          refY: 0,
+          x: xHandle.x,
+          y: xHandle.y,
+          ref: FALLBACK,
         });
         handles.push({
           layerIdx: i,
           role: "xfm-scaleY",
-          x: dx + mat.xy * FALLBACK,
-          y: dy + mat.yy * FALLBACK,
-          refX: 0,
-          refY: FALLBACK,
+          x: yHandle.x,
+          y: yHandle.y,
+          ref: FALLBACK,
         });
       }
     } else if (t === "PaintRotate" || t === "PaintRotateAroundCenter") {
       const cx = p.centerX ?? 0,
         cy = p.centerY ?? 0;
-      const angleRad = (p.angle ?? 0) * Math.PI * 2; // COLR turns → radians
+      const angleRad = (p.angle ?? 0) * Math.PI * 2;
       handles.push({ layerIdx: i, role: "rot-center", x: cx, y: cy });
       handles.push({
         layerIdx: i,
@@ -247,12 +237,8 @@ function collectHandles(paint, glyphBoundsCache) {
   return handles;
 }
 
-// ─── Role dispatch maps ────────────────────────────────────────────────────────
+// ─── Role dispatch maps ───────────────────────────────────────────────────────
 
-/**
- * Roles where commit writes directly to xKey/yKey on fillPaint (or a nested
- * sub-object when `nested` is set).
- */
 const DIRECT_ROLE_MAP = {
   "p0": { xKey: "x0", yKey: "y0" },
   "p1": { xKey: "x1", yKey: "y1" },
@@ -269,14 +255,12 @@ const DIRECT_ROLE_MAP = {
   "xfm-origin": { nested: "transform", xKey: "dx", yKey: "dy" },
 };
 
-/** Roles where commit computes an angle from the pointer vector to a center. */
 const ANGLE_ROLE_MAP = {
   "sweepStart": { angleKey: "startAngle" },
   "sweepEnd": { angleKey: "endAngle" },
   "rot-handle": { angleKey: "angle" },
 };
 
-/** Roles that need fully custom commit logic (not covered by the two maps above). */
 const CUSTOM_ROLES = new Set([
   "scale-x",
   "scale-y",
@@ -285,46 +269,44 @@ const CUSTOM_ROLES = new Set([
   "xfm-scaleY",
 ]);
 
-// ─── Unified paint tool ────────────────────────────────────────────────────────
+// ─── Unified paint tool ───────────────────────────────────────────────────────
 
 export class UnifiedPaintTool extends BaseTool {
   iconPath = "/images/paintbrush.svg";
   identifier = "paint-tool-unified";
 
-  /** Map<glyphName, bounds|null> — populated async, invalidated on glyphChanged. */
   _glyphBoundsCache = new Map();
-  /** Set<glyphName> — guards against concurrent duplicate fetches. */
   _glyphBoundsFetching = new Set();
+  _prefetchStarted = false;
 
-  // ── Lifecycle ────────────────────────────────────────────────────────────────
+  // ── Lifecycle ──────────────────────────────────────────────────────────────
 
   activate() {
     super.activate?.();
     this._glyphBoundsCache.clear();
     this._glyphBoundsFetching.clear();
+    this._prefetchStarted = false;
 
-    // Invalidate and refetch bounds every time the glyph changes so handles
-    // always reflect the current child glyph shape.
     this._onGlyphChanged = () => {
       this._glyphBoundsCache.clear();
       this._glyphBoundsFetching.clear();
-      this._prefetchAllChildBounds();
+      this._prefetchStarted = false;
     };
     this.sceneController.addEventListener("glyphChanged", this._onGlyphChanged);
-
-    // Prefetch on activation for glyphs already in the scene.
-    this._prefetchAllChildBounds();
   }
 
   deactivate() {
-    super.deactivate();
-    this.sceneController.removeEventListener("glyphChanged", this._onGlyphChanged);
+    super.deactivate?.();
+    if (this._onGlyphChanged) {
+      this.sceneController.removeEventListener("glyphChanged", this._onGlyphChanged);
+    }
+    this._prefetchStarted = false;
     delete this.sceneModel.paintToolHandles;
     delete this.sceneModel.paintToolHighlight;
     this.canvasController.requestUpdate();
   }
 
-  // ── Cursor ──────────────────────────────────────────────────────────────────
+  // ── Cursor ─────────────────────────────────────────────────────────────────
 
   setCursor(hit = null) {
     if (!this.sceneModel.selectedGlyph?.isEditing) {
@@ -352,7 +334,7 @@ export class UnifiedPaintTool extends BaseTool {
     }
   }
 
-  // ── Hover ───────────────────────────────────────────────────────────────────
+  // ── Hover ──────────────────────────────────────────────────────────────────
 
   handleHover(event) {
     if (!this.sceneModel.selectedGlyph?.isEditing) {
@@ -362,14 +344,13 @@ export class UnifiedPaintTool extends BaseTool {
     this._updateHighlight(event);
   }
 
-  // ── Drag / Click ─────────────────────────────────────────────────────────────
+  // ── Drag / Click ───────────────────────────────────────────────────────────
 
   async handleDrag(eventStream, initialEvent) {
     if (!this.sceneModel.selectedGlyph?.isEditing) {
       await this.editor.tools["pointer-tool"].handleDrag(eventStream, initialEvent);
       return;
     }
-
     const hit = this._hitTest(initialEvent);
     if (!hit) return;
 
@@ -380,33 +361,34 @@ export class UnifiedPaintTool extends BaseTool {
       }
       return;
     }
-
-    await this.dragHandle(hit, eventStream, initialEvent);
+    await this._dragHandle(hit, eventStream, initialEvent);
   }
 
-  // ── Internals ────────────────────────────────────────────────────────────────
+  // ── Internals ──────────────────────────────────────────────────────────────
 
   _getHandles() {
     const paint = getV1Paint(this.sceneController);
-    return paint ? collectHandles(paint, this._glyphBoundsCache) : [];
+    if (!paint) return [];
+
+    // Trigger prefetch on first call — glyph is guaranteed loaded by now
+    if (!this._prefetchStarted) {
+      this._prefetchStarted = true;
+      this._prefetchAllChildBounds();
+    }
+
+    return collectHandles(paint, this._glyphBoundsCache);
   }
 
   _glyphPoint(event) {
     return this.sceneController.selectedGlyphPoint(event);
   }
 
-  glyphPoint(event) {
-    return this.sceneController.selectedGlyphPoint(event);
-  }
-
   _hitTest(event) {
     const pt = this._glyphPoint(event);
     if (pt.x === undefined) return null;
-
     const handles = this._getHandles();
     const scale = this.canvasController.magnification ?? 1;
     const threshold = HIT_RADIUS / scale;
-
     let best = null,
       bestDist = Infinity;
     for (const h of handles) {
@@ -427,16 +409,11 @@ export class UnifiedPaintTool extends BaseTool {
     this.canvasController.requestUpdate();
   }
 
-  // ── Async bounds prefetch ────────────────────────────────────────────────────
+  // ── Async bounds prefetch ──────────────────────────────────────────────────
 
-  /**
-   * Walk all paint layers in the current glyph and prefetch bounds for every
-   * child glyph referenced by a PaintTransform.
-   */
   _prefetchAllChildBounds() {
     const paint = getV1Paint(this.sceneController);
     if (!paint?.layers) return;
-
     for (const layer of paint.layers) {
       const t = layer.type?.replace(/^PaintVar/, "Paint");
       if (t === "PaintTransform") {
@@ -446,44 +423,38 @@ export class UnifiedPaintTool extends BaseTool {
     }
   }
 
-  /**
-   * Async-fetch controlBounds for a named glyph and store in the cache.
-   * On completion triggers a handle redraw so handles snap to real positions.
-   * Protected against concurrent duplicate fetches via _glyphBoundsFetching.
-   */
   async _prefetchChildGlyphBounds(glyphName) {
     if (!glyphName) return;
-    if (this._glyphBoundsCache.has(glyphName)) return; // already cached
-    if (this._glyphBoundsFetching.has(glyphName)) return; // in flight
-
+    if (this._glyphBoundsCache.has(glyphName)) return;
+    if (this._glyphBoundsFetching.has(glyphName)) return;
     this._glyphBoundsFetching.add(glyphName);
     try {
-      const varGlyph = await this.sceneController.fontController.getGlyph(glyphName);
-      const defaultSource =
-        varGlyph?.sources?.find((s) => !s.inactive && !s.locationBase) ??
-        varGlyph?.sources?.[0];
-      const layerGlyph = varGlyph?.layers?.[defaultSource?.layerName]?.glyph;
-      const path = layerGlyph?.path;
-      const bounds = path?.controlBounds ?? boundsFromPath(path);
+      const fontController = this.sceneController.sceneModel.fontController;
+      const varGlyph = await fontController.getGlyph(glyphName);
 
-      // Store result — null means "glyph exists but has no path" — prevents
-      // repeated fetches for glyphs that will never have bounds.
-      this._glyphBoundsCache.set(glyphName, bounds ?? null);
+      // getGlyph returns a VariableGlyphController — glyph data is on .glyph
+      const vg = varGlyph?.glyph;
+      // Take first source regardless of locationBase
+      const defaultSource = vg?.sources?.[0];
+      const layerName = defaultSource?.layerName;
+      const path = vg?.layers?.[layerName]?.glyph?.path;
+      const bounds = path?.controlBounds ?? boundsFromPath(path) ?? null;
 
-      // Redraw with real bounds
+      this._glyphBoundsCache.set(glyphName, bounds);
       this.sceneModel.paintToolHandles = this._getHandles();
       this.canvasController.requestUpdate();
-    } catch (_e) {
+    } catch (e) {
+      console.error("PaintTool: failed to fetch bounds for", glyphName, e);
       this._glyphBoundsCache.set(glyphName, null);
     } finally {
       this._glyphBoundsFetching.delete(glyphName);
     }
   }
 
-  // ── Drag handle ──────────────────────────────────────────────────────────────
+  // ── Drag handle ────────────────────────────────────────────────────────────
 
-  async dragHandle(hit, eventStream, initialEvent) {
-    const initialPt = this.glyphPoint(initialEvent);
+  async _dragHandle(hit, eventStream, initialEvent) {
+    const initialPt = this._glyphPoint(initialEvent);
     if (!(await shouldInitiateDrag(eventStream, initialEvent))) return;
 
     const paint = getV1Paint(this.sceneController);
@@ -498,7 +469,7 @@ export class UnifiedPaintTool extends BaseTool {
     // ── Branch A: angle handles ──────────────────────────────────────────────
     if (ANGLE_ROLE_MAP[hit.role]) {
       for await (const event of eventStream) {
-        const pt = this.glyphPoint(event);
+        const pt = this._glyphPoint(event);
         if (pt.x === undefined) continue;
         this.sceneModel.paintToolDragPreview = {
           layerIdx: hit.layerIdx,
@@ -510,17 +481,17 @@ export class UnifiedPaintTool extends BaseTool {
       }
       const preview = this.sceneModel.paintToolDragPreview;
       if (preview) {
-        await this.commitHandleDrag(hit, preview.x, preview.y, paint);
+        await this._commitHandleDrag(hit, preview.x, preview.y, paint);
         delete this.sceneModel.paintToolDragPreview;
+        this.canvasController.requestUpdate();
       }
-      this.canvasController.requestUpdate();
       return;
     }
 
     // ── Branch B: custom commit roles ────────────────────────────────────────
     if (CUSTOM_ROLES.has(hit.role)) {
       for await (const event of eventStream) {
-        const pt = this.glyphPoint(event);
+        const pt = this._glyphPoint(event);
         if (pt.x === undefined) continue;
         this.sceneModel.paintToolDragPreview = {
           layerIdx: hit.layerIdx,
@@ -532,10 +503,10 @@ export class UnifiedPaintTool extends BaseTool {
       }
       const preview = this.sceneModel.paintToolDragPreview;
       if (preview) {
-        await this.commitHandleDrag(hit, preview.x, preview.y, paint);
+        await this._commitHandleDrag(hit, preview.x, preview.y, paint);
         delete this.sceneModel.paintToolDragPreview;
+        this.canvasController.requestUpdate();
       }
-      this.canvasController.requestUpdate();
       return;
     }
 
@@ -548,7 +519,7 @@ export class UnifiedPaintTool extends BaseTool {
     const previewBaseY = source[keys.yKey] ?? 0;
 
     for await (const event of eventStream) {
-      const pt = this.glyphPoint(event);
+      const pt = this._glyphPoint(event);
       if (pt.x === undefined) continue;
       this.sceneModel.paintToolDragPreview = {
         layerIdx: hit.layerIdx,
@@ -560,15 +531,15 @@ export class UnifiedPaintTool extends BaseTool {
     }
     const preview = this.sceneModel.paintToolDragPreview;
     if (preview) {
-      await this.commitHandleDrag(hit, preview.x, preview.y, paint);
+      await this._commitHandleDrag(hit, preview.x, preview.y, paint);
       delete this.sceneModel.paintToolDragPreview;
+      this.canvasController.requestUpdate();
     }
-    this.canvasController.requestUpdate();
   }
 
-  // ── Commit handle drag ───────────────────────────────────────────────────────
+  // ── Commit handle drag ─────────────────────────────────────────────────────
 
-  async commitHandleDrag(hit, newX, newY, paint) {
+  async _commitHandleDrag(hit, newX, newY, paint) {
     const layers = paint.layers.map((layer, i) => {
       if (i !== hit.layerIdx) return layer;
 
@@ -577,10 +548,11 @@ export class UnifiedPaintTool extends BaseTool {
       );
       const fillPaint = isWrapper ? layer : layer.paint ?? layer;
 
+      // pack: write mutated fillPaint back into the layer structure correctly
       const pack = (nfp) =>
-        isWrapper ? nfp : layer.paint ? { ...layer, paint: nfp } : nfp;
+        isWrapper ? { ...layer, ...nfp } : layer.paint ? { ...layer, paint: nfp } : nfp;
 
-      // ── Branch A: angle ──────────────────────────────────────────────────
+      // ── Branch A: angle ────────────────────────────────────────────────────
       const angleEntry = ANGLE_ROLE_MAP[hit.role];
       if (angleEntry) {
         const cx = fillPaint.centerX ?? 0,
@@ -594,7 +566,7 @@ export class UnifiedPaintTool extends BaseTool {
         return pack({ ...fillPaint, [angleEntry.angleKey]: value });
       }
 
-      // ── Branch B: custom ─────────────────────────────────────────────────
+      // ── Branch B: custom ───────────────────────────────────────────────────
       if (hit.role === "scale-x") {
         const ARM = 60;
         return pack({ ...fillPaint, scaleX: (newX - (fillPaint.centerX ?? 0)) / ARM });
@@ -606,44 +578,28 @@ export class UnifiedPaintTool extends BaseTool {
       if (hit.role === "skew-x") {
         const cx = fillPaint.centerX ?? 0,
           cy = fillPaint.centerY ?? 0;
-        const angle = Math.atan2(newY - cy, newX - cx) / Math.PI;
+        const ARM = 60;
+        // correct inverse: atan of y-deflection only, x is fixed at cx+ARM
+        const angle = Math.atan((newY - cy) / ARM) / Math.PI;
         return pack({ ...fillPaint, xSkewAngle: Math.max(-0.5, Math.min(0.5, angle)) });
       }
 
       if (hit.role === "xfm-scaleX" || hit.role === "xfm-scaleY") {
         const t = fillPaint.transform ?? { xx: 1, yx: 0, xy: 0, yy: 1, dx: 0, dy: 0 };
-
-        // Each axis handle carries the child-space reference point (refX, refY)
-        // at which it was placed. Reconstruct the matrix column from:
-        //   newX = dx + xx*refX + xy*refY   (X col)
-        //   newY = dy + yx*refX + yy*refY   (X col)
-        // or the Y column equivalently.
-        //
-        // Solving for the column via least-squares (ref·ref denominator):
-        //   col = (ref · (newPos - origin)) / |ref|²
-        const refX = hit.refX ?? (hit.role === "xfm-scaleX" ? 200 : 0);
-        const refY = hit.refY ?? (hit.role === "xfm-scaleY" ? 200 : 0);
-        const relX = newX - t.dx;
-        const relY = newY - t.dy;
-        const denom = refX * refX + refY * refY || 1;
-
+        const ref = hit.ref ?? 200;
         if (hit.role === "xfm-scaleX") {
-          // Solves the X column: [xx, yx]
-          // newX - dx = xx*refX + xy*refY  →  dot with [refX,refY] / |ref|²
-          // Because xy*refY part from the other column: we only move the X arm,
-          // so set xx and yx holding xy/yy constant.
-          const xx = (relX * refX + relY * refY) / denom;
-          const yx = (relY * refX - relX * refY) / denom;
-          return pack({ ...fillPaint, transform: { ...t, xx, yx } });
+          return pack({
+            ...fillPaint,
+            transform: { ...t, xx: (newX - t.dx) / ref, yx: (newY - t.dy) / ref },
+          });
         } else {
-          // Solves the Y column: [xy, yy]
-          const xy = (relX * refX + relY * refY) / denom;
-          const yy = (relY * refX - relX * refY) / denom;
-          return pack({ ...fillPaint, transform: { ...t, xy, yy } });
+          return pack({
+            ...fillPaint,
+            transform: { ...t, xy: (newX - t.dx) / ref, yy: (newY - t.dy) / ref },
+          });
         }
       }
-
-      // ── Branch C: direct xKey/yKey ───────────────────────────────────────
+      // ── Branch C: direct xKey/yKey ─────────────────────────────────────────
       const keys = DIRECT_ROLE_MAP[hit.role];
       if (!keys) {
         console.warn("Unhandled handle role:", hit.role);
@@ -668,22 +624,18 @@ export class UnifiedPaintTool extends BaseTool {
     });
 
     await writeV1Paint(this.sceneController, { ...paint, layers });
-    // glyphChanged fires here → _onGlyphChanged → bounds cache invalidated →
-    // _prefetchAllChildBounds → handles redrawn with fresh bbox-derived positions.
   }
 
-  // ── Palette cycling ──────────────────────────────────────────────────────────
+  // ── Palette cycling ────────────────────────────────────────────────────────
 
   async _cyclePaletteIndex(layerIdx, delta) {
     const paint = getV1Paint(this.sceneController);
     if (!paint) return;
-
     const palette =
-      (this.fontController?.customData ?? {})[
+      (this.sceneController.sceneModel.fontController?.customData ?? {})[
         "com.github.googlei18n.ufo2ft.colorPalettes"
       ]?.[0] ?? [];
     const maxIdx = Math.max(0, palette.length - 1);
-
     const layers = paint.layers.map((layer, i) => {
       if (i !== layerIdx) return layer;
       const fp = layer.paint ?? layer;
@@ -693,13 +645,12 @@ export class UnifiedPaintTool extends BaseTool {
         ? { ...layer, paint: { ...layer.paint, paletteIndex: next } }
         : { ...layer, paletteIndex: next };
     });
-
     await writeV1Paint(this.sceneController, { ...paint, layers });
     this.sceneController._dispatchEvent(new CustomEvent("glyphChanged"));
   }
 }
 
-// ─── Visualization layer ───────────────────────────────────────────────────────
+// ─── Visualization layer ──────────────────────────────────────────────────────
 
 registerVisualizationLayerDefinition({
   identifier: "fontra.painttool.handles",
@@ -713,11 +664,11 @@ registerVisualizationLayerDefinition({
     lineColor: "#0008",
     solidBadge: "#FFD700",
     highlightRing: "#FF4500",
-    transformBox: "#FF8C00", // orange  – PaintTransform axis arms
-    rotateArc: "#9370DB", // purple  – PaintRotate arc
-    scaleArm: "#32CD32", // green   – PaintScale arms
-    skewArm: "#FF6347", // tomato  – PaintSkew arm
-    translateCross: "#00CED1", // teal    – PaintTranslate crosshair
+    transformBox: "#FF8C00",
+    rotateArc: "#9370DB",
+    scaleArm: "#32CD32",
+    skewArm: "#FF6347",
+    translateCross: "#00CED1",
   },
   colorsDarkMode: {
     handleFill: "#00BFFF",
@@ -739,14 +690,12 @@ registerVisualizationLayerDefinition({
     const highlight = model.paintToolHighlight;
     const preview = model.paintToolDragPreview;
 
-    // Apply live preview position override
     const effectiveHandles = handles.map((h) =>
       preview && h.layerIdx === preview.layerIdx && h.role === preview.role
         ? { ...h, x: preview.x, y: preview.y }
         : h
     );
 
-    // Group handles by layer index for connector-line drawing
     const byLayer = {};
     for (const h of effectiveHandles) {
       (byLayer[h.layerIdx] ??= []).push(h);
@@ -787,7 +736,7 @@ registerVisualizationLayerDefinition({
     context.lineWidth = parameters.strokeWidth;
 
     for (const group of Object.values(byLayer)) {
-      // PaintTranslate – crosshair
+      // PaintTranslate crosshair
       const tHandle = group.find((h) => h.role === "translate");
       if (tHandle) {
         const S = 10;
@@ -801,7 +750,7 @@ registerVisualizationLayerDefinition({
         context.stroke();
       }
 
-      // PaintRotate – dashed hint circle + radial arm
+      // PaintRotate dashed arc + radial arm
       const rotCenter = group.find((h) => h.role === "rot-center");
       const rotHandle = group.find((h) => h.role === "rot-handle");
       if (rotCenter && rotHandle) {
@@ -817,7 +766,7 @@ registerVisualizationLayerDefinition({
         context.stroke();
       }
 
-      // PaintScale – solid arms from center to each scale handle
+      // PaintScale arms
       const scaleCenter = group.find((h) => h.role === "scale-center");
       const scaleX = group.find((h) => h.role === "scale-x");
       const scaleY = group.find((h) => h.role === "scale-y");
@@ -836,7 +785,7 @@ registerVisualizationLayerDefinition({
         context.stroke();
       }
 
-      // PaintSkew – dashed arm to skew handle
+      // PaintSkew dashed arm
       const skewCenter = group.find((h) => h.role === "skew-center");
       const skewX = group.find((h) => h.role === "skew-x");
       if (skewCenter && skewX) {
@@ -848,7 +797,7 @@ registerVisualizationLayerDefinition({
         context.stroke();
       }
 
-      // PaintTransform – origin + two axis arms + closed parallelogram corner
+      // PaintTransform parallelogram
       const xfmOrigin = group.find((h) => h.role === "xfm-origin");
       const xfmScaleX = group.find((h) => h.role === "xfm-scaleX");
       const xfmScaleY = group.find((h) => h.role === "xfm-scaleY");
@@ -856,13 +805,10 @@ registerVisualizationLayerDefinition({
         context.setLineDash([]);
         context.strokeStyle = parameters.transformBox;
         context.beginPath();
-        // X arm
         context.moveTo(xfmOrigin.x, xfmOrigin.y);
         context.lineTo(xfmScaleX.x, xfmScaleX.y);
-        // Y arm
         context.moveTo(xfmOrigin.x, xfmOrigin.y);
         context.lineTo(xfmScaleY.x, xfmScaleY.y);
-        // Close the parallelogram
         context.moveTo(xfmScaleX.x, xfmScaleX.y);
         context.lineTo(
           xfmScaleX.x + (xfmScaleY.x - xfmOrigin.x),
@@ -878,9 +824,7 @@ registerVisualizationLayerDefinition({
     for (const h of effectiveHandles) {
       const isHighlighted =
         highlight && h.layerIdx === highlight.layerIdx && h.role === highlight.role;
-
       context.save();
-
       if (isHighlighted) {
         context.beginPath();
         context.arc(h.x, h.y, r + 3, 0, Math.PI * 2);
@@ -888,7 +832,6 @@ registerVisualizationLayerDefinition({
         context.lineWidth = 2;
         context.stroke();
       }
-
       if (h.role === "solid") {
         context.beginPath();
         context.moveTo(h.x, h.y - r);
@@ -902,7 +845,6 @@ registerVisualizationLayerDefinition({
         context.arc(h.x, h.y, r, 0, Math.PI * 2);
         context.fillStyle = parameters.handleFill;
       }
-
       context.fill();
       context.strokeStyle = parameters.handleStroke;
       context.lineWidth = parameters.strokeWidth;
