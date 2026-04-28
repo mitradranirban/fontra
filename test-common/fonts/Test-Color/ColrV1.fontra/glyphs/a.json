@@ -10,13 +10,11 @@
 "layers": {
 "202ed5cd": {
 "glyph": {
-"xAdvance": 500,
+"xAdvance": 1000,
 "customData": {
 "colorv1": {
 "layers": [
 {
-"paint": {
-"paint": {
 "paint": {
 "glyph": "A",
 "paint": {
@@ -27,32 +25,12 @@
 "type": "PaintGlyph"
 },
 "transform": {
-"dx": 0,
-"dy": 0,
-"xx": 1,
+"dx": -61,
+"dy": 520,
+"xx": 0.21270788478817365,
 "xy": 0,
-"yx": 0,
-"yy": 2.7639344262295076
-},
-"type": "PaintTransform"
-},
-"transform": {
-"dx": 0,
-"dy": 0,
-"xx": 1,
-"xy": 0.059016393442622925,
-"yx": 0,
-"yy": 2.0557377049180325
-},
-"type": "PaintTransform"
-},
-"transform": {
-"dx": 0,
-"dy": 0,
-"xx": 1,
-"xy": 0,
-"yx": 0,
-"yy": 1
+"yx": 0.0061030396528047644,
+"yy": 0.2839833010895022
 },
 "type": "PaintTransform"
 }

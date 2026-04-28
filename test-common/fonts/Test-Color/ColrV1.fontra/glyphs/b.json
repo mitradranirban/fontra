@@ -15,63 +15,63 @@
 {
 "points": [
 {
-"x": 436,
-"y": 335.5,
+"x": 668,
+"y": 360,
 "smooth": true
 },
 {
-"x": 436,
-"y": 463.9062043285,
+"x": 668,
+"y": 452.78383796640003,
 "type": "cubic"
 },
 {
-"x": 358.5452617154,
-"y": 568,
+"x": 597.0371328433,
+"y": 528,
 "type": "cubic"
 },
 {
-"x": 263,
-"y": 568,
+"x": 509.5,
+"y": 528,
 "smooth": true
 },
 {
-"x": 167.4547382846,
-"y": 568,
+"x": 421.9628671567,
+"y": 528,
 "type": "cubic"
 },
 {
-"x": 90,
-"y": 463.9062043285,
+"x": 351,
+"y": 452.78383796640003,
 "type": "cubic"
 },
 {
-"x": 90,
-"y": 335.5,
+"x": 351,
+"y": 360,
 "smooth": true
 },
 {
-"x": 90,
-"y": 207.0937956715,
+"x": 351,
+"y": 267.21616203359997,
 "type": "cubic"
 },
 {
-"x": 167.4547382846,
-"y": 103,
+"x": 421.9628671567,
+"y": 192,
 "type": "cubic"
 },
 {
-"x": 263,
-"y": 103,
+"x": 509.5,
+"y": 192,
 "smooth": true
 },
 {
-"x": 358.5452617154,
-"y": 103,
+"x": 597.0371328433,
+"y": 192,
 "type": "cubic"
 },
 {
-"x": 436,
-"y": 207.0937956715,
+"x": 668,
+"y": 267.21616203359997,
 "type": "cubic"
 }
 ],
@@ -79,48 +79,31 @@
 }
 ]
 },
-"xAdvance": 500,
+"xAdvance": 1000,
 "customData": {
 "colorv1": {
 "layers": [
 {
-"backdropPaint": {
-"alpha": 1,
-"paletteIndex": 2,
-"type": "PaintSolid"
-},
-"compositeMode": "src_in",
-"sourcePaint": {
-"layers": [
-{
 "glyph": "b",
 "paint": {
-"alpha": 0.5,
-"paletteIndex": 2,
-"type": "PaintSolid"
-},
-"type": "PaintGlyph"
-},
-{
-"glyph": "a",
+"centerX": 290,
+"centerY": 76,
 "paint": {
 "alpha": 1,
-"paletteIndex": 2,
+"paletteIndex": 0,
 "type": "PaintSolid"
 },
-"type": "PaintGlyph"
-}
-],
-"type": "PaintColrLayers"
+"type": "PaintSkew",
+"xSkewAngle": 0.06182882938672875,
+"ySkewAngle": 0
 },
-"type": "PaintComposite"
+"type": "PaintGlyph"
 }
 ],
 "type": "PaintColrLayers"
 },
 "fontra.colrv1.referencedGlyphs": [
-"b",
-"a"
+"b"
 ]
 }
 }

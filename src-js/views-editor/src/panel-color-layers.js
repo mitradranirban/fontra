@@ -8,7 +8,95 @@ import Panel from "./panel.js";
 const PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes";
 const CUSTOM_DATA_KEY = "colorLayerMapping";
 const COLRV1_KEY = "colorv1";
+const REPLACE_LAYER_TYPES = ["PaintTransform", "PaintScale", "PaintComposite"];
 
+const DEFAULT_PAINTS = {
+  PaintSolid: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
+  PaintLinearGradient: {
+    type: "PaintLinearGradient",
+    x0: 0,
+    y0: 0,
+    x1: 500,
+    y1: 0,
+    x2: 500,
+    y2: 500,
+    colorLine: {
+      colorStops: [
+        { paletteIndex: 0, alpha: 1.0, stopOffset: 0 },
+        { paletteIndex: 1, alpha: 1.0, stopOffset: 1 },
+      ],
+    },
+  },
+  PaintRadialGradient: {
+    type: "PaintRadialGradient",
+    x0: 250,
+    y0: 250,
+    r0: 0,
+    x1: 250,
+    y1: 250,
+    r1: 250,
+    colorLine: {
+      colorStops: [
+        { paletteIndex: 0, alpha: 1.0, stopOffset: 0 },
+        { paletteIndex: 1, alpha: 1.0, stopOffset: 1 },
+      ],
+    },
+  },
+  PaintSweepGradient: {
+    type: "PaintSweepGradient",
+    centerX: 250,
+    centerY: 250,
+    startAngle: 0,
+    endAngle: 1,
+    colorLine: {
+      colorStops: [
+        { paletteIndex: 0, alpha: 1.0, stopOffset: 0 },
+        { paletteIndex: 1, alpha: 1.0, stopOffset: 1 },
+      ],
+    },
+  },
+  PaintTranslate: {
+    type: "PaintTranslate",
+    dx: 0,
+    dy: 0,
+    paint: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
+  },
+  PaintRotate: {
+    type: "PaintRotate",
+    angle: 0,
+    paint: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
+  },
+  PaintSkew: {
+    type: "PaintSkew",
+    xSkewAngle: 0,
+    ySkewAngle: 0,
+    paint: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
+  },
+  PaintTransform: {
+    type: "PaintTransform",
+    transform: { xx: 1, yx: 0, xy: 0, yy: 1, dx: 0, dy: 0 },
+    paint: {
+      type: "PaintGlyph",
+      glyph: "",
+      paint: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
+    },
+  },
+  PaintComposite: {
+    type: "PaintComposite",
+    compositeMode: "src_in",
+    sourcePaint: {
+      type: "PaintColrLayers",
+      layers: [
+        {
+          type: "PaintGlyph",
+          glyph: "",
+          paint: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
+        },
+      ],
+    },
+    backdropPaint: { type: "PaintSolid", paletteIndex: 1, alpha: 1.0 },
+  },
+};
 // ---------------------------------------------------------------------------
 // COLRv1 parameter schema (unchanged)
 // ---------------------------------------------------------------------------
@@ -568,115 +656,24 @@ export default class ColorLayersPanel extends Panel {
         const layers = this._currentPaint.layers ?? [];
         const layer = layers[layerIdx];
         if (!layer) return;
-        const defaults = {
-          PaintSolid: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
-          PaintLinearGradient: {
-            type: "PaintLinearGradient",
-            x0: 0,
-            y0: 0,
-            x1: 500,
-            y1: 0,
-            x2: 500,
-            y2: 500,
-            colorLine: {
-              colorStops: [
-                { paletteIndex: 0, alpha: 1.0, stopOffset: 0 },
-                { paletteIndex: 1, alpha: 1.0, stopOffset: 1 },
-              ],
-            },
-          },
-          PaintRadialGradient: {
-            type: "PaintRadialGradient",
-            x0: 250,
-            y0: 250,
-            r0: 0,
-            x1: 250,
-            y1: 250,
-            r1: 250,
-            colorLine: {
-              colorStops: [
-                { paletteIndex: 0, alpha: 1.0, stopOffset: 0 },
-                { paletteIndex: 1, alpha: 1.0, stopOffset: 1 },
-              ],
-            },
-          },
-          PaintSweepGradient: {
-            type: "PaintSweepGradient",
-            centerX: 250,
-            centerY: 250,
-            startAngle: 0,
-            endAngle: 1,
-            colorLine: {
-              colorStops: [
-                { paletteIndex: 0, alpha: 1.0, stopOffset: 0 },
-                { paletteIndex: 1, alpha: 1.0, stopOffset: 1 },
-              ],
-            },
-          },
-          PaintTranslate: {
-            type: "PaintTranslate",
-            dx: 0,
-            dy: 0,
-            paint: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
-          },
-          PaintRotate: {
-            type: "PaintRotate",
-            angle: 0,
-            paint: {
-              type: "PaintSolid",
-              paletteIndex: 0,
-              alpha: 1.0,
-            },
-          },
-          PaintSkew: {
-            type: "PaintSkew",
-            xSkewAngle: 0,
-            ySkewAngle: 0,
-            paint: {
-              type: "PaintSolid",
-              paletteIndex: 0,
-              alpha: 1.0,
-            },
-          },
-          PaintTransform: {
-            type: "PaintTransform",
-            transform: { xx: 1, yx: 0, xy: 0, yy: 1, dx: 0, dy: 0 },
-            paint: {
-              type: "PaintGlyph",
-              glyph: "",
-              paint: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
-            },
-          },
-          PaintComposite: {
-            type: "PaintComposite",
-            compositeMode: "src_in",
-            sourcePaint: {
-              type: "PaintColrLayers",
-              layers: [
-                {
-                  type: "PaintGlyph",
-                  glyph: "",
-                  paint: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
-                },
-              ],
-            },
-            backdropPaint: { type: "PaintSolid", paletteIndex: 1, alpha: 1.0 },
-          },
-        };
-        const newFillPaint = defaults[value] ?? { type: value };
-        const TOPLEVEL_TYPES = [
-          "PaintTransform",
-          "PaintTranslate",
-          "PaintRotate",
-          "PaintSkew",
-          "PaintScale",
-          "PaintComposite",
-        ];
+
+        let newFillPaint = DEFAULT_PAINTS[value]
+          ? structuredClone(DEFAULT_PAINTS[value])
+          : { type: value };
+        if (REPLACE_LAYER_TYPES.includes(value)) {
+          const existingGlyph = layer.glyph ?? layer.paint?.glyph ?? "";
+          if (existingGlyph && newFillPaint.paint?.type === "PaintGlyph") {
+            newFillPaint = {
+              ...newFillPaint,
+              paint: { ...newFillPaint.paint, glyph: existingGlyph },
+            };
+          }
+        }
         const newLayers = layers.map((l, i) =>
           i === layerIdx
-            ? TOPLEVEL_TYPES.includes(value)
-              ? newFillPaint
-              : { ...l, paint: newFillPaint }
+            ? REPLACE_LAYER_TYPES.has(value)
+              ? newFillPaint // PaintTransform/Scale/Composite replace whole layer ✅
+              : { ...l, paint: newFillPaint } // Translate/Rotate/Skew nest under PaintGlyph clip ✅
             : l
         );
         await this._writeV1Paint({ ...this._currentPaint, layers: newLayers });
@@ -865,120 +862,14 @@ export default class ColorLayersPanel extends Panel {
                     {
                       style: "font-size:0.75em;opacity:0.7;",
                       onclick: async () => {
-                        const defaults = {
-                          PaintSolid: {
-                            type: "PaintSolid",
-                            paletteIndex: 0,
-                            alpha: 1.0,
-                          },
-                          PaintLinearGradient: {
-                            type: "PaintLinearGradient",
-                            x0: 0,
-                            y0: 0,
-                            x1: 500,
-                            y1: 0,
-                            x2: 500,
-                            y2: 500,
-                            colorLine: {
-                              colorStops: [
-                                { paletteIndex: 0, alpha: 1.0, stopOffset: 0 },
-                                { paletteIndex: 1, alpha: 1.0, stopOffset: 1 },
-                              ],
-                            },
-                          },
-                          PaintRadialGradient: {
-                            type: "PaintRadialGradient",
-                            x0: 250,
-                            y0: 250,
-                            r0: 0,
-                            x1: 250,
-                            y1: 250,
-                            r1: 250,
-                            colorLine: {
-                              colorStops: [
-                                { paletteIndex: 0, alpha: 1.0, stopOffset: 0 },
-                                { paletteIndex: 1, alpha: 1.0, stopOffset: 1 },
-                              ],
-                            },
-                          },
-                          PaintSweepGradient: {
-                            type: "PaintSweepGradient",
-                            centerX: 250,
-                            centerY: 250,
-                            startAngle: 0,
-                            endAngle: 1,
-                            colorLine: {
-                              colorStops: [
-                                { paletteIndex: 0, alpha: 1.0, stopOffset: 0 },
-                                { paletteIndex: 1, alpha: 1.0, stopOffset: 1 },
-                              ],
-                            },
-                          },
-                          PaintTranslate: {
-                            type: "PaintTranslate",
-                            dx: 0,
-                            dy: 0,
-                            paint: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
-                          },
-                          PaintRotate: {
-                            type: "PaintRotate",
-                            angle: 0,
-                            paint: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
-                          },
-                          PaintSkew: {
-                            type: "PaintSkew",
-                            xSkewAngle: 0,
-                            ySkewAngle: 0,
-                            paint: { type: "PaintSolid", paletteIndex: 0, alpha: 1.0 },
-                          },
-                          PaintTransform: {
-                            type: "PaintTransform",
-                            transform: { xx: 1, yx: 0, xy: 0, yy: 1, dx: 0, dy: 0 },
-                            paint: {
-                              type: "PaintGlyph",
-                              glyph: "",
-                              paint: {
-                                type: "PaintSolid",
-                                paletteIndex: 0,
-                                alpha: 1.0,
-                              },
-                            },
-                          },
-                          PaintComposite: {
-                            type: "PaintComposite",
-                            compositeMode: "src_in",
-                            sourcePaint: {
-                              type: "PaintColrLayers",
-                              layers: [
-                                {
-                                  type: "PaintGlyph",
-                                  glyph: layer.glyph ?? "",
-                                  paint: {
-                                    type: "PaintSolid",
-                                    paletteIndex: 0,
-                                    alpha: 1.0,
-                                  },
-                                },
-                              ],
-                            },
-                            backdropPaint: {
-                              type: "PaintSolid",
-                              paletteIndex: 1,
-                              alpha: 1.0,
-                            },
-                          },
-                        };
-                        const TOPLEVEL_TYPES = [
-                          "PaintTransform",
-                          "PaintTranslate",
-                          "PaintRotate",
-                          "PaintSkew",
-                          "PaintScale",
-                          "PaintComposite",
-                        ];
-                        let newFillPaint = defaults[pt] ?? { type: pt };
-                        if (TOPLEVEL_TYPES.includes(pt)) {
-                          // Carry over the existing glyph reference into the nested PaintGlyph
+                        let newFillPaint = DEFAULT_PAINTS[pt]
+                          ? structuredClone(DEFAULT_PAINTS[pt])
+                          : { type: pt };
+                        if (pt === "PaintComposite") {
+                          newFillPaint.sourcePaint.layers[0].glyph = layer.glyph ?? "";
+                        }
+                        // For layer-replacing types, carry existing glyph into nested PaintGlyph
+                        if (REPLACE_LAYER_TYPES.includes(pt)) {
                           const existingGlyph = layer.glyph ?? layer.paint?.glyph ?? "";
                           if (
                             existingGlyph &&
@@ -993,7 +884,7 @@ export default class ColorLayersPanel extends Panel {
                         const newLayers = (this._currentPaint.layers ?? []).map(
                           (l, idx) =>
                             idx === i
-                              ? TOPLEVEL_TYPES.includes(pt)
+                              ? REPLACE_LAYER_TYPES.includes(pt)
                                 ? newFillPaint
                                 : { ...l, paint: newFillPaint }
                               : l
