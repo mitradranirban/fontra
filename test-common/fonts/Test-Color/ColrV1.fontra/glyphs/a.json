@@ -19,7 +19,7 @@
 "glyph": "A",
 "paint": {
 "alpha": 1,
-"paletteIndex": 0,
+"paletteIndex": 2,
 "type": "PaintSolid"
 },
 "type": "PaintGlyph"
@@ -27,10 +27,30 @@
 "transform": {
 "dx": -61,
 "dy": 520,
-"xx": 0.21270788478817365,
+"xx": 0.539314091980599,
 "xy": 0,
-"yx": 0.0061030396528047644,
+"yx": 0.006103039652804796,
 "yy": 0.2839833010895022
+},
+"type": "PaintTransform"
+},
+{
+"paint": {
+"glyph": "B",
+"paint": {
+"alpha": 1,
+"paletteIndex": 1,
+"type": "PaintSolid"
+},
+"type": "PaintGlyph"
+},
+"transform": {
+"dx": 0,
+"dy": 0,
+"xx": 0.41210882705363416,
+"xy": -0.01088687357308089,
+"yx": 0,
+"yy": 0.3794482063343917
 },
 "type": "PaintTransform"
 }
@@ -38,7 +58,8 @@
 "type": "PaintColrLayers"
 },
 "fontra.colrv1.referencedGlyphs": [
-"A"
+"A",
+"B"
 ]
 }
 }

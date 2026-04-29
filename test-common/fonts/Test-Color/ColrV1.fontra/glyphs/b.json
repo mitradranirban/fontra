@@ -86,24 +86,38 @@
 {
 "glyph": "b",
 "paint": {
-"centerX": 290,
-"centerY": 76,
+"alpha": 1,
+"paletteIndex": 0,
+"type": "PaintSolid"
+},
+"type": "PaintGlyph"
+},
+{
+"paint": {
+"glyph": "C",
 "paint": {
 "alpha": 1,
 "paletteIndex": 0,
 "type": "PaintSolid"
 },
-"type": "PaintSkew",
-"xSkewAngle": 0.06182882938672875,
-"ySkewAngle": 0
-},
 "type": "PaintGlyph"
+},
+"transform": {
+"dx": 0,
+"dy": 0,
+"xx": 0.4774300684921192,
+"xy": -0.01088687357308089,
+"yx": -0.010886873573080847,
+"yy": 0.564525057076766
+},
+"type": "PaintTransform"
 }
 ],
 "type": "PaintColrLayers"
 },
 "fontra.colrv1.referencedGlyphs": [
-"b"
+"b",
+"C"
 ]
 }
 }

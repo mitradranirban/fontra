@@ -346,18 +346,18 @@ export default class ColorLayersPanel extends Panel {
 
       if (tag === "v1GlyphRef") {
         const [layerIdx] = rest;
-        if (this.currentPaint.layers) {
-          const newLayers = this.currentPaint.layers.map((l, i) => {
+        if (this._currentPaint.layers) {
+          const newLayers = this._currentPaint.layers.map((l, i) => {
             if (i !== layerIdx) return l;
             return { ...l, glyph: value };
           });
-          await this._writeV1Paint({ ...this.currentPaint, layers: newLayers });
+          await this._writeV1Paint({ ...this._currentPaint, layers: newLayers });
         } else if (
-          this.currentPaint.type === "PaintGlyph" ||
-          this.currentPaint.type === "PaintColrGlyph" ||
-          this.currentPaint.type === "PaintVarGlyph"
+          this._currentPaint.type === "PaintGlyph" ||
+          this._currentPaint.type === "PaintColrGlyph" ||
+          this._currentPaint.type === "PaintVarGlyph"
         ) {
-          await this._writeV1Paint({ ...this.currentPaint, glyph: value });
+          await this._writeV1Paint({ ...this._currentPaint, glyph: value });
         }
         return;
       }
@@ -365,19 +365,30 @@ export default class ColorLayersPanel extends Panel {
       if (tag === "v1NestedGlyphRef") {
         const [layerIdx] = rest;
 
-        if (this.currentPaint.layers) {
-          const newLayers = this.currentPaint.layers.map((layer, i) =>
+        if (this._currentPaint.layers) {
+          const newLayers = this._currentPaint.layers.map((layer, i) =>
             i !== layerIdx ? layer : setNestedGlyphOnLayer(layer, value)
           );
-          await this.writeV1Paint({ ...this.currentPaint, layers: newLayers });
+          await this._writeV1Paint({ ...this._currentPaint, layers: newLayers });
           return;
         }
 
-        if (normalizePaintType(this.currentPaint.type) === "PaintTransform") {
-          await this.writeV1Paint(setNestedGlyphOnLayer(this.currentPaint, value));
+        if (normalizePaintType(this._currentPaint.type) === "PaintTransform") {
+          await this._writeV1Paint(setNestedGlyphOnLayer(this._currentPaint, value));
           return;
         }
 
+        return;
+      }
+      if (tag === "v1NestedPaintParam") {
+        const [layerIdx, paramKey] = rest;
+        await this._setV1NestedPaintParam(
+          this._currentGlyphName,
+          this._currentPaint,
+          layerIdx,
+          paramKey,
+          value
+        );
         return;
       }
       if (tag === "colorIndex") {
@@ -1065,6 +1076,32 @@ export default class ColorLayersPanel extends Panel {
         label: translate("color-layers.transformed-glyph"),
         value: fillPaint.paint.glyph ?? "",
       });
+
+      const nestedFill = fillPaint.paint.paint ?? {
+        type: "PaintSolid",
+        paletteIndex: 0,
+        alpha: 1.0,
+      };
+
+      if (normalizePaintType(nestedFill.type) === "PaintSolid") {
+        formContents.push({
+          type: "edit-number",
+          key: JSON.stringify(["v1NestedPaintParam", layerIdx, "paletteIndex"]),
+          label: translate("color-layers.color-index"),
+          value: nestedFill.paletteIndex ?? 0,
+          integer: true,
+          minValue: 0,
+          maxValue: palette.length - 1,
+        });
+        formContents.push({
+          type: "edit-number",
+          key: JSON.stringify(["v1NestedPaintParam", layerIdx, "alpha"]),
+          label: translate("color-layers.alpha"),
+          value: nestedFill.alpha ?? 1.0,
+          minValue: 0,
+          maxValue: 1,
+        });
+      }
     }
     // --- NEW PAINT COMPOSITE UI BLOCK ---
     else if (fillPaint.type === "PaintComposite") {
@@ -1105,8 +1142,8 @@ export default class ColorLayersPanel extends Panel {
             value: String(fillPaint.compositeMode ?? "srcover"),
             onchange: async (event) => {
               await this.setV1PaintParam(
-                this.currentGlyphName,
-                this.currentPaint,
+                this._currentGlyphName,
+                this._currentPaint,
                 layerIdx,
                 "compositeMode",
                 event.target.value
@@ -1923,6 +1960,65 @@ export default class ColorLayersPanel extends Panel {
     await this._writeV1Paint({ ...paint, layers });
   }
 
+  async _setV1NestedPaintParam(glyphName, paint, layerIndex, key, value) {
+    const layers = (paint.layers ?? []).map((layer, i) => {
+      if (i !== layerIndex) return layer;
+
+      // Shape B: PaintTransform → PaintGlyph → PaintSolid
+      // layer.paint is the PaintGlyph; layer.paint.paint is the PaintSolid to update
+      if (normalizePaintType(layer.type) === "PaintTransform") {
+        const glyphPaint = layer.paint;
+        if (
+          !glyphPaint ||
+          !["PaintGlyph", "PaintVarGlyph", "PaintColrGlyph"].includes(glyphPaint.type)
+        ) {
+          return layer;
+        }
+        return {
+          ...layer,
+          paint: {
+            ...glyphPaint,
+            paint: {
+              ...(glyphPaint.paint ?? {
+                type: "PaintSolid",
+                paletteIndex: 0,
+                alpha: 1.0,
+              }),
+              [key]: value,
+            },
+          },
+        };
+      }
+
+      // Original path (kept for any future Shape A usage, currently unreachable)
+      const fillPaint = layer.paint ?? layer;
+      const nestedGlyphPaint = fillPaint.paint;
+      if (
+        !nestedGlyphPaint ||
+        !["PaintGlyph", "PaintVarGlyph", "PaintColrGlyph"].includes(
+          nestedGlyphPaint.type
+        )
+      ) {
+        return layer;
+      }
+      const updatedNestedGlyphPaint = {
+        ...nestedGlyphPaint,
+        paint: {
+          ...(nestedGlyphPaint.paint ?? {
+            type: "PaintSolid",
+            paletteIndex: 0,
+            alpha: 1.0,
+          }),
+          [key]: value,
+        },
+      };
+      return layer.paint != null
+        ? { ...layer, paint: { ...fillPaint, paint: updatedNestedGlyphPaint } }
+        : { ...fillPaint, paint: updatedNestedGlyphPaint };
+    });
+
+    await this._writeV1Paint({ ...paint, layers });
+  }
   async _setV1FieldKeyframes(glyphName, paint, layerIndex, field, newKeyframes) {
     const layers = (paint.layers ?? []).map((layer, i) => {
       if (i !== layerIndex) return layer;
