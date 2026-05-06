@@ -1,3 +1,3 @@
 #!/bin/bash
 source venv/bin/activate
-fontra --dev --launch filesystem ./test-common/fonts
+fontra --dev --launch filesystem /home/artim/Desktop/COLOUR

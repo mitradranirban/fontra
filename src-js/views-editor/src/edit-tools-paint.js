@@ -144,30 +144,27 @@ function collectHandles(paint, glyphBoundsCache) {
       const mat = p.transform ?? { xx: 1, yx: 0, xy: 0, yy: 1, dx: 0, dy: 0 };
       const childName = p.paint?.glyph ?? p.paint?.paint?.glyph ?? null;
       const bounds = glyphBoundsCache?.get(childName) ?? null;
-
       if (bounds) {
-        const w = bounds.xMax - bounds.xMin;
-        const h = bounds.yMax - bounds.yMin;
-        const origin = applyMatrix(mat, 0, 0);
-        const xHandle = applyMatrix(mat, w, 0);
-        const yHandle = applyMatrix(mat, 0, h);
-
+        const { xMin, yMin, xMax, yMax } = bounds;
+        const origin = applyMatrix(mat, xMin, yMin);
+        const xHandle = applyMatrix(mat, xMax, yMin);
+        const yHandle = applyMatrix(mat, xMin, yMax);
         handles.push({ layerIdx: i, role: "xfm-origin", x: origin.x, y: origin.y });
         handles.push({
           layerIdx: i,
           role: "xfm-scaleX",
           x: xHandle.x,
           y: xHandle.y,
-          ref: w,
+          ref: xMax,
         });
         handles.push({
           layerIdx: i,
           role: "xfm-scaleY",
           x: yHandle.x,
           y: yHandle.y,
-          ref: h,
+          ref: yMax,
         });
-      } else {
+      } else if (!childName || glyphBoundsCache?.has(childName)) {
         const FALLBACK = 200;
         const origin = applyMatrix(mat, 0, 0);
         const xHandle = applyMatrix(mat, FALLBACK, 0);
@@ -285,7 +282,8 @@ export class UnifiedPaintTool extends BaseTool {
     super.activate?.();
     this._glyphBoundsCache.clear();
     this._glyphBoundsFetching.clear();
-    this._prefetchStarted = false;
+    this._prefetchStarted = true;
+    this.prefetchAllChildBounds();
 
     this._onGlyphChanged = () => {
       this._glyphBoundsCache.clear();
@@ -369,13 +367,6 @@ export class UnifiedPaintTool extends BaseTool {
   _getHandles() {
     const paint = getV1Paint(this.sceneController);
     if (!paint) return [];
-
-    // Trigger prefetch on first call — glyph is guaranteed loaded by now
-    if (!this._prefetchStarted) {
-      this._prefetchStarted = true;
-      this._prefetchAllChildBounds();
-    }
-
     return collectHandles(paint, this._glyphBoundsCache);
   }
 
