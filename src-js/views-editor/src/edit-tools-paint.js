@@ -164,7 +164,7 @@ function collectHandles(paint, glyphBoundsCache) {
           y: yHandle.y,
           ref: yMax,
         });
-      } else if (!childName || glyphBoundsCache?.has(childName)) {
+      } else {
         const FALLBACK = 200;
         const origin = applyMatrix(mat, 0, 0);
         const xHandle = applyMatrix(mat, FALLBACK, 0);
