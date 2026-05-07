@@ -674,8 +674,12 @@ export class FontController {
     return instanceController;
   }
 
+  get fallbackXAdvance() {
+    return this.unitsPerEm / 2;
+  }
+
   getDummyGlyphInstanceController(glyphName = "<dummy>") {
-    const dummyGlyph = StaticGlyph.fromObject({ xAdvance: this.unitsPerEm / 2 });
+    const dummyGlyph = StaticGlyph.fromObject({ xAdvance: this.fallbackXAdvance });
     return new StaticGlyphController(glyphName, dummyGlyph, undefined);
   }
 

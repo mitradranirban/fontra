@@ -1,10 +1,43 @@
 # Changelog for Fontra
 
-## 2026-04-?? [version 2026.4.4]
+## 2026-05-?? [version 2026.5.1]
+
+### New features
+
+- [Axes panel] Add "Hidden" checkbox to Axis box and New Axis dialog, so we can finally edit the "hidden" axis flag. [Issue 1373](https://github.com/fontra/fontra/issues/1373), [PR 2582](https://github.com/fontra/fontra/pull/2582)
+
+## 2026-05-06 [version 2026.5.0]
+
+### New features
+
+- [fontra pak] Add a checkbox to the launcher window that (when checked) causes fonts to be opened in read-only mode. [fontra-pak Issue 247](https://github.com/fontra/fontra-pak/issues/247), [fontra-pak PR 248](https://github.com/fontra/fontra-pak/pull/248), [PR 2581](https://github.com/fontra/fontra/pull/2581)
+
+### Improvements
+
+- [help menu] Added links to the Blog and the Discord invite. Contributed by Dave Crossland. [PR 2580](https://github.com/fontra/fontra/pull/2580)
+- [editor view] Make minimum zoom limit relative to em size (units-per-em). Contributed by Qwerasd. [Issue 2573](https://github.com/fontra/fontra/issues/2573), [PR 2574](https://github.com/fontra/fontra/pull/2574)
+- [shaping] When the "Apply text shaping and features" option is _off_, don't do any positioning emulation. [Issue 2517](https://github.com/fontra/fontra/issues/2517), [PR 2571](https://github.com/fontra/fontra/pull/2571)
+- [shaping debugger] Improved message formatting in feature debugger. Contributed by Khaled Hosny. [PR 2566](https://github.com/fontra/fontra/pull/2566)
+- [opentype feature editor] When navigating to a line from an error message or from the shaping debugger, scroll the selected line into the center of the view like most editors do, instead of near the edge. Contributed by Khaled Hosny. [PR 2565](https://github.com/fontra/fontra/pull/2565)
+
+### Fixes
+
+- [editor view] Fix inconsistent advance widths for undefined glyphs. [Issue 2572](https://github.com/fontra/fontra/issues/2572), [PR 2575](https://github.com/fontra/fontra/pull/2575)
+- [editor view] Fix display glitch with Safari on very large screens. Contributed by Qwerasd. [PR 2567](https://github.com/fontra/fontra/pull/2567)
+- [fontra-glyphs] Use the correct encoding when reading .plist files. This fixes read errors with certain .glyphs and .glyphspackage files. [fontra-glyphs Issue 140](https://github.com/fontra/fontra-glyphs/issues/140), [fontra-glyphs PR 141](https://github.com/fontra/fontra-glyphs/pull/141)
+
+## 2026-04-29 [version 2026.4.4]
 
 ### New features
 
 - [Windows installer] Add option to add a desktop shortcut. [fontra-pak Issue 239](https://github.com/fontra/fontra-pak/issues/239), [fontra-pak PR 240](https://github.com/fontra/fontra-pak/pull/240)
+
+### Fixes
+
+- [fontra-pak] Reinstate export as .rcjk. This was accidentally removed when .rcjk was removed as an option for new fonts. [fontra-pak PR 244](https://github.com/fontra/fontra-pak/pull/244)
+- [rcjk] Fix .rcjk export by ignoring empty conditional substitutions. [PR 2557](https://github.com/fontra/fontra/pull/2557)
+- [conditional substitutions] Fix axis (`avar`) mapping logic for conditional substitutions. Previously Fontra could substitute glyphs at not quite the correct locations, if an axis had an `avar` mapping. [Issue 2556](https://github.com/fontra/fontra/issues/2556), [PR 2558](https://github.com/fontra/fontra/pull/2558)
+- [conditional substitutions] Fix previewing behavior when a rule has multiple condition sets. [build-shaper-font Issue 30](https://github.com/fontra/build-shaper-font/issues/30), [build-shaper-font PR 31](https://github.com/fontra/build-shaper-font/pull/31)
 
 ## 2026-04-15 [version 2026.4.3]
 

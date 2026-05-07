@@ -112,13 +112,15 @@ class PythonBackend extends AbstractBackend {
   /**
    *
    * @param {string} projectIdentifier
+   * @param {boolean} [readOnly=false] Open the font in read-only mode
    * @returns {Promise<RemoteFont>} Proxy object representing a font on the server.
    */
-  static async remoteFont(projectIdentifier) {
+  static async remoteFont(projectIdentifier, readOnly = false) {
     const protocol = window.location.protocol === "http:" ? "ws" : "wss";
+    const readOnlyString = readOnly ? "&read-only=true" : "";
     const wsURL = `${protocol}://${
       window.location.host
-    }/websocket?project=${encodeURIComponent(projectIdentifier)}`;
+    }/websocket?project=${encodeURIComponent(projectIdentifier)}${readOnlyString}`;
     return getRemoteProxy(wsURL);
   }
 }

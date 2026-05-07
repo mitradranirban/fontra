@@ -96,6 +96,7 @@ export const strings = {
   "axes.preset.slant": "傾斜角度",
   "axes.preset.weight": "字重",
   "axes.preset.width": "字寬",
+  "axes.properties.hidden": "Hidden axis",
   "axes.range": "範圍",
   "axes.range.axis-type": "參數軸類型",
   "axes.range.axis-type.continuous": "連續",

@@ -96,6 +96,7 @@ export const strings = {
   "axes.preset.slant": "Slant",
   "axes.preset.weight": "Weight",
   "axes.preset.width": "Width",
+  "axes.properties.hidden": "Hidden axis",
   "axes.range": "補完軸の範囲",
   "axes.range.axis-type": "補完軸の種類",
   "axes.range.axis-type.continuous": "連続",

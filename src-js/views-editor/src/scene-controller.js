@@ -65,6 +65,24 @@ import { dialog, message } from "@fontra/web-components/modal-dialog.js";
 import { _collectClipGlyphs, getPaintGraph } from "./colrv1-canvas-renderer.js";
 import { EditBehaviorFactory } from "./edit-behavior.js";
 import { SceneModel } from "./scene-model.js";
+
+// Minimum pixels per em and maximum pixels per unit for zooming out and in.
+//
+// Note that these are not _screen pixels_, they are css "pixels" which are
+// scaled by screen DPI and browser zoom level. So on a high dpi display or
+// in a browser with a higher zoom level set, the minimum and maximum scale
+// in _screen pixels_ will be higher (for both).
+//
+// Zooming out is capped by pixels per em to allow a consistent size when
+// zoomed all the way out at different em scales, and zooming in is capped
+// by pixels per unit to allow a consistent 1 unit size when zoomed all the
+// way in regardless of em scale.
+//
+// These values are chosen arbitrarily and in the future there may
+// be some merit to letting users configure this to their own taste.
+const MIN_PIX_PER_EM = 5;
+const MAX_PIX_PER_UNIT = 200;
+
 export class SceneController {
   constructor(
     fontController,
@@ -123,6 +141,7 @@ export class SceneController {
         { sentFromInitializer: true }
       );
       this.updateShaperInfo();
+      this.setCanvasMagnificationLimits();
     });
 
     // Set up the mutual relationship between text and characterLines
@@ -349,6 +368,22 @@ export class SceneController {
     this.fontController.addChangeListener({ glyphMap: null }, (change) =>
       updateCombinedGlyphAndCharacterMapping(null, change)
     );
+
+    this.fontController.addChangeListener({ unitsPerEm: null }, (change) =>
+      this.setCanvasMagnificationLimits()
+    );
+  }
+
+  setCanvasMagnificationLimits() {
+    // The lower magnification limit is implemented relative to UPM
+    // to provide a consistent em size when zoomed all the way out.
+    this.canvasController.minMagnification =
+      MIN_PIX_PER_EM / this.fontController.unitsPerEm;
+
+    // The upper magnification limit is implemented relative to individual
+    // units, so that when zoomed all the way in the size of an individual
+    // unit is the same regardless of em size.
+    this.canvasController.maxMagnification = MAX_PIX_PER_UNIT;
   }
 
   async updateCombinedGlyphAndCharacterMapping(event, change) {

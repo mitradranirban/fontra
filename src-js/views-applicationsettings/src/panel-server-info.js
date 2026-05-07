@@ -24,19 +24,13 @@ export class ServerInfoPanel extends MultiPanelBasePanel {
     this.panelElement.innerHTML = "";
     this.panelElement.style = "gap: 1em;";
 
-    Object.entries(serverInfo).flatMap((entry) => {
+    Object.entries(serverInfo).flatMap(([key, value]) => {
       const container = html.div({ class: "fontra-ui-server-info-panel-card" }, []);
       container.appendChild(
-        html.createDomElement("div", {
-          class: "fontra-ui-server-info-panel-header",
-          innerHTML: entry[0] + ":",
-        })
+        html.div({ class: "fontra-ui-server-info-panel-header" }, [key + ":"])
       );
       container.appendChild(
-        html.createDomElement("div", {
-          class: "fontra-ui-server-info-panel-plain",
-          innerHTML: entry[1],
-        })
+        html.div({ class: "fontra-ui-server-info-panel-plain" }, [value])
       );
       this.panelElement.appendChild(container);
     });

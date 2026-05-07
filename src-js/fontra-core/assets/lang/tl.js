@@ -96,6 +96,7 @@ export const strings = {
   "axes.preset.slant": "Pahilig",
   "axes.preset.weight": "Timbang",
   "axes.preset.width": "Lapad",
+  "axes.properties.hidden": "Hidden axis",
   "axes.range": "Saklaw",
   "axes.range.axis-type": "Uri ng aksis",
   "axes.range.axis-type.continuous": "Tuloy-tuloy",

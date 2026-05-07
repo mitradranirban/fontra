@@ -96,6 +96,7 @@ export const strings = {
   "axes.preset.slant": "Penché",
   "axes.preset.weight": "Graisse",
   "axes.preset.width": "Largeur",
+  "axes.properties.hidden": "Hidden axis",
   "axes.range": "Range",
   "axes.range.axis-type": "Type d'axe",
   "axes.range.axis-type.continuous": "Continue",

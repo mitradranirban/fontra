@@ -104,6 +104,20 @@ function getHelpMenu() {
             window.open("https://github.com/mitradranirban/colr-pak");
           },
         },
+        {
+          title: "Blog",
+          enabled: () => true,
+          callback: () => {
+            window.open("https://blog.fontra.xyz", "fontra.blog");
+          },
+        },
+        {
+          title: "Discord",
+          enabled: () => true,
+          callback: () => {
+            window.open("https://discord.gg/SeZWugEYzd", "fontra.discord");
+          },
+        },
       ];
     },
   };

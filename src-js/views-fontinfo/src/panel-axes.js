@@ -7,6 +7,7 @@ import { ObservableController } from "@fontra/core/observable-object.js";
 import * as svg from "@fontra/core/svg-utils.js";
 import {
   checkboxListCell,
+  labeledCheckbox,
   labeledTextInput,
   setupSortableList,
 } from "@fontra/core/ui-utils.js";
@@ -172,11 +173,19 @@ export class AxesPanel extends BaseInfoPanel {
         ...labeledTextInput(translate("axes.names.name"), controller, "name"),
         ...labeledTextInput(translate("axes.names.ot-tag"), controller, "tag"),
         ...labeledTextInput(translate("axes.names.ui-name"), controller, "label"),
+        labeledCheckbox(translate("axes.properties.hidden"), controller, "hidden", {
+          class: "new-axis-dialog-checkbox",
+        }),
       ]
     );
 
     const dialogContents = html.div({}, [...radioGroup, customFields]);
 
+    dialog.appendStyle(`
+      .new-axis-dialog-checkbox {
+        grid-column-start: span 2;
+      }
+    `);
     dialog.setContent(dialogContents);
     const result = await dialog.run();
     if (!result) {
@@ -196,6 +205,7 @@ export class AxesPanel extends BaseInfoPanel {
       minValue: presetAxis.minValue,
       defaultValue: presetAxis.defaultValue,
       maxValue: presetAxis.maxValue,
+      hidden: controller.model.hidden ?? false,
     };
 
     const undoLabel = translate("axes.undo.add", newAxis.name);
@@ -280,6 +290,10 @@ select {
 
 .fontra-ui-font-info-axes-panel-axis-box-header {
   font-weight: bold;
+}
+
+.fontra-ui-font-info-axes-panel-hidden-checkbox {
+  grid-column-start: span 2;
 }
 `);
 
@@ -408,7 +422,6 @@ class AxisBox extends HTMLElement {
         "data-tooltipposition": "left",
       }),
 
-      // html.div({ class: "fontra-ui-font-info-axes-panel-axis-box-header" }, ["x"]),
       html.div(
         { class: "fontra-ui-font-info-axes-panel-axis-box-names" },
         [
@@ -441,6 +454,12 @@ class AxisBox extends HTMLElement {
             })
           )
           .flat(),
+        labeledCheckbox(
+          translate("axes.properties.hidden"),
+          this.axisController,
+          "hidden",
+          { class: "fontra-ui-font-info-axes-panel-hidden-checkbox" }
+        ),
       ]),
       this.mappingGraph,
       this.mappingList,

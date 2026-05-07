@@ -92,6 +92,7 @@ export class ShaperController {
         glyphOrder,
         isGlyphMarkFunc: (glyphName) => markGlyphsSet.has(glyphName),
         insertMarkers,
+        fallbackXAdvance: this.fontController.fallbackXAdvance,
       };
 
       // If compiling the font failed (!fontData) and we have a previous
@@ -102,8 +103,7 @@ export class ShaperController {
           : getShaper(shaperSupport);
 
       if (textShaping && fontData) {
-        // The new shaper is good, help harfbuzzjs with GS and close the old one
-        this._previousShaper?.close();
+        // The new shaper is good
         this._previousShaper = shaper;
       }
 
@@ -170,6 +170,7 @@ export class ShaperController {
     const conditionalSubstitutions = prepareConditionalSubstitutions(
       await this.fontController.getConditionalSubstitutions(),
       this.fontController.fontAxes,
+      this.fontController.fontAxesSourceSpace,
       this.fontController.glyphMap
     );
 
@@ -319,13 +320,25 @@ function ensureNotdef(glyphOrder) {
   glyphOrder.unshift(".notdef");
 }
 
-function prepareConditionalSubstitutions(substitutions, fontAxes, glyphMap) {
+function prepareConditionalSubstitutions(
+  substitutions,
+  fontAxes,
+  fontAxesSourceSpace,
+  glyphMap
+) {
   const axesByName = Object.fromEntries(fontAxes.map((axis) => [axis.name, axis]));
   const mapFuncs = Object.fromEntries(
-    fontAxes.map((axis) => {
-      const mapping = axis.mapping
-        ? Object.fromEntries(axis.mapping.map(([a, b]) => [b, a]))
-        : null;
+    fontAxesSourceSpace.map((axisSourceSpace) => {
+      const axis = axesByName[axisSourceSpace.name];
+      // We don't "unapply" avar mapping, we just *scale* from source space to user space
+      const mapping =
+        axis.mapping && axis.minValue != undefined
+          ? {
+              [axisSourceSpace.minValue]: axis.minValue,
+              [axisSourceSpace.defaultValue]: axis.defaultValue,
+              [axisSourceSpace.maxValue]: axis.maxValue,
+            }
+          : null;
       return [axis.name, mapping ? (v) => piecewiseLinearMap(v, mapping) : (v) => v];
     })
   );

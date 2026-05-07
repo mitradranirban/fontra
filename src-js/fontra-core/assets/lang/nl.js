@@ -96,6 +96,7 @@ export const strings = {
   "axes.preset.slant": "Hellingshoek",
   "axes.preset.weight": "Gewicht",
   "axes.preset.width": "Breedte",
+  "axes.properties.hidden": "Hidden axis",
   "axes.range": "Bereik",
   "axes.range.axis-type": "As type",
   "axes.range.axis-type.continuous": "Doorlopend",

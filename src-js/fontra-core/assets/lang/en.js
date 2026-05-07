@@ -96,6 +96,7 @@ export const strings = {
   "axes.preset.slant": "Slant",
   "axes.preset.weight": "Weight",
   "axes.preset.width": "Width",
+  "axes.properties.hidden": "Hidden axis",
   "axes.range": "Range",
   "axes.range.axis-type": "Axis type",
   "axes.range.axis-type.continuous": "Continuous",
