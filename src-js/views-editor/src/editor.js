@@ -91,6 +91,7 @@ import { subVectors } from "@fontra/core/vector.js";
 import { ViewController } from "@fontra/core/view-controller.js";
 import { collectReferencedGlyphs } from "./colrv1-utils.js";
 import CharactersGlyphsPanel from "./panel-characters-glyphs.js";
+import ColorGraphPanel from "./panel-color-graph.js";
 import ColorLayersPanel from "./panel-color-layers.js";
 import DesignspaceNavigationPanel from "./panel-designspace-navigation.js";
 import GlyphNotePanel from "./panel-glyph-note.js";
@@ -1079,6 +1080,7 @@ export class EditorController extends ViewController {
     this.addSidebarPanel(new GlyphNotePanel(this), "right");
     this.addSidebarPanel(new RelatedGlyphsPanel(this), "right");
     this.addSidebarPanel(new ColorLayersPanel(this), "right");
+    this.addSidebarPanel(new ColorGraphPanel(this), "right");
     this.addSidebarPanel(new CharactersGlyphsPanel(this), "right");
 
     // Upon reload, the "animating" class may still be set (why?), so remove it
@@ -1125,7 +1127,7 @@ export class EditorController extends ViewController {
       );
     }
 
-    if (sidebar.panelIdentifiers.includes(panelElement.name)) {
+    if (sidebar.panelIdentifiers.includes(panelElement.identifier)) {
       throw new Error(
         `Panel "${panelElement.identifier}" in "${sidebarName}" sidebar exists.`
       );

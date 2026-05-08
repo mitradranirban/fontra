@@ -66,3 +66,26 @@
 ,color-layers.transformed-glyph,Transformed Glyph,变换字形,変換されたグリフ,변환된 글리프,Glyphe transformé,Transformiertes Glyph,Glifo transformado,Getransformeerde glyph,የተቀየረ ፊደል,轉換字符,Transformed na Glyph
 ,color-layers.convert-to-v1,→ COLRv1,→ COLRv1,→ COLRv1,→ COLRv1,→ COLRv1,→ COLRv1,→ COLRv1,→ COLRv1,→ COLRv1,→ COLRv1,→ COLRv1
 ,color-layers.add-kf-at-current-location,Add keyframe at current axis location,在当前轴位置添加关键帧,現在の軸位置にキーフレームを追加,현재 축 위치에 키프레임 추가,Ajouter un keyframe à la position actuelle de l'axe,Keyframe an der aktuellen Achsenposition hinzufügen,Agregar fotograma clave en la ubicación actual del eje,Keyframe toevoegen op huidige aspositie,በአሁኑ ዘንግ ቦታ ቁልፍ ፍሬም ጨምር,在目前軸位置新增關鍵影格,Magdagdag ng keyframe sa kasalukuyang lokasyon ng axis
+,color-graph.title,Color Graph,颜色图形,カラーグラフ,색상 그래프,Graphique de couleur,Farbgraph,Gráfico de color,Kleurengraph,የቀለም ግራፍ,顏色圖形,Grapo ng Kulay
+,color-graph.paint-graph,Paint Graph,绘制图形,ペイントグラフ,페인트 그래프,Graphique de peinture,Farbauftragsgraph,Gráfico de pintura,Verfgraph,የቀለም ሥዕል ግራፍ,繪製圖形,Grapo ng Pintura
+,color-graph.no-palette,No color palette found,未找到调色板,カラーパレットが見つかりません,색상 팔레트를 찾을 수 없습니다,Aucune palette de couleurs trouvée,Keine Farbpalette gefunden,No se encontró paleta de colores,Geen kleurenpalet gevonden,የቀለም ፓሌት አልተገኘም,未找到調色板,Walang nakitang palette ng kulay
+,color-graph.no-glyph-selected,No glyph selected,未选择字形,グリフが選択されていません,글리프가 선택되지 않았습니다,Aucun glyphe sélectionné,Kein Glyph ausgewählt,Ningún glifo seleccionado,Geen glyph geselecteerd,ምንም ፊደል አልተመረጠም,未選擇字符,Walang napiling glyph
+,color-graph.no-paint-data,No COLRv1 paint data,没有 COLRv1 绘制数据,COLRv1 のペイントデータがありません,COLRv1 페인트 데이터 없음,Aucune donnée de peinture COLRv1,Keine COLRv1-Farbdaten,Sin datos de pintura COLRv1,Geen COLRv1-verfgegevens,የ COLRv1 ቀለም ውሂብ የለም,沒有 COLRv1 繪製資料,Walang datos ng pintura ng COLRv1
+,color-graph.palette,Palette,调色板,パレット,팔레트,Palette,Palette,Paleta,Palet,ፓሌት,調色板,Palette
+,color-graph.solid,Solid,纯色,単色,단색,Solide,Einfarbig,Sólido,Effen,ጠንካራ,純色,Solid
+,color-graph.linear-gradient,Linear Gradient,线性渐变,線形グラデーション,선형 그라디언트,Dégradé linéaire,Linearer Verlauf,Degradado lineal,Lineair verloop,ቀጥተኛ ቁልቁሌት,線性漸層,Linear na Gradient
+,color-graph.radial-gradient,Radial Gradient,径向渐变,放射状グラデーション,방사형 그라디언트,Dégradé radial,Radialer Verlauf,Degradado radial,Radiaal verloop,ሃዲያ ቁልቁሌት,放射狀漸層,Radial na Gradient
+,color-graph.sweep-gradient,Sweep Gradient,扫描渐变,スイープグラデーション,스윕 그라디언트,Dégradé balayage,Sweep-Verlauf,Degradado de barrido,Sweep-verloop,ሽፋን ቁልቁሌት,掃描漸層,Sweep na Gradient
+,color-graph.layers,Layers,图层,レイヤー,레이어,Couches,Ebenen,Capas,Lagen,ሽፋኖች,圖層,Mga Layer
+,color-graph.transform,Transform,变换,変換,변환,Transformation,Transformieren,Transformar,Transformatie,ለውጥ,變換,Transform
+,color-graph.composite,Composite,合成,コンポジット,합성,Composite,Komposit,Compuesto,Composiet,ውህደት,合成,Composite
+,color-graph.glyph,Glyph,字形,グリフ,글리프,Glyphe,Glyph,Glifo,Glyph,ፊደል,字符,Glyph
+,color-graph.composite-mode,Composite Mode,合成模式,合成モード,합성 모드,Mode composite,Kompositmodus,Modo compuesto,Composietmodus,የውህደት ሁነታ,合成模式,Mode ng Composite
+,color-graph.source-paint,Source Paint,源绘制,ソースペイント,소스 페인트,Peinture source,Quell-Farbe,Pintura fuente,Bronverf,የምንጭ ቀለም,來源繪製,Source na Pintura
+,color-graph.backdrop-paint,Backdrop Paint,背景绘制,バックドロップペイント,배경 페인트,Peinture de fond,Hintergrund-Farbe,Pintura de fondo,Achtergrondverf,የጀርባ ቀለም,背景繪製,Backdrop na Pintura
+,color-graph.refresh,Refresh,刷新,更新,새로 고침,Actualiser,Aktualisieren,Actualizar,Vernieuwen,አድስ,重新整理,I-refresh
+,color-graph.add-paint-layers,Add paint layers in the Color Layers panel,在颜色图层面板中添加绘制图层,カラーレイヤーパネルでペイントレイヤーを追加してください,색상 레이어 패널에서 페인트 레이어를 추가하세요,Ajoutez des couches de peinture dans le panneau Couches de couleur,Fügen Sie Farbebenen im Farbebenen-Panel hinzu,Agregue capas de pintura en el panel Capas de color,Voeg verflagen toe in het paneel Kleurenlagen,በቀለም ሽፋን ፓነል ውስጥ የቀለም ሽፋኖችን ያክሉ,在顏色圖層面板中新增繪製圖層,Magdagdag ng mga layer ng pintura sa panel ng Color Layers
+,color-graph.palette-index,Palette Index,调色板索引,パレットインデックス,팔레트 인덱스,Index de palette,Palettenindex,Índice de paleta,Paletindex,የፓሌት ኢንዴክስ,調色板索引,Index ng Palette
+,color-graph.alpha,Alpha,透明度,アルファ,알파,Alpha,Alpha,Alfa,Alfa,አልፋ,不透明度,Alpha
+,color-graph.color-stops,Color Stops,颜色停止点,カラーストップ,색상 중지점,Arrêts de couleur,Farbstopps,Paradas de color,Kleurstops,የቀለም ማቆሚያዎች,顏色停止點,Mga Color Stop
+,color-graph.unknown,Unknown,未知,不明,알 수 없음,Inconnu,Unbekannt,Desconocido,Onbekend,ያልታወቀ,未知,Hindi Kilala

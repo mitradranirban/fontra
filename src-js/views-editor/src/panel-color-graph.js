@@ -1,0 +1,606 @@
+/**
+ * panel-color-graph.js
+ * Visual Color Graph Panel for ColorPak v0.7.0
+ *
+ * Renders COLRv1 paint trees as interactive visual graphs with live color previews,
+ * instead of the text-form-based approach used in panel-color-layers.js.
+ */
+
+import * as html from "@fontra/core/html-utils.js";
+import { translate } from "@fontra/core/localization.js";
+import Panel from "./panel.js";
+
+const PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes";
+const CUSTOM_DATA_KEY = "colorLayerMapping";
+const COLRV1_KEY = "colorv1";
+
+// ---------------------------------------------------------------------------
+// Paint type → display color category
+// ---------------------------------------------------------------------------
+const PAINT_CATEGORY_COLORS = {
+  PaintSolid: "#4f98a3",
+  PaintLinearGradient: "#6daa45",
+  PaintRadialGradient: "#a86fdf",
+  PaintSweepGradient: "#fdab43",
+  PaintGlyph: "#5591c7",
+  PaintColrGlyph: "#5591c7",
+  PaintVarGlyph: "#5591c7",
+  PaintColrLayers: "#dd6974",
+  PaintTranslate: "#e8af34",
+  PaintRotate: "#e8af34",
+  PaintSkew: "#e8af34",
+  PaintTransform: "#e8af34",
+  PaintScale: "#e8af34",
+  PaintComposite: "#bb653b",
+};
+
+function normalizePaintType(t) {
+  return t?.replace?.("Var", "") ?? t;
+}
+
+// ---------------------------------------------------------------------------
+// Render a CSS gradient preview for gradient paints
+// ---------------------------------------------------------------------------
+function buildGradientPreview(paint, palette) {
+  const stops = paint?.colorLine?.colorStops ?? [];
+  if (!stops.length) return "transparent";
+  const cssStops = stops.map((s) => {
+    const hex = palette[s.paletteIndex] ?? "#888";
+    const alpha = s.alpha ?? 1.0;
+    const pct = Math.round((s.stopOffset ?? 0) * 100);
+    return `${hexWithAlpha(hex, alpha)} ${pct}%`;
+  });
+  const type = normalizePaintType(paint?.type ?? "");
+  if (type === "PaintLinearGradient") {
+    return `linear-gradient(to right, ${cssStops.join(", ")})`;
+  }
+  if (type === "PaintRadialGradient") {
+    return `radial-gradient(circle, ${cssStops.join(", ")})`;
+  }
+  if (type === "PaintSweepGradient") {
+    return `conic-gradient(${cssStops.join(", ")})`;
+  }
+  return `linear-gradient(to right, ${cssStops.join(", ")})`;
+}
+
+function hexWithAlpha(hex, alpha) {
+  if (!hex || !hex.startsWith("#")) return `rgba(128,128,128,${alpha})`;
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+// ---------------------------------------------------------------------------
+// Build a paint swatch element for a given paint + palette
+// ---------------------------------------------------------------------------
+function makePaintSwatch(paint, palette) {
+  const type = normalizePaintType(paint?.type ?? "");
+  const size = "28px";
+  const style = `
+    width:${size}; height:${size}; border-radius:50%; display:inline-block;
+    flex-shrink:0; border:1.5px solid rgba(255,255,255,0.18);
+    box-shadow:0 1px 4px rgba(0,0,0,0.35);
+    vertical-align:middle; overflow:hidden;
+  `;
+  if (type === "PaintSolid") {
+    const hex = palette[paint?.paletteIndex ?? 0] ?? "#888";
+    const alpha = paint?.alpha ?? 1.0;
+    return html.span({ style: style + `background:${hexWithAlpha(hex, alpha)};` });
+  }
+  if (
+    ["PaintLinearGradient", "PaintRadialGradient", "PaintSweepGradient"].includes(type)
+  ) {
+    const grad = buildGradientPreview(paint, palette);
+    return html.span({ style: style + `background:${grad};` });
+  }
+  // Structural / composite / glyph nodes — show category icon-color indicator
+  const catColor = PAINT_CATEGORY_COLORS[type] ?? "#888";
+  return html.span({
+    style: style + `background:${catColor}22; border-color:${catColor};`,
+    title: type,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Build a color-stop row list for gradient paints
+// ---------------------------------------------------------------------------
+function makeColorStopsPreview(paint, palette) {
+  const stops = paint?.colorLine?.colorStops ?? [];
+  if (!stops.length)
+    return html.span({ style: "font-size:0.75em;opacity:0.5;" }, "no stops");
+  const row = html.div({
+    style: "display:flex; gap:4px; flex-wrap:wrap; margin-top:4px;",
+  });
+  for (const s of stops) {
+    const hex = palette[s.paletteIndex ?? 0] ?? "#888";
+    const alpha = s.alpha ?? 1.0;
+    const pct = Math.round((s.stopOffset ?? 0) * 100);
+    const swatch = html.div({
+      style: `display:inline-flex; align-items:center; gap:3px;
+              font-size:0.72em; background:rgba(255,255,255,0.06);
+              border-radius:4px; padding:1px 5px; color:var(--color-text-muted);`,
+      title: `Index ${s.paletteIndex}, alpha=${alpha}`,
+    });
+    swatch.appendChild(
+      html.span({
+        style: `width:12px;height:12px;border-radius:50%;display:inline-block;
+              background:${hexWithAlpha(
+                hex,
+                alpha
+              )};border:1px solid rgba(255,255,255,0.2);`,
+      })
+    );
+    swatch.appendChild(document.createTextNode(`${pct}%`));
+    row.appendChild(swatch);
+  }
+  return row;
+}
+
+// ---------------------------------------------------------------------------
+// Render a single paint node as a visual card in the graph
+// ---------------------------------------------------------------------------
+function makePaintNode(paint, depth, palette, opts = {}) {
+  const { label = "", onSelectPaint, selectedPaintId, nodeId } = opts;
+  const type = normalizePaintType(paint?.type ?? translate("color-graph.unknown"));
+  const catColor = PAINT_CATEGORY_COLORS[type] ?? "#888";
+  const isSelected = nodeId !== undefined && nodeId === selectedPaintId?.current;
+
+  const node = html.div({
+    class: `cgp-node cgp-node--${type.toLowerCase()} ${
+      isSelected ? "cgp-node--selected" : ""
+    }`,
+    style: `
+      margin-left:${depth * 18}px;
+      border-left: 3px solid ${catColor};
+      background: var(--color-surface, #1c1b19);
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 4px;
+      padding: 6px 10px;
+      cursor: pointer;
+      transition: background 150ms;
+    `,
+    onclick: () => onSelectPaint && onSelectPaint(paint, nodeId),
+    title: type,
+  });
+
+  // Header row
+  const header = html.div({ style: "display:flex; align-items:center; gap:8px;" });
+  header.appendChild(makePaintSwatch(paint, palette));
+
+  const typeLabel = html.span(
+    {
+      style: `font-size:0.8em; font-weight:600; color:${catColor};
+            flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;`,
+    },
+    label ? `${label} · ${type}` : type
+  );
+  header.appendChild(typeLabel);
+
+  // Glyph reference badge
+  const glyphName = paint?.glyph ?? paint?.paint?.glyph;
+  if (glyphName) {
+    header.appendChild(
+      html.span(
+        {
+          style: `font-size:0.72em; background:rgba(255,255,255,0.1); border-radius:3px;
+              padding:1px 5px; color:var(--color-text-muted); max-width:80px;
+              overflow:hidden; text-overflow:ellipsis; white-space:nowrap;`,
+          title: glyphName,
+        },
+        glyphName
+      )
+    );
+  }
+
+  node.appendChild(header);
+
+  // Gradient bar + color stops
+  if (
+    ["PaintLinearGradient", "PaintRadialGradient", "PaintSweepGradient"].includes(type)
+  ) {
+    const gradBar = html.div({
+      style: `margin-top:5px; height:8px; border-radius:4px;
+              background:${buildGradientPreview(paint, palette)};
+              border:1px solid rgba(255,255,255,0.08);`,
+    });
+    node.appendChild(gradBar);
+    node.appendChild(makeColorStopsPreview(paint, palette));
+  }
+
+  // Palette index + alpha for solid paints
+  if (type === "PaintSolid") {
+    const alpha = paint?.alpha ?? 1.0;
+    const idx = paint?.paletteIndex ?? 0;
+    node.appendChild(
+      html.div(
+        {
+          style: "font-size:0.72em; color:var(--color-text-muted); margin-top:3px;",
+        },
+        `${translate("color-graph.palette-index")}: ${idx}  ${translate(
+          "color-graph.alpha"
+        )}: ${alpha.toFixed(2)}`
+      )
+    );
+  }
+
+  // Transform params summary
+  if (
+    [
+      "PaintTranslate",
+      "PaintRotate",
+      "PaintSkew",
+      "PaintScale",
+      "PaintScaleUniform",
+    ].includes(type)
+  ) {
+    const params = [];
+    if (paint?.dx !== undefined) params.push(`dx=${paint.dx} dy=${paint.dy}`);
+    if (paint?.angle !== undefined) params.push(`angle=${paint.angle}`);
+    if (paint?.xSkewAngle !== undefined)
+      params.push(`skewX=${paint.xSkewAngle} skewY=${paint.ySkewAngle}`);
+    if (paint?.scaleX !== undefined)
+      params.push(`scaleX=${paint.scaleX} scaleY=${paint.scaleY}`);
+    if (paint?.scale !== undefined) params.push(`scale=${paint.scale}`);
+    if (params.length) {
+      node.appendChild(
+        html.div(
+          {
+            style: "font-size:0.72em; color:var(--color-text-muted); margin-top:3px;",
+          },
+          params.join(" · ")
+        )
+      );
+    }
+  }
+
+  // PaintTransform matrix summary
+  if (type === "PaintTransform" && paint?.transform) {
+    const t = paint.transform;
+    node.appendChild(
+      html.div(
+        {
+          style:
+            "font-size:0.72em; color:var(--color-text-muted); margin-top:3px; font-family:monospace;",
+        },
+        `[${t.xx ?? 1}, ${t.yx ?? 0}, ${t.xy ?? 0}, ${t.yy ?? 1}] dx=${t.dx ?? 0} dy=${
+          t.dy ?? 0
+        }`
+      )
+    );
+  }
+
+  // Composite mode badge
+  if (type === "PaintComposite" && paint?.compositeMode) {
+    node.appendChild(
+      html.div(
+        {
+          style: `display:inline-block; font-size:0.72em; background:rgba(187,101,59,0.25);
+              border-radius:3px; padding:1px 6px; margin-top:4px; color:#bb653b;`,
+        },
+        `${translate("color-graph.composite-mode")}: ${paint.compositeMode}`
+      )
+    );
+  }
+
+  return node;
+}
+
+// ---------------------------------------------------------------------------
+// Recursively walk a paint tree and produce node elements
+// ---------------------------------------------------------------------------
+function renderPaintTree(paint, depth, palette, container, opts, counter = { n: 0 }) {
+  if (!paint) return;
+  const nodeId = counter.n++;
+  const type = normalizePaintType(paint?.type ?? "");
+  const node = makePaintNode(paint, depth, palette, { ...opts, nodeId });
+  container.appendChild(node);
+
+  // PaintColrLayers / layer arrays
+  if (paint.layers?.length) {
+    for (let i = 0; i < paint.layers.length; i++) {
+      const layer = paint.layers[i];
+      // Each layer can be a PaintGlyph-like struct (has .glyph + .paint) or a raw paint
+      const isGlyphLayer =
+        layer.type === "PaintGlyph" || layer.type === "PaintVarGlyph";
+      const childPaint = isGlyphLayer ? layer : layer.paint ?? layer;
+      const glyph = layer.glyph ?? layer.paint?.glyph ?? "";
+      renderPaintTree(
+        isGlyphLayer ? layer : childPaint,
+        depth + 1,
+        palette,
+        container,
+        { ...opts, label: glyph ? `[${i}] ${glyph}` : `[${i}]` },
+        counter
+      );
+    }
+  } else if (paint.paint) {
+    // Single nested paint (PaintGlyph, PaintTranslate, PaintRotate, etc.)
+    renderPaintTree(
+      paint.paint,
+      depth + 1,
+      palette,
+      container,
+      { ...opts, label: "fill" },
+      counter
+    );
+  }
+
+  // Composite children
+  if (type === "PaintComposite") {
+    if (paint.sourcePaint) {
+      renderPaintTree(
+        paint.sourcePaint,
+        depth + 1,
+        palette,
+        container,
+        { ...opts, label: "source" },
+        counter
+      );
+    }
+    if (paint.backdropPaint) {
+      renderPaintTree(
+        paint.backdropPaint,
+        depth + 1,
+        palette,
+        container,
+        { ...opts, label: "backdrop" },
+        counter
+      );
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Palette color tile strip (top of panel)
+// ---------------------------------------------------------------------------
+function makePaletteStrip(palette) {
+  const strip = html.div({
+    style: `display:flex; flex-wrap:wrap; gap:4px; padding:6px 10px;
+            background:var(--color-surface-offset, #1d1c1a);
+            border-bottom:1px solid var(--color-border, #393836);`,
+  });
+  const label = html.span(
+    {
+      style:
+        "font-size:0.7em; color:var(--color-text-muted); align-self:center; margin-right:4px;",
+    },
+    translate("color-graph.palette") + ":"
+  );
+  strip.appendChild(label);
+  for (let i = 0; i < palette.length; i++) {
+    const hex = palette[i] ?? "#888";
+    strip.appendChild(
+      html.div({
+        style: `width:18px; height:18px; border-radius:3px; background:${hex};
+              border:1px solid rgba(255,255,255,0.15); flex-shrink:0;`,
+        title: `[${i}] ${hex}`,
+      })
+    );
+  }
+  return strip;
+}
+
+// ---------------------------------------------------------------------------
+// Legend bar
+// ---------------------------------------------------------------------------
+function makeLegend() {
+  const entries = [
+    ["PaintSolid", translate("color-graph.solid")],
+    ["PaintLinearGradient", translate("color-graph.linear-gradient")],
+    ["PaintRadialGradient", translate("color-graph.radial-gradient")],
+    ["PaintSweepGradient", translate("color-graph.sweep-gradient")],
+    ["PaintGlyph", translate("color-graph.glyph")],
+    ["PaintColrLayers", translate("color-graph.layers")],
+    ["PaintTranslate", translate("color-graph.transform")],
+    ["PaintComposite", translate("color-graph.composite")],
+  ];
+  const legend = html.div({
+    style: `display:flex; flex-wrap:wrap; gap:6px; padding:5px 10px;
+            font-size:0.7em; color:var(--color-text-muted);
+            border-bottom:1px solid var(--color-border, #393836);
+            background:var(--color-surface, #1c1b19);`,
+  });
+  for (const [key, label] of entries) {
+    const color = PAINT_CATEGORY_COLORS[key] ?? "#888";
+    const item = html.div({ style: "display:flex; align-items:center; gap:3px;" });
+    item.appendChild(
+      html.span({
+        style: `width:9px; height:9px; border-radius:50%; background:${color}; display:inline-block; flex-shrink:0;`,
+      })
+    );
+    item.appendChild(document.createTextNode(label));
+    legend.appendChild(item);
+  }
+  return legend;
+}
+
+// ---------------------------------------------------------------------------
+// Empty / no-data placeholder
+// ---------------------------------------------------------------------------
+function makeEmptyState(message) {
+  return html.div(
+    {
+      style:
+        "display:flex; flex-direction:column; align-items:center; justify-content:center; padding:48px 16px; color:var(--color-text-muted); font-size:0.85em; gap:10px; text-align:center; flex:1;",
+    },
+    html.div({ style: "font-size:2.5em; opacity:0.25; line-height:1;" }, "◎"),
+    html.div({}, message)
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Inject required CSS (once per document)
+// ---------------------------------------------------------------------------
+function ensureStyles() {
+  if (document.getElementById("cgp-styles")) return;
+  const style = document.createElement("style");
+  style.id = "cgp-styles";
+  style.textContent = `
+    .cgp-node { transition: background 150ms ease; }
+    .cgp-node:hover { background: var(--color-surface-2, #201f1d) !important; }
+    .cgp-node--selected {
+      background: var(--color-surface-dynamic, #2d2c2a) !important;
+      outline: 1px solid var(--color-primary, #4f98a3);
+      outline-offset: -1px;
+    }
+    .color-graph-panel {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+      background: var(--color-bg, #171614);
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// ---------------------------------------------------------------------------
+// The Panel class
+// ---------------------------------------------------------------------------
+export default class ColorGraphPanel extends Panel {
+  static identifier = "color-graph";
+  static iconPath = "images/color-graph.svg";
+
+  constructor(editorController) {
+    super(editorController);
+    this.sceneController = editorController.sceneController;
+    this._selectedPaintId = { current: null };
+    this.sceneController.sceneSettingsController.addKeyListener(
+      "selectedGlyphName",
+      () => this.update()
+    );
+    this.sceneController.addCurrentGlyphChangeListener(() => this.update());
+  }
+
+  getContentElement() {
+    this._container = html.div({ class: "color-graph-panel" });
+    return this._container;
+  }
+
+  async toggle(on, focus) {
+    if (on) await this.update();
+  }
+
+  // -------------------------------------------------------------------------
+  // Main render method
+  // -------------------------------------------------------------------------
+  async update() {
+    const container = this._container;
+    if (!container) return;
+    container.innerHTML = "";
+    ensureStyles();
+
+    // --- Palette ---
+    let palette = [];
+    try {
+      const cd = this.fontController?.customData ?? {};
+      const raw = cd[PALETTES_KEY]?.[0] ?? [];
+      palette = raw.map((entry) => {
+        if (Array.isArray(entry)) {
+          // [r, g, b] or [r, g, b, a] — convert to hex
+          const [r, g, b] = entry;
+          return `#${r.toString(16).padStart(2, "0")}${g
+            .toString(16)
+            .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+        }
+        return entry; // assume already a hex string
+      });
+    } catch (_) {}
+
+    if (!palette.length) {
+      container.appendChild(makeEmptyState(translate("color-graph.no-palette")));
+      return;
+    }
+
+    // --- Selected glyph ---
+    const glyphName = this.sceneController?.sceneSettings?.selectedGlyphName;
+    if (!glyphName) {
+      container.appendChild(makeEmptyState(translate("color-graph.no-glyph-selected")));
+      return;
+    }
+
+    // --- COLRv1 paint data ---
+    let paint = null;
+    try {
+      const varGlyphController =
+        await this.sceneController.sceneModel.getSelectedVariableGlyphController();
+      const varGlyph = varGlyphController?.glyph;
+      const pg = this.sceneController.sceneModel?.getSelectedPositionedGlyph?.();
+      const instanceGlyph = pg?.glyph?.instance;
+      const colorV1Data =
+        instanceGlyph?.customData?.[COLRV1_KEY] ?? varGlyph?.customData?.[COLRV1_KEY];
+      if (colorV1Data) {
+        paint = colorV1Data;
+        // Normalize to PaintColrLayers wrapper for consistent rendering
+        if (paint.type !== "PaintColrLayers") {
+          paint = { type: "PaintColrLayers", layers: [paint] };
+        }
+      }
+    } catch (_) {}
+
+    // --- Header bar ---
+    const headerBar = html.div({
+      style: `display:flex; align-items:center; padding:6px 10px; gap:8px;
+              border-bottom:1px solid var(--color-border, #393836);
+              background:var(--color-surface, #1c1b19); flex-shrink:0;`,
+    });
+    headerBar.appendChild(
+      html.span(
+        {
+          style:
+            "font-size:0.78em; font-weight:600; color:var(--color-text, #cdccca); flex:1;",
+        },
+        `${translate("color-graph.paint-graph")} — ${glyphName}`
+      )
+    );
+
+    // Refresh button
+    const refreshBtn = html.button(
+      {
+        style: `font-size:0.78em; padding:2px 8px; border-radius:4px; cursor:pointer;
+              background:var(--color-surface-offset); border:1px solid var(--color-border);
+              color:var(--color-text-muted);`,
+        onclick: () => this.update(),
+        title: translate("color-graph.refresh"),
+      },
+      translate("color-graph.refresh")
+    );
+    headerBar.appendChild(refreshBtn);
+    container.appendChild(headerBar);
+
+    // --- Palette strip ---
+    container.appendChild(makePaletteStrip(palette));
+
+    // --- Legend ---
+    container.appendChild(makeLegend());
+
+    // --- Graph scroll area ---
+    const scrollArea = html.div({
+      style: `flex:1; overflow-y:auto; overflow-x:hidden; padding:8px 8px 24px;`,
+    });
+
+    if (!paint) {
+      scrollArea.appendChild(
+        makeEmptyState(
+          `${translate("color-graph.no-paint-data")} — ${glyphName}. ${translate(
+            "color-graph.add-paint-layers"
+          )}`
+        )
+      );
+    } else {
+      renderPaintTree(paint, 0, palette, scrollArea, {
+        onSelectPaint: (p, id) => {
+          this._selectedPaintId.current =
+            this._selectedPaintId.current === id ? null : id;
+          this.update();
+        },
+        selectedPaintId: this._selectedPaintId,
+      });
+    }
+
+    container.appendChild(scrollArea);
+  }
+}
+
+customElements.define("panel-color-graph", ColorGraphPanel);
