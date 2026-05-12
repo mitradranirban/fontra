@@ -357,6 +357,7 @@ export const strings = {
   "sidebar.characters-glyphs.shaping-debugger.options-menu-tooltip": " ",
   "sidebar.characters-glyphs.shaping-debugger.show-ineffective-items":
     "Show ineffective items",
+  "sidebar.color-graph": "颜色图形",
   "sidebar.color-layers": "颜色图层",
   "sidebar.color-layers.title": "颜色图层",
   "sidebar.designspace-navigation": "Designspace 导航",

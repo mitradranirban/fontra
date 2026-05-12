@@ -18,7 +18,7 @@ export const strings = {
   "action.add-guideline-between-points": "在兩點間新增參考線",
   "action.add-paint": "新增繪製",
   "action.add-paint.no-v1-layers.message":
-    'ይህ ፊደል እስካሁን COLRv1 ሽፋኖች የሉትም። መጀመሪያ የቀለም ሽፋኖች ፓኔሉ ውስጥ ያለውን "v1" ቁልፍ ተጠቅሞ ቀለም ግራፉን ያስጀምሩ።',
+    "此字符尚無 COLRv1 圖層。請先使用色彩圖層面板中的「v1」按鈕初始化繪製圖。",
   "action.add-paint.no-v1-layers.title": "沒有 COLRv1 繪製圖",
   "action.break-contour": "斷開輪廓",
   "action.break-contour.plural": "斷開輪廓",
@@ -358,6 +358,7 @@ export const strings = {
     "Shaping debugger options",
   "sidebar.characters-glyphs.shaping-debugger.show-ineffective-items":
     "Show ineffective items",
+  "sidebar.color-graph": "顏色圖形",
   "sidebar.color-layers": "色彩圖層",
   "sidebar.color-layers.title": "色彩圖層",
   "sidebar.designspace-navigation": "Designspace 導覽",

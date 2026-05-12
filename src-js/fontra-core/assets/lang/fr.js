@@ -380,6 +380,7 @@ export const strings = {
     "Shaping debugger options",
   "sidebar.characters-glyphs.shaping-debugger.show-ineffective-items":
     "Show ineffective items",
+  "sidebar.color-graph": "Graphique de couleur",
   "sidebar.color-layers": "Calques de couleur",
   "sidebar.color-layers.title": "Calques de couleur",
   "sidebar.designspace-navigation": "Navigation du designspace",

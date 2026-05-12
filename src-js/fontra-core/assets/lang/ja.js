@@ -373,6 +373,7 @@ export const strings = {
     "Shaping debugger options",
   "sidebar.characters-glyphs.shaping-debugger.show-ineffective-items":
     "Show ineffective items",
+  "sidebar.color-graph": "カラーグラフ",
   "sidebar.color-layers": "カラーレイヤー",
   "sidebar.color-layers.title": "カラーレイヤー",
   "sidebar.designspace-navigation": "Designspaceナビゲーション",

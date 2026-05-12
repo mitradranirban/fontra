@@ -18,7 +18,7 @@ export const strings = {
   "action.add-guideline-between-points": "Add Guideline Between Points",
   "action.add-paint": "Paint hinzufügen",
   "action.add-paint.no-v1-layers.message":
-    "Dieses Glyph hat noch keine COLRv1-Ebenen. Verwenden Sie zuerst die Schaltfläche „v1 im Farbebenen-Panel",
+    'Dieses Glyph hat noch keine COLRv1-Ebenen. Verwenden Sie zuerst die Schaltfläche „v1" im Farbebenen-Panel, um das Maldiagramm zu initialisieren.',
   "action.add-paint.no-v1-layers.title": "Kein COLRv1-Maldiagramm",
   "action.break-contour": "Kontur öffnen",
   "action.break-contour.plural": "Konturen öffnen",
@@ -377,6 +377,7 @@ export const strings = {
     "Shaping debugger options",
   "sidebar.characters-glyphs.shaping-debugger.show-ineffective-items":
     "Show ineffective items",
+  "sidebar.color-graph": "Farbgraph",
   "sidebar.color-layers": "Farbebenen",
   "sidebar.color-layers.title": "Farbebenen",
   "sidebar.designspace-navigation": "Designspace Navigation",

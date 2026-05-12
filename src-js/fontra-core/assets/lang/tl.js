@@ -18,7 +18,7 @@ export const strings = {
   "action.add-guideline-between-points": "Magdagdag ng Gabay sa Pagitan ng mga Puntos",
   "action.add-paint": "Magdagdag ng Paint",
   "action.add-paint.no-v1-layers.message":
-    "此字符尚無 COLRv1 圖層。請先使用色彩圖層面板中的「v1」按鈕初始化繪製圖。",
+    'Ang glyphe na ito ay wala pang mga COLRv1 layer. Gamitin ang "v1" na button sa Color Layers panel upang simulan ang paint graph muna.',
   "action.add-paint.no-v1-layers.title": "Walang COLRv1 Paint Graph",
   "action.break-contour": "Hugis ng Paghihiwalay",
   "action.break-contour.plural": "Mga Contour ng Break",
@@ -382,6 +382,7 @@ export const strings = {
     "Shaping debugger options",
   "sidebar.characters-glyphs.shaping-debugger.show-ineffective-items":
     "Show ineffective items",
+  "sidebar.color-graph": "Grapo ng Kulay",
   "sidebar.color-layers": "Mga Layer ng Kulay",
   "sidebar.color-layers.title": "Mga Layer ng Kulay",
   "sidebar.designspace-navigation": "Nabigasyon sa Designspace",

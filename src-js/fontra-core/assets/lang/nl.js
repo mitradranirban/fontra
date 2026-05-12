@@ -18,7 +18,7 @@ export const strings = {
   "action.add-guideline-between-points": "Add Guideline Between Points",
   "action.add-paint": "Verf toevoegen",
   "action.add-paint.no-v1-layers.message":
-    'Este glifo aún no tiene capas COLRv1. Use el botón "v1" en el panel Capas de color para inicializar el gráfico de pintura primero.',
+    'Dit glyph heeft nog geen COLRv1-lagen. Gebruik de knop "v1" in het Kleurlagen-paneel om de verfgrafiek eerst te initialiseren.',
   "action.add-paint.no-v1-layers.title": "Geen COLRv1-verfgrafiek",
   "action.break-contour": "Breek contour",
   "action.break-contour.plural": "Break Contours",
@@ -373,6 +373,7 @@ export const strings = {
     "Shaping debugger options",
   "sidebar.characters-glyphs.shaping-debugger.show-ineffective-items":
     "Show ineffective items",
+  "sidebar.color-graph": "Kleurengraph",
   "sidebar.color-layers": "Kleurlagen",
   "sidebar.color-layers.title": "Kleurlagen",
   "sidebar.designspace-navigation": "Designspace navigatie",
