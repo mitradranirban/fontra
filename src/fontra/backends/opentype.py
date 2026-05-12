@@ -591,6 +591,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         self.gvarVariations = gvar.variations if gvar is not None else None
         varc = self.font.get("VARC")
         self.varcTable = varc.table if varc is not None else None
+
         self.charStrings = (
             list(self.font["CFF2"].cff.values())[0].CharStrings
             if "CFF2" in self.font
@@ -603,13 +604,16 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             glyphMap[glyphName] = []
         for code, glyphName in sorted(self.characterMap.items()):
             glyphMap[glyphName].append(code)
+
         self.glyphMap = glyphMap
         self.glyphSet = self.font.getGlyphSet()
         self.variationGlyphSets: dict[str, Any] = {}
 
-        # COLR / CPAL
-        self.colrVersion: int = 0
+        # Initialize COLR / CPAL / GSUB State
+        self.colrVersion = 0
         self.colrV0Layers: dict[str, list[tuple[str, int]]] = {}
+        self.colrLayerGlyphs: set[str] = set()
+        self.gsubGlyphs: set[str] = set()
         self.colrPaintGraphs: dict[str, Any] = {}
         self.colrLayerList: list[Any] = []
         self.colrVarIndexMap: list[Any] = []
@@ -617,32 +621,49 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         self.colrOtVarStore = None
         self.colorPalettes: list[list[RGBAColor]] = []
         self.colrGlyphPaintEntries: dict[str, list[dict]] = {}
+        self.colrClipBoxes: dict[str, Any] = {}
 
+        # 1. Handle GSUB (Track ligatures/alternates so they aren't hidden)
+        if "GSUB" in self.font:
+            from fontTools.otlLib.utils import getReferencedGlyphs
+
+            self.gsubGlyphs = getReferencedGlyphs(self.font["GSUB"].table)
+
+        # 2. Handle COLR Table
         colrTable = self.font.get("COLR")
         if colrTable is not None:
             self.colrVersion = colrTable.version
+
+            # Version 0 Logic
             if self.colrVersion == 0:
                 for baseGlyph, layerRecords in colrTable.ColorLayers.items():
                     self.colrV0Layers[baseGlyph] = [
                         (layer.name, layer.colorID) for layer in layerRecords
                     ]
+                    for layer in layerRecords:
+                        self.colrLayerGlyphs.add(layer.name)
+
+            # Version 1 Logic (Fixed Indentation/Syntax)
             elif self.colrVersion >= 1:
                 colr = colrTable.table
                 self.colrPaintGraphs = colrUnbuilder.unbuildColrV1(
                     colr.LayerList, colr.BaseGlyphList
                 )
-                self.colrClipBoxes: dict[str, Any] = {}
+
                 if getattr(colr, "ClipList", None):
                     self.colrClipBoxes = colr.ClipList.clips
-                self.colrGlyphPaintEntries: dict[str, list[dict]] = {}
+
                 for paintGraph in self.colrPaintGraphs.values():
                     _indexPaintGlyphs(paintGraph, self.colrGlyphPaintEntries)
+
                 if getattr(colr, "VarIndexMap", None):
                     self.colrVarIndexMap = list(colr.VarIndexMap.mapping)
+
                 if getattr(colr, "VarStore", None):
                     self.colrOtVarStore = colr.VarStore
                     self.colrVarStore = _serializeVarStore(colr.VarStore)
 
+        # 3. Handle CPAL (Palettes)
         cpalTable = self.font.get("CPAL")
         if cpalTable is not None:
             for palette in cpalTable.palettes:
@@ -662,7 +683,27 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         self.font.close()
 
     async def getGlyphMap(self) -> dict[str, list[int]]:
-        return self.glyphMap
+        filtered_map = {}
+        for name, codes in self.glyphMap.items():
+            # Keep if it has Unicode
+            if codes:
+                filtered_map[name] = codes
+                continue
+
+            # Keep if it is a GSUB substitution/ligature
+            if name in self.gsubGlyphs:
+                filtered_map[name] = codes
+                continue
+
+            # Keep if it is NOT a color layer component
+            if name not in self.colrLayerGlyphs:
+                filtered_map[name] = codes
+                continue
+
+            # If it's ONLY a color layer component and has no Unicode/GSUB,
+            # we skip it so it doesn't clutter the main glyph list.
+
+        return filtered_map
 
     async def getGlyph(self, glyphName: str) -> VariableGlyph | None:
         isColorOnly = (
@@ -683,6 +724,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
         glyph = VariableGlyph(name=glyphName)
 
+        # 1. Initialize Base Geometry
         if glyphName in self.glyphSet:
             staticGlyph = buildStaticGlyph(self.glyphSet, glyphName)
         else:
@@ -708,6 +750,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             )
         ]
 
+        # 2. Handle Variable Outlines (Masters)
         for sparseLoc in self._getGlyphVariationLocations(glyphName):
             fullLoc = defaultLocation | sparseLoc
             locStr = locationToString(unnormalizeLocation(sparseLoc, self.axes.axes))
@@ -722,11 +765,7 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                 varGlyph = StaticGlyph()
                 varGlyph.path = PackedPath()
                 varGlyph.components = []
-                varGlyph.xAdvance = (
-                    self.font["hmtx"].metrics.get(glyphName, (0, 0))[0]
-                    if "hmtx" in self.font
-                    else 0
-                )
+                varGlyph.xAdvance = staticGlyph.xAdvance
 
             sourceLocation = unnormalizeLocation(fullLoc, self.axes.axes)
             locationBase = self.fontSourcesInstancer.getSourceIdentifierForLocation(
@@ -736,7 +775,6 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
             layers[layerName] = Layer(glyph=varGlyph)
             layerLocations[layerName] = fullLoc.copy()
-
             sources.append(
                 GlyphSource(
                     location={} if locationBase is not None else sourceLocation,
@@ -749,33 +787,65 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         if self.charStrings is not None:
             checkAndFixCFF2Compatibility(glyphName, layers)
 
-        glyph.layers = layers
-        glyph.sources = sources
-
-        # Attach COLRv0 layer list to customData
+        # 3. Handle COLRv0 (Layer-based Color)
         if glyphName in self.colrV0Layers:
-            glyph.customData["fontra.colrv0.layers"] = self.colrV0Layers[glyphName]
+            color_mapping = []
+            for i, (layerGlyphName, colorID) in enumerate(self.colrV0Layers[glyphName]):
+                ufoLayerName = f"color.{i}"
 
-        # Process COLRv1 variations via layer-specific locations
+                if layerGlyphName in self.glyphSet:
+                    layerGlyph = buildStaticGlyph(self.glyphSet, layerGlyphName)
+                else:
+                    layerGlyph = StaticGlyph()
+                    layerGlyph.path = PackedPath()
+                    layerGlyph.components = []
+                    layerGlyph.xAdvance = staticGlyph.xAdvance
+
+                layerGlyph.customData["fontra.colrv0.colorID"] = colorID
+                layers[ufoLayerName] = Layer(glyph=layerGlyph)
+                color_mapping.append([ufoLayerName, colorID])
+                sources.append(
+                    GlyphSource(
+                        location={},
+                        locationBase=defaultSourceIdentifier,
+                        name=f"Color {i}",  # Label in the Layers panel
+                        layerName=ufoLayerName,
+                    )
+                )
+            staticGlyph.customData["com.github.googlei18n.ufo2ft.colorLayerMapping"] = (
+                color_mapping
+            )
+
+        # 4. Handle COLRv1 (Graph-based Color)
         fvarAxes = self.font["fvar"].axes if "fvar" in self.font else None
+        rawPaint = None
 
         if glyphName in self.colrPaintGraphs:
             rawPaint = self.colrPaintGraphs[glyphName]
+        elif (
+            hasattr(self, "colrGlyphPaintEntries")
+            and glyphName in self.colrGlyphPaintEntries
+        ):
+            entries = self.colrGlyphPaintEntries[glyphName]
+            rawPaint = (
+                entries[0] if len(entries) == 1 else {"Format": 1, "Layers": entries}
+            )
 
+        if rawPaint:
+            # Process Paint and ClipBox for every layer (including masters)
             for layerName, layer in layers.items():
                 loc = layerLocations.get(layerName, defaultLocation)
-
+                instancer = None
                 if self.colrOtVarStore is not None and fvarAxes is not None:
                     instancer = VarStoreInstancer(self.colrOtVarStore, fvarAxes, loc)
-                    layerPaint = _instantiatePaint(
-                        rawPaint, instancer, self.colrVarIndexMap or None
-                    )
-                else:
-                    layerPaint = deepcopy(rawPaint)
 
+                # A. Process Paint
+                layerPaint = (
+                    _instantiatePaint(rawPaint, instancer, self.colrVarIndexMap)
+                    if instancer
+                    else deepcopy(rawPaint)
+                )
                 fontraPaint = _convertPaintGraphToFontra(layerPaint)
-
-                # Correctly assign to the layer's glyph customData
                 layer.glyph.customData["colorv1"] = fontraPaint
 
                 referencedGlyphs = []
@@ -785,80 +855,48 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
                         referencedGlyphs
                     )
 
-        elif (
-            hasattr(self, "colrGlyphPaintEntries")
-            and glyphName in self.colrGlyphPaintEntries
-        ):
-            entries = self.colrGlyphPaintEntries[glyphName]
-            # Wrap entries in PaintColrLayers if multiple, or use directly if single
-            if len(entries) == 1:
-                rawPaint = entries[0]
-            else:
-                rawPaint = {"Format": 1, "Layers": entries}
-
-            for layerName, layer in layers.items():
-                # Process COLRv1 variations via layer-specific locations
-                fvarAxes = self.font["fvar"].axes if "fvar" in self.font else None
-
-                # ADD THIS: Process ClipBox data
+                # B. Process ClipBox
                 if (
                     getattr(self, "colrClipBoxes", None)
                     and glyphName in self.colrClipBoxes
                 ):
                     rawClipBox = self.colrClipBoxes[glyphName]
-                    for layerName, layer in layers.items():
-                        loc = layerLocations.get(layerName, defaultLocation)
+                    clipDict = {
+                        "Format": rawClipBox.Format,
+                        "xMin": rawClipBox.xMin,
+                        "yMin": rawClipBox.yMin,
+                        "xMax": rawClipBox.xMax,
+                        "yMax": rawClipBox.yMax,
+                    }
+                    if rawClipBox.Format == 2:
+                        clipDict["VarIndexBase"] = rawClipBox.VarIndexBase
 
-                        clipDict = {
-                            "Format": rawClipBox.Format,
-                            "xMin": rawClipBox.xMin,
-                            "yMin": rawClipBox.yMin,
-                            "xMax": rawClipBox.xMax,
-                            "yMax": rawClipBox.yMax,
-                        }
-                        if rawClipBox.Format == 2:
-                            clipDict["VarIndexBase"] = rawClipBox.VarIndexBase
-
-                        if self.colrOtVarStore is not None and fvarAxes is not None:
-                            instancer = VarStoreInstancer(
-                                self.colrOtVarStore, fvarAxes, loc
-                            )
-                            layerClip = _applyVarDeltas(
-                                clipDict,
-                                (
-                                    ("xMin", "int16"),
-                                    ("yMin", "int16"),
-                                    ("xMax", "int16"),
-                                    ("yMax", "int16"),
-                                ),
-                                instancer,
-                                self.colrVarIndexMap or None,
-                            )
-                        else:
-                            layerClip = clipDict
-
-                        # Save into the glyph layer's customData so Fontra preserves it
-                        layer.glyph.customData["fontra.colrv1.clipBox"] = {
-                            "xMin": layerClip["xMin"],
-                            "yMin": layerClip["yMin"],
-                            "xMax": layerClip["xMax"],
-                            "yMax": layerClip["yMax"],
-                        }
-                loc = layerLocations.get(layerName, defaultLocation)
-
-                if self.colrOtVarStore is not None and fvarAxes is not None:
-                    instancer = VarStoreInstancer(self.colrOtVarStore, fvarAxes, loc)
-                    layerPaint = _instantiatePaint(
-                        rawPaint, instancer, self.colrVarIndexMap or None
+                    layerClip = (
+                        _applyVarDeltas(
+                            clipDict,
+                            (
+                                ("xMin", "int16"),
+                                ("yMin", "int16"),
+                                ("xMax", "int16"),
+                                ("yMax", "int16"),
+                            ),
+                            instancer,
+                            self.colrVarIndexMap,
+                        )
+                        if instancer
+                        else clipDict
                     )
-                else:
-                    layerPaint = deepcopy(rawPaint)
 
-                fontraPaint = _convertPaintGraphToFontra(layerPaint)
+                    layer.glyph.customData["fontra.colrv1.clipBox"] = {
+                        "xMin": layerClip["xMin"],
+                        "yMin": layerClip["yMin"],
+                        "xMax": layerClip["xMax"],
+                        "yMax": layerClip["yMax"],
+                    }
 
-                # Correctly assign to the layer's glyph customData
-                layer.glyph.customData["colorv1"] = fontraPaint
-
+        # 5. Finalize
+        glyph.layers = layers
+        glyph.sources = sources
         return glyph
 
     def _getGlyphVariationLocations(self, glyphName: str) -> list[dict[str, float]]:
