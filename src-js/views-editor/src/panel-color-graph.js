@@ -8,6 +8,7 @@
 
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
+import { PAINT_PARAM_SCHEMA, normalizePaintType } from "./panel-color-layers.js";
 import Panel from "./panel.js";
 
 const PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes";
@@ -33,10 +34,6 @@ const PAINT_CATEGORY_COLORS = {
   PaintScale: "#e8af34",
   PaintComposite: "#bb653b",
 };
-
-function normalizePaintType(t) {
-  return t?.replace?.("Var", "") ?? t;
-}
 
 // ---------------------------------------------------------------------------
 // Render a CSS gradient preview for gradient paints
@@ -141,15 +138,12 @@ function makeColorStopsPreview(paint, palette) {
 // Render a single paint node as a visual card in the graph
 // ---------------------------------------------------------------------------
 function makePaintNode(paint, depth, palette, opts = {}) {
-  const { label = "", onSelectPaint, selectedPaintId, nodeId } = opts;
+  const { label = "", onSelectPaint, selectedPaintId, nodeId, layerIdx } = opts;
   const type = normalizePaintType(paint?.type ?? translate("color-graph.unknown"));
   const catColor = PAINT_CATEGORY_COLORS[type] ?? "#888";
   const isSelected = nodeId !== undefined && nodeId === selectedPaintId?.current;
 
   const node = html.div({
-    class: `cgp-node cgp-node--${type.toLowerCase()} ${
-      isSelected ? "cgp-node--selected" : ""
-    }`,
     style: `
       margin-left:${depth * 18}px;
       border-left: 3px solid ${catColor};
@@ -158,10 +152,8 @@ function makePaintNode(paint, depth, palette, opts = {}) {
       margin-bottom: 4px;
       padding: 6px 10px;
       cursor: pointer;
-      transition: background 150ms;
     `,
-    onclick: () => onSelectPaint && onSelectPaint(paint, nodeId),
-    title: type,
+    onclick: () => onSelectPaint && onSelectPaint(paint, layerIdx, nodeId),
   });
 
   // Header row
@@ -292,8 +284,9 @@ function makePaintNode(paint, depth, palette, opts = {}) {
 function renderPaintTree(paint, depth, palette, container, opts, counter = { n: 0 }) {
   if (!paint) return;
   const nodeId = counter.n++;
+  const layerIdx = opts.layerIdx ?? 0;
   const type = normalizePaintType(paint?.type ?? "");
-  const node = makePaintNode(paint, depth, palette, { ...opts, nodeId });
+  const node = makePaintNode(paint, depth, palette, { ...opts, nodeId, layerIdx });
   container.appendChild(node);
 
   // PaintColrLayers / layer arrays
@@ -310,7 +303,11 @@ function renderPaintTree(paint, depth, palette, container, opts, counter = { n: 
         depth + 1,
         palette,
         container,
-        { ...opts, label: glyph ? `[${i}] ${glyph}` : `[${i}]` },
+        {
+          ...opts,
+          layerIdx: depth === 0 ? i : layerIdx,
+          label: glyph ? `[${i}] ${glyph}` : `[${i}]`,
+        },
         counter
       );
     }
@@ -321,7 +318,7 @@ function renderPaintTree(paint, depth, palette, container, opts, counter = { n: 
       depth + 1,
       palette,
       container,
-      { ...opts, label: "fill" },
+      { ...opts, label: "fill", layerIdx: layerIdx },
       counter
     );
   }
@@ -334,7 +331,7 @@ function renderPaintTree(paint, depth, palette, container, opts, counter = { n: 
         depth + 1,
         palette,
         container,
-        { ...opts, label: "source" },
+        { ...opts, label: "source", layerIdx: layerIdx },
         counter
       );
     }
@@ -344,7 +341,7 @@ function renderPaintTree(paint, depth, palette, container, opts, counter = { n: 
         depth + 1,
         palette,
         container,
-        { ...opts, label: "backdrop" },
+        { ...opts, label: "backdrop", layerIdx: layerIdx },
         counter
       );
     }
@@ -419,53 +416,197 @@ function makeLegend() {
 // Empty / no-data placeholder
 // ---------------------------------------------------------------------------
 function makeEmptyState(message) {
+  const msgNode =
+    message instanceof Node ? message : document.createTextNode(String(message ?? ""));
+
   return html.div(
     {
       style:
-        "display:flex; flex-direction:column; align-items:center; justify-content:center; padding:48px 16px; color:var(--color-text-muted); font-size:0.85em; gap:10px; text-align:center; flex:1;",
+        "display:flex; flex-direction:column; align-items:center; justify-content:center; padding:48px 16px; color:var(--color-text-muted); font-size:0.85em; gap:10px; text-align:center; flex:1",
     },
-    html.div({ style: "font-size:2.5em; opacity:0.25; line-height:1;" }, "◎"),
-    html.div({}, message)
+    [html.div({ style: "font-size:2.5em; opacity:0.25; line-height:1" }, "🎨"), msgNode]
   );
 }
 
-// ---------------------------------------------------------------------------
-// Inject required CSS (once per document)
-// ---------------------------------------------------------------------------
-function ensureStyles() {
-  if (document.getElementById("cgp-styles")) return;
-  const style = document.createElement("style");
-  style.id = "cgp-styles";
-  style.textContent = `
-    .cgp-node { transition: background 150ms ease; }
-    .cgp-node:hover { background: var(--color-surface-2, #201f1d) !important; }
-    .cgp-node--selected {
-      background: var(--color-surface-dynamic, #2d2c2a) !important;
-      outline: 1px solid var(--color-primary, #4f98a3);
-      outline-offset: -1px;
+function buildDetailPane(pane, paint, layerIdx, palette, graphPanel) {
+  pane.innerHTML = "";
+  const type = normalizePaintType(paint?.type ?? "");
+  const schema = PAINT_PARAM_SCHEMA[type];
+
+  // Header
+  pane.appendChild(
+    html.div(
+      {
+        style: `font-size:0.78em; font-weight:600; padding:8px 2px 4px;
+            color:var(--color-text); border-bottom:1px solid var(--color-border);`,
+      },
+      `Edit · ${type}`
+    )
+  );
+
+  if (!schema || !schema.length) {
+    pane.appendChild(
+      html.div(
+        {
+          style: "font-size:0.75em; color:var(--color-text-muted); padding:8px 0;",
+        },
+        "No editable parameters for this node type."
+      )
+    );
+    return;
+  }
+
+  // For each field in PAINT_PARAM_SCHEMA[type]
+  for (const fd of schema) {
+    if (fd.paired) continue; // skip — rendered with its partner
+
+    const sourceObj = fd.sourceKey ? paint?.[fd.sourceKey] : paint;
+
+    if (fd.type === "array") {
+      // Color stops — render each stop with editable fields
+      const stops = sourceObj?.[fd.key] ?? [];
+      const stopHeader = html.div(
+        {
+          style: "font-size:0.75em; color:var(--color-text-muted); padding:6px 0 2px;",
+        },
+        `${fd.key} (${stops.length})`
+      );
+      pane.appendChild(stopHeader);
+
+      stops.forEach((stop, si) => {
+        const row = html.div({
+          style: "display:flex; gap:6px; align-items:center; margin-bottom:4px;",
+        });
+        for (const sf of fd.itemSchema ?? []) {
+          const input = makeNumberInput(
+            stop[sf.key] ?? 0,
+            sf.min,
+            sf.max,
+            sf.integer,
+            async (val) => {
+              await graphPanel._layersPanel.setV1ArrayParam(
+                graphPanel.currentGlyphName,
+                graphPanel.currentPaint,
+                layerIdx,
+                fd.key,
+                si,
+                sf.key,
+                val
+              );
+              graphPanel.update();
+            }
+          );
+          row.appendChild(
+            html.label(
+              {
+                style: "font-size:0.72em; color:var(--color-text-muted);",
+              },
+              sf.key
+            )
+          );
+          row.appendChild(input);
+        }
+        pane.appendChild(row);
+      });
+      continue;
     }
-    .color-graph-panel {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      overflow: hidden;
-      background: var(--color-bg, #171614);
+
+    const partner = fd.pairWith ? schema.find((s) => s.key === fd.pairWith) : null;
+    const row = html.div({
+      style: "display:flex; gap:8px; align-items:center; margin-bottom:4px;",
+    });
+    row.appendChild(
+      html.label(
+        {
+          style: "font-size:0.72em; color:var(--color-text-muted); min-width:60px;",
+        },
+        fd.key
+      )
+    );
+
+    const rawVal =
+      sourceObj?.[fd.key] ??
+      (fd.key === "alpha" || ["scaleX", "scaleY", "scale", "xx", "yy"].includes(fd.key)
+        ? 1.0
+        : 0);
+    row.appendChild(
+      makeNumberInput(rawVal, fd.min, fd.max, fd.integer, async (val) => {
+        await graphPanel._layersPanel.setV1PaintParam(
+          graphPanel.currentGlyphName,
+          graphPanel.currentPaint,
+          layerIdx,
+          fd.key,
+          val
+        );
+        graphPanel.update();
+      })
+    );
+
+    if (partner) {
+      const rawB = sourceObj?.[partner.key] ?? 0;
+      row.appendChild(
+        html.label(
+          {
+            style: "font-size:0.72em; color:var(--color-text-muted);",
+          },
+          partner.key
+        )
+      );
+      row.appendChild(
+        makeNumberInput(
+          rawB,
+          partner.min,
+          partner.max,
+          partner.integer,
+          async (val) => {
+            await graphPanel._layersPanel.setV1PaintParam(
+              graphPanel.currentGlyphName,
+              graphPanel.currentPaint,
+              layerIdx,
+              partner.key,
+              val
+            );
+            graphPanel.update();
+          }
+        )
+      );
     }
-  `;
-  document.head.appendChild(style);
+    pane.appendChild(row);
+  }
+}
+
+// Small helper — native number input wired to async callback
+function makeNumberInput(value, min, max, integer, onChange) {
+  const input = html.input({
+    type: "number",
+    value: String(value),
+    min: min !== undefined ? String(min) : undefined,
+    max: max !== undefined ? String(max) : undefined,
+    step: integer ? "1" : "0.01",
+    style: `width:70px; background:var(--color-surface-2);
+            border:1px solid var(--color-border); border-radius:4px;
+            color:var(--color-text); padding:2px 5px; font-size:0.78em;`,
+  });
+  input.addEventListener("change", () => {
+    const val = integer ? parseInt(input.value) : parseFloat(input.value);
+    if (!isNaN(val)) onChange(val);
+  });
+  return input;
 }
 
 // ---------------------------------------------------------------------------
 // The Panel class
 // ---------------------------------------------------------------------------
 export default class ColorGraphPanel extends Panel {
-  static identifier = "color-graph";
-  static iconPath = "images/color-graph.svg";
+  identifier = "color-graph";
+  iconPath = "images/color-graph.svg";
 
   constructor(editorController) {
     super(editorController);
     this.sceneController = editorController.sceneController;
     this._selectedPaintId = { current: null };
+    this._layersPanel = editorController.panels?.["color-layers"] ?? null;
+
     this.sceneController.sceneSettingsController.addKeyListener(
       "selectedGlyphName",
       () => this.update()
@@ -474,8 +615,15 @@ export default class ColorGraphPanel extends Panel {
   }
 
   getContentElement() {
-    this._container = html.div({ class: "color-graph-panel" });
-    return this._container;
+    this._scrollArea = html.div({
+      class: "panel-section panel-section--flex panel-section--scrollable",
+    });
+    this._detailPane = html.div({
+      id: "cgp-detail-pane",
+      style:
+        "flex-shrink:0; max-height:45%; overflow-y:auto; border-top:1px solid var(--color-border); background:var(--color-surface-offset); padding:0 8px 16px; display:none;",
+    });
+    return html.div({ class: "panel" }, [this._scrollArea, this._detailPane]);
   }
 
   async toggle(on, focus) {
@@ -486,10 +634,10 @@ export default class ColorGraphPanel extends Panel {
   // Main render method
   // -------------------------------------------------------------------------
   async update() {
-    const container = this._container;
-    if (!container) return;
-    container.innerHTML = "";
-    ensureStyles();
+    const scrollArea = this._scrollArea;
+    const detailPane = this._detailPane;
+    if (!scrollArea) return;
+    scrollArea.innerHTML = "";
 
     // --- Palette ---
     let palette = [];
@@ -498,29 +646,28 @@ export default class ColorGraphPanel extends Panel {
       const raw = cd[PALETTES_KEY]?.[0] ?? [];
       palette = raw.map((entry) => {
         if (Array.isArray(entry)) {
-          // [r, g, b] or [r, g, b, a] — convert to hex
           const [r, g, b] = entry;
           return `#${r.toString(16).padStart(2, "0")}${g
             .toString(16)
             .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
         }
-        return entry; // assume already a hex string
+        return entry;
       });
     } catch (_) {}
 
     if (!palette.length) {
-      container.appendChild(makeEmptyState(translate("color-graph.no-palette")));
+      scrollArea.appendChild(makeEmptyState(translate("color-graph.no-palette")));
       return;
     }
 
-    // --- Selected glyph ---
     const glyphName = this.sceneController?.sceneSettings?.selectedGlyphName;
     if (!glyphName) {
-      container.appendChild(makeEmptyState(translate("color-graph.no-glyph-selected")));
+      scrollArea.appendChild(
+        makeEmptyState(translate("color-graph.no-glyph-selected"))
+      );
       return;
     }
 
-    // --- COLRv1 paint data ---
     let paint = null;
     try {
       const varGlyphController =
@@ -532,18 +679,17 @@ export default class ColorGraphPanel extends Panel {
         instanceGlyph?.customData?.[COLRV1_KEY] ?? varGlyph?.customData?.[COLRV1_KEY];
       if (colorV1Data) {
         paint = colorV1Data;
-        // Normalize to PaintColrLayers wrapper for consistent rendering
         if (paint.type !== "PaintColrLayers") {
           paint = { type: "PaintColrLayers", layers: [paint] };
         }
       }
     } catch (_) {}
+    this.currentGlyphName = glyphName;
+    this.currentPaint = paint;
 
-    // --- Header bar ---
+    // Header
     const headerBar = html.div({
-      style: `display:flex; align-items:center; padding:6px 10px; gap:8px;
-              border-bottom:1px solid var(--color-border, #393836);
-              background:var(--color-surface, #1c1b19); flex-shrink:0;`,
+      style: `display:flex; align-items:center; padding:6px 10px; gap:8px; border-bottom:1px solid var(--color-border, #393836); background:var(--color-surface, #1c1b19); flex-shrink:0;`,
     });
     headerBar.appendChild(
       html.span(
@@ -554,53 +700,48 @@ export default class ColorGraphPanel extends Panel {
         `${translate("color-graph.paint-graph")} — ${glyphName}`
       )
     );
-
-    // Refresh button
-    const refreshBtn = html.button(
-      {
-        style: `font-size:0.78em; padding:2px 8px; border-radius:4px; cursor:pointer;
-              background:var(--color-surface-offset); border:1px solid var(--color-border);
-              color:var(--color-text-muted);`,
-        onclick: () => this.update(),
-        title: translate("color-graph.refresh"),
-      },
-      translate("color-graph.refresh")
+    headerBar.appendChild(
+      html.button(
+        {
+          style: `font-size:0.78em; padding:2px 8px; border-radius:4px; cursor:pointer; background:var(--color-surface-offset); border:1px solid var(--color-border); color:var(--color-text-muted);`,
+          onclick: () => this.update(),
+          title: translate("color-graph.refresh"),
+        },
+        translate("color-graph.refresh")
+      )
     );
-    headerBar.appendChild(refreshBtn);
-    container.appendChild(headerBar);
 
-    // --- Palette strip ---
-    container.appendChild(makePaletteStrip(palette));
+    scrollArea.appendChild(headerBar);
+    scrollArea.appendChild(makePaletteStrip(palette));
+    scrollArea.appendChild(makeLegend());
 
-    // --- Legend ---
-    container.appendChild(makeLegend());
-
-    // --- Graph scroll area ---
-    const scrollArea = html.div({
-      style: `flex:1; overflow-y:auto; overflow-x:hidden; padding:8px 8px 24px;`,
-    });
+    detailPane.style.display = "none";
 
     if (!paint) {
       scrollArea.appendChild(
         makeEmptyState(
-          `${translate("color-graph.no-paint-data")} — ${glyphName}. ${translate(
-            "color-graph.add-paint-layers"
-          )}`
+          translate("color-graph.no-paint-data") +
+            " — " +
+            glyphName +
+            ". " +
+            translate("color-graph.add-paint-layers")
         )
       );
     } else {
       renderPaintTree(paint, 0, palette, scrollArea, {
-        onSelectPaint: (p, id) => {
+        onSelectPaint: (selectedPaint, layerIdx, nodeId) => {
           this._selectedPaintId.current =
-            this._selectedPaintId.current === id ? null : id;
-          this.update();
+            this._selectedPaintId.current === nodeId ? null : nodeId;
+          if (this._selectedPaintId.current === null) {
+            detailPane.style.display = "none";
+          } else {
+            detailPane.style.display = "block";
+            buildDetailPane(detailPane, selectedPaint, layerIdx, palette, this);
+          }
         },
         selectedPaintId: this._selectedPaintId,
       });
     }
-
-    container.appendChild(scrollArea);
   }
 }
-
 customElements.define("panel-color-graph", ColorGraphPanel);

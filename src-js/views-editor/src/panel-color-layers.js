@@ -2298,5 +2298,5 @@ export default class ColorLayersPanel extends Panel {
     await this._setV1FieldKeyframes(glyphName, paint, layerIdx, field, newKfs);
   }
 }
-
+export { DEFAULT_PAINTS, normalizePaintType, PAINT_PARAM_SCHEMA };
 customElements.define("panel-color-layers", ColorLayersPanel);
