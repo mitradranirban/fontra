@@ -6,6 +6,7 @@ import {
   COLRV1_KEY,
   getPaintGraph,
   getTagLocation,
+  renderCOLRv0FromLayers,
   renderCOLRv1,
 } from "./colrv1-canvas-renderer.js";
 
@@ -142,18 +143,22 @@ export const colrv1PaintOverlayDefinition = {
       positionedGlyph?.varGlyph?.instance?.customData; // interpolated instance
 
     const paint = getPaintGraph(instanceCd) ?? getPaintGraph(varGlyphCd);
-    if (!paint) return;
-
-    const axisValues = getTagLocation(model.fontController, model.sceneSettings);
-    renderCOLRv1(
-      context,
-      positionedGlyph,
-      model.fontController,
-      axisValues,
-      0,
-      controller,
-      colrPathCache
-    );
+    if (paint) {
+      // COLRv1: existing paint graph path
+      const axisValues = getTagLocation(model.fontController, model.sceneSettings);
+      renderCOLRv1(
+        context,
+        positionedGlyph,
+        model.fontController,
+        axisValues,
+        0,
+        controller,
+        colrPathCache
+      );
+    } else {
+      // COLRv0: draw directly from color.N UFO layers + CPAL palette
+      renderCOLRv0FromLayers(context, positionedGlyph, model.fontController, 0);
+    }
   },
 };
 // ---------------------------------------------------------------------------

@@ -87,7 +87,168 @@ export function resolveVal(val, axisValues) {
   }
   return base;
 }
+// ---------------------------------------------------------------------------
+// COLRv0 from UFO layers (color.N naming convention)
+// ---------------------------------------------------------------------------
 
+export function renderCOLRv0FromLayers(
+  ctx,
+  positionedGlyph,
+  fontController,
+  activePaletteIndex = 0
+) {
+  const varGlyph = positionedGlyph?.varGlyph?.glyph ?? positionedGlyph?.varGlyph;
+  if (!varGlyph) return;
+
+  const palettes = fontController.customData?.[PALETTES_KEY];
+
+  if (!palettes?.length) {
+    console.warn("[COLRv0] BAIL: no palettes");
+    return;
+  }
+
+  const palette =
+    palettes[Math.max(0, Math.min(activePaletteIndex, palettes.length - 1))];
+
+  const colorLayers = _collectColorLayers(varGlyph);
+
+  if (!colorLayers.length) {
+    console.warn("[COLRv0] BAIL: no color layers");
+    return;
+  }
+
+  ctx.save();
+  for (const { layerIndex, source } of colorLayers) {
+    const path2d = _getLayerPath2D(source);
+    if (!palette[layerIndex] || !path2d) continue;
+    const [r, g, b, a = 1.0] = palette[layerIndex];
+    ctx.fillStyle = `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(
+      b * 255
+    )}, ${a.toFixed(4)})`;
+    ctx.fill(path2d);
+  }
+  ctx.restore();
+}
+
+function _collectColorLayers(varGlyph) {
+  // Color layer mapping is stored in customData, not derivable from layer names alone
+  // Shape: [[layerName, colorIndex], ...] e.g. [["color.0", 0], ["color.1", 1], ...]
+  const colorLayerMapping = varGlyph.customData?.colorLayerMapping;
+  if (!colorLayerMapping?.length) return [];
+
+  const layers = varGlyph.layers;
+  if (!layers) return [];
+
+  const result = [];
+  for (const [layerName, colorIndex] of colorLayerMapping) {
+    // Fontra stores layers with a "default^" prefix: "default^color.0"
+    const fontraLayerName = `default^${layerName}`;
+    const layer = layers[fontraLayerName] ?? layers[layerName];
+    if (!layer) continue;
+    result.push({
+      layerIndex: colorIndex,
+      source: layer,
+    });
+  }
+
+  // Sort ascending by colorIndex = bottom-to-top paint order
+  return result.sort((a, b) => a.layerIndex - b.layerIndex);
+}
+function _getLayerPath2D(source) {
+  const glyphData = source?.glyph ?? source;
+
+  if (glyphData?.flattenedPath2d instanceof Path2D) return glyphData.flattenedPath2d;
+  if (glyphData?.instance?.path2d instanceof Path2D) return glyphData.instance.path2d;
+
+  const pathData = glyphData?.instance?.path ?? glyphData?.path;
+  if (!pathData) return null;
+
+  // Use dedicated converter for VarPackedPath (Fontra point type encoding)
+  return _convertVarPackedPathToPath2D(pathData);
+}
+
+function _convertVarPackedPathToPath2D(path) {
+  const p = new Path2D();
+  const coords = path.coordinates;
+  const types = path.pointTypes;
+  const contourInfo = path.contourInfo;
+  if (!coords || !types || !contourInfo) return p;
+
+  let pointIndex = 0;
+  let coordIndex = 0;
+
+  for (let contourIdx = 0; contourIdx < contourInfo.length; contourIdx++) {
+    const info = contourInfo[contourIdx];
+    const isClosed = info.isClosed;
+    const numPoints = info.length ?? info.endPoint + 1 - pointIndex;
+    if (numPoints === 0) continue;
+
+    // Collect contour points
+    // Fontra VarPackedPath point types: 0=on-curve, 1=off-curve-smooth(quad), 2=off-curve-cubic
+    const pts = [];
+    for (let i = 0; i < numPoints; i++) {
+      pts.push({
+        x: coords[coordIndex],
+        y: coords[coordIndex + 1],
+        type: types[pointIndex],
+      });
+      coordIndex += 2;
+      pointIndex++;
+    }
+
+    // Find first on-curve point to start from
+    let startIdx = pts.findIndex((pt) => pt.type === 0);
+    if (startIdx === -1) startIdx = 0;
+
+    p.moveTo(pts[startIdx].x, pts[startIdx].y);
+
+    const n = pts.length;
+    let i = 1;
+    while (i <= n) {
+      const pt = pts[(startIdx + i) % n];
+
+      if (pt.type === 0) {
+        // on-curve: straight line
+        if (i < n) p.lineTo(pt.x, pt.y);
+        i++;
+      } else if (pt.type === 2) {
+        // cubic: two off-curve handles + on-curve end
+        const c1 = pt;
+        const c2 = pts[(startIdx + i + 1) % n];
+        const end = pts[(startIdx + i + 2) % n];
+        p.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, end.x, end.y);
+        i += 3;
+      } else {
+        // quadratic (type=1): collect consecutive off-curves, implicit on-curves between
+        const offCurves = [pt];
+        let j = i + 1;
+        while (j < i + n) {
+          const next = pts[(startIdx + j) % n];
+          if (next.type !== 0) {
+            offCurves.push(next);
+            j++;
+          } else break;
+        }
+        for (let k = 0; k < offCurves.length; k++) {
+          const qc = offCurves[k];
+          const isLast = k === offCurves.length - 1;
+          const qe = isLast
+            ? pts[(startIdx + j) % n]
+            : {
+                x: (offCurves[k].x + offCurves[k + 1].x) / 2,
+                y: (offCurves[k].y + offCurves[k + 1].y) / 2,
+              };
+          p.quadraticCurveTo(qc.x, qc.y, qe.x, qe.y);
+        }
+        i = j + 1;
+      }
+    }
+
+    if (isClosed) p.closePath();
+  }
+
+  return p;
+}
 // ---------------------------------------------------------------------------
 // Public entry point
 // ---------------------------------------------------------------------------
