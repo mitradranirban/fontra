@@ -926,7 +926,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
                     colorLayerName,
                     colorLayerName,
                 )
-            colorGlyphSet = ufoColorLayer.glyphSet
+            colorGlyphSet = ufoColorLayer.glyphSetWriter
             # Write the .glif using default layer geometry if not yet present
             if glyphName not in colorGlyphSet:
                 colorLayerGlyph = readGlyphOrCreate(
