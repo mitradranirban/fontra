@@ -9,6 +9,7 @@ from fontTools.colorLib import unbuilder as colrUnbuilder
 from fontTools.misc.fixedTools import fixedToFloat
 from fontTools.misc.psCharStrings import SimpleT2Decompiler
 from fontTools.pens.pointPen import GuessSmoothPointPen
+from fontTools.subset import Options, Subsetter
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables.otTables import NO_VARIATION_INDEX
 from fontTools.varLib.models import piecewiseLinearMap
@@ -625,11 +626,22 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
         # 1. Handle GSUB (Track ligatures/alternates so they aren't hidden)
         if "GSUB" in self.font:
-            from fontTools.otlLib.utils import getReferencedGlyphs
 
-            self.gsubGlyphs = getReferencedGlyphs(self.font["GSUB"].table)
+            # Initialize options to preserve all GSUB layout features
+            options = Options()
+            options.layout_features = ["*"]
+            subsetter = Subsetter(options=options)
 
-        # 2. Handle COLR Table
+            # Start the subsetter with the entire list of glyphs in the font
+            base_glyphs = set(self.font.getGlyphOrder())
+            subsetter.populate(glyphs=list(base_glyphs))
+
+            # Let fonttools natively figure out which glyphs refer to which via GSUB
+            subsetter._closure_glyphs(self.font)
+
+            # Subsetter populates `subsetter.glyphs` with base glyphs AND referenced glyphs.
+            # Subtracting the base glyphs gives us JUST the GSUB target/ligature/alternate glyphs.
+            self.gsubGlyphs = subsetter.glyphs - base_glyphs
         colrTable = self.font.get("COLR")
         if colrTable is not None:
             self.colrVersion = colrTable.version
