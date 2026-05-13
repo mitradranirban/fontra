@@ -484,15 +484,9 @@ function buildDetailPane(pane, paint, layerIdx, palette, graphPanel) {
             sf.max,
             sf.integer,
             async (val) => {
-              await graphPanel._layersPanel.setV1ArrayParam(
-                graphPanel.currentGlyphName,
-                graphPanel.currentPaint,
-                layerIdx,
-                fd.key,
-                si,
-                sf.key,
-                val
-              );
+              stop[sf.key] = val;
+              const layersPanel = graphPanel.editorController.panels?.["color-layers"];
+              if (layersPanel) await layersPanel._writeV1Paint(graphPanel.currentPaint);
               graphPanel.update();
             }
           );
@@ -531,13 +525,9 @@ function buildDetailPane(pane, paint, layerIdx, palette, graphPanel) {
         : 0);
     row.appendChild(
       makeNumberInput(rawVal, fd.min, fd.max, fd.integer, async (val) => {
-        await graphPanel._layersPanel.setV1PaintParam(
-          graphPanel.currentGlyphName,
-          graphPanel.currentPaint,
-          layerIdx,
-          fd.key,
-          val
-        );
+        sourceObj[fd.key] = val; // Mutate the node directly
+        const layersPanel = graphPanel.editorController.panels?.["color-layers"];
+        if (layersPanel) await layersPanel._writeV1Paint(graphPanel.currentPaint);
         graphPanel.update();
       })
     );
@@ -559,13 +549,9 @@ function buildDetailPane(pane, paint, layerIdx, palette, graphPanel) {
           partner.max,
           partner.integer,
           async (val) => {
-            await graphPanel._layersPanel.setV1PaintParam(
-              graphPanel.currentGlyphName,
-              graphPanel.currentPaint,
-              layerIdx,
-              partner.key,
-              val
-            );
+            sourceObj[partner.key] = val; // Mutate the node directly
+            const layersPanel = graphPanel.editorController.panels?.["color-layers"];
+            if (layersPanel) await layersPanel._writeV1Paint(graphPanel.currentPaint);
             graphPanel.update();
           }
         )
@@ -647,9 +633,12 @@ export default class ColorGraphPanel extends Panel {
       palette = raw.map((entry) => {
         if (Array.isArray(entry)) {
           const [r, g, b] = entry;
-          return `#${r.toString(16).padStart(2, "0")}${g
+          const rInt = Math.round(r * 255);
+          const gInt = Math.round(g * 255);
+          const bInt = Math.round(b * 255);
+          return `#${rInt.toString(16).padStart(2, "0")}${gInt
             .toString(16)
-            .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+            .padStart(2, "0")}${bInt.toString(16).padStart(2, "0")}`;
         }
         return entry;
       });
