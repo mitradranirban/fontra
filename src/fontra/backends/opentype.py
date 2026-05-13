@@ -637,11 +637,16 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
             # Version 0 Logic
             if self.colrVersion == 0:
                 for baseGlyph, layerRecords in colrTable.ColorLayers.items():
-                    self.colrV0Layers[baseGlyph] = [
-                        (layer.name, layer.colorID) for layer in layerRecords
-                    ]
+                    layers_list = []
                     for layer in layerRecords:
-                        self.colrLayerGlyphs.add(layer.name)
+                        # fontTools exposes these as .name and .colorID on ColorLayerRecord
+                        name = layer.name if hasattr(layer, "name") else layer[0]
+                        colorID = (
+                            layer.colorID if hasattr(layer, "colorID") else layer[1]
+                        )
+                        layers_list.append((name, colorID))
+                        self.colrLayerGlyphs.add(name)
+                    self.colrV0Layers[baseGlyph] = layers_list
 
             # Version 1 Logic (Fixed Indentation/Syntax)
             elif self.colrVersion >= 1:
@@ -791,7 +796,8 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
         if glyphName in self.colrV0Layers:
             color_mapping = []
             for i, (layerGlyphName, colorID) in enumerate(self.colrV0Layers[glyphName]):
-                ufoLayerName = f"color.{i}"
+                shortLayerName = f"color.{i}"
+                ufoLayerName = f"{defaultLayerName}^color.{i}"
 
                 if layerGlyphName in self.glyphSet:
                     layerGlyph = buildStaticGlyph(self.glyphSet, layerGlyphName)
@@ -803,18 +809,8 @@ class OTFBackend(WatchableBackend, ReadableBaseBackend):
 
                 layerGlyph.customData["fontra.colrv0.colorID"] = colorID
                 layers[ufoLayerName] = Layer(glyph=layerGlyph)
-                color_mapping.append([ufoLayerName, colorID])
-                sources.append(
-                    GlyphSource(
-                        location={},
-                        locationBase=defaultSourceIdentifier,
-                        name=f"Color {i}",  # Label in the Layers panel
-                        layerName=ufoLayerName,
-                    )
-                )
-            staticGlyph.customData["com.github.googlei18n.ufo2ft.colorLayerMapping"] = (
-                color_mapping
-            )
+                color_mapping.append([shortLayerName, colorID])
+            glyph.customData["colorLayerMapping"] = color_mapping
 
         # 4. Handle COLRv1 (Graph-based Color)
         fvarAxes = self.font["fvar"].axes if "fvar" in self.font else None
