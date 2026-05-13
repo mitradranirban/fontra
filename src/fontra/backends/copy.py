@@ -151,8 +151,7 @@ async def copyGlyphs(
                     layer.glyph.backgroundImage.identifier
                 )
 
-        await destBackend.putGlyph(glyphName, glyph, glyphMap[glyphName])
-
+        await destBackend.putGlyph(glyphName, glyph, glyphMap.get(glyphName, []))
     return backgroundImageIdentifiers
 
 
