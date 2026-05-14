@@ -1651,11 +1651,50 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         return imageIdentifier
 
     async def getCustomData(self) -> dict[str, Any]:
-        return deepcopy(self.dsDoc.lib)
+        lib = deepcopy(self.dsDoc.lib)
+        # Read the color palettes from the default master's UFO lib
+        COLOR_PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes"
+        ufolib = self.defaultReader.readLib()
+        color_palettes = ufolib.get(COLOR_PALETTES_KEY)
+
+        # Inject it into the custom data sent to Fontra's frontend
+        if color_palettes is not None:
+            lib[COLOR_PALETTES_KEY] = color_palettes
+
+        return lib
 
     async def putCustomData(self, lib) -> None:
-        self.dsDoc.lib = deepcopy(lib)
+        COLOR_PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes"
+        COLOR_LAYER_MAPPING_KEY = "com.github.googlei18n.ufo2ft.colorLayerMapping"
+
+        ds_lib = deepcopy(lib)
+
+        # 1. Extract palettes to write down to the component UFOs
+        color_palettes = ds_lib.pop(COLOR_PALETTES_KEY, None)
+
+        # 2. Completely discard the layer mapping from the designspace lib,
+        # since it is handled per-glyph in the .glif files
+        ds_lib.pop(COLOR_LAYER_MAPPING_KEY, None)
+
+        # 3. Write the designspace file without the palettes or layer mapping
+        self.dsDoc.lib = ds_lib
         self._writeDesignSpaceDocument()
+
+        # 4. Write the palettes into every source UFO's font-level lib
+        for source in self.dsDoc.sources:
+            if not source.path:
+                continue
+
+            writer = self.ufoManager.getWriter(source.path)
+            ufo_lib = writer.readLib()
+
+            if color_palettes is not None:
+                ufo_lib[COLOR_PALETTES_KEY] = deepcopy(color_palettes)
+            else:
+                ufo_lib.pop(COLOR_PALETTES_KEY, None)
+
+            writer.writeLib(ufo_lib)
+            self.fileWatcherIgnoreNextChange(os.path.join(source.path, "lib.plist"))
 
     async def getGlyphInfos(self) -> dict[str, Any]:
         lib = self.defaultReader.readLib()
