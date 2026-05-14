@@ -92,6 +92,9 @@ GLYPH_SOURCE_CUSTOM_DATA_LIB_KEY = "xyz.fontra.glyph.source.customData"
 LINE_METRICS_HOR_ZONES_KEY = "xyz.fontra.lineMetricsHorizontalLayout.zones"
 GLYPH_NOTE_LIB_KEY = "fontra.glyph.note"
 RF_GUIDELINE_LOCK_LIB_PREFIX = "com.typemytype.robofont.guideline.locked."
+COLOR_PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes"
+COLOR_LAYERS_KEY = "com.github.googlei18n.ufo2ft.colorLayers"
+COLOR_LAYER_MAPPING_KEY = "com.github.googlei18n.ufo2ft.colorLayerMapping"
 
 
 defaultUFOInfoAttrs = {
@@ -1652,8 +1655,12 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
 
     async def getCustomData(self) -> dict[str, Any]:
         lib = deepcopy(self.dsDoc.lib)
+        # Ensure top-level color data never leaks from a dirty dsDoc.lib to the UI
+        lib.pop(COLOR_PALETTES_KEY, None)
+        lib.pop(COLOR_LAYERS_KEY, None)
+        lib.pop(COLOR_LAYER_MAPPING_KEY, None)
+
         # Read the color palettes from the default master's UFO lib
-        COLOR_PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes"
         ufolib = self.defaultReader.readLib()
         color_palettes = ufolib.get(COLOR_PALETTES_KEY)
 
@@ -1664,28 +1671,33 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
         return lib
 
     async def putCustomData(self, lib) -> None:
-        COLOR_PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes"
-        COLOR_LAYER_MAPPING_KEY = "com.github.googlei18n.ufo2ft.colorLayerMapping"
-
         ds_lib = deepcopy(lib)
 
         # 1. Extract palettes to write down to the component UFOs
         color_palettes = ds_lib.pop(COLOR_PALETTES_KEY, None)
 
-        # 2. Completely discard the layer mapping from the designspace lib,
-        # since it is handled per-glyph in the .glif files
+        # 2. Completely discard ALL color mappings from the designspace lib
+        ds_lib.pop(COLOR_LAYERS_KEY, None)
         ds_lib.pop(COLOR_LAYER_MAPPING_KEY, None)
 
-        # 3. Write the designspace file without the palettes or layer mapping
+        # 3. Write the designspace file completely free of color info
         self.dsDoc.lib = ds_lib
         self._writeDesignSpaceDocument()
+
+        # Resolve the base directory of the .designspace file
+        ds_dir = os.path.dirname(os.path.abspath(self.dsDoc.path))
 
         # 4. Write the palettes into every source UFO's font-level lib
         for source in self.dsDoc.sources:
             if not source.path:
                 continue
 
-            writer = self.ufoManager.getWriter(source.path)
+            # Ensure we are resolving relative UFO paths correctly
+            ufo_path = source.path
+            if not os.path.isabs(ufo_path):
+                ufo_path = os.path.join(ds_dir, ufo_path)
+
+            writer = self.ufoManager.getWriter(ufo_path)
             ufo_lib = writer.readLib()
 
             if color_palettes is not None:
@@ -1694,7 +1706,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
                 ufo_lib.pop(COLOR_PALETTES_KEY, None)
 
             writer.writeLib(ufo_lib)
-            self.fileWatcherIgnoreNextChange(os.path.join(source.path, "lib.plist"))
+            self.fileWatcherIgnoreNextChange(os.path.join(ufo_path, "lib.plist"))
 
     async def getGlyphInfos(self) -> dict[str, Any]:
         lib = self.defaultReader.readLib()
