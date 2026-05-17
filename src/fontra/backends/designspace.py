@@ -503,7 +503,9 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
                     manager=manager,
                     path=ufoPath,
                     name=ufoLayerName,
-                    fontraLayerName=source.name,
+                    fontraLayerName=(
+                        "default" if source == self.dsDoc.default else source.name
+                    ),
                 )
                 self.ufoLayers.append(sourceLayer)
 
@@ -537,8 +539,17 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
             for ufoLayerName in reader.getLayerNames():
                 layer = self.ufoLayers.findItem(path=ufoPath, name=ufoLayerName)
                 if layer is None:
+                    # For COLRv0 color layers (glyphs.color.N), use the default layer's
+                    # Fontra name as the prefix, not the source identifier. This ensures
+                    # the frontend can associate color layers with their source via the
+                    # layer name prefix matching.
+                    sourceIdentifier = source.name
+                    if ufoLayerName.startswith("color."):
+                        # Use the default layer's fontraLayerName for color layers
+                        sourceIdentifier = self.defaultUFOLayer.fontraLayerName
+
                     fontraLayerName = self._getFontraLayerNameFromUFOLayerName(
-                        source.name, ufoLayerName
+                        sourceIdentifier, ufoLayerName
                     )
                     self.ufoLayers.append(
                         UFOLayer(
@@ -695,10 +706,40 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
                 layerNameMapping.get(layerName, layerName): layer
                 for layerName, layer in layers.items()
             }
-
+        colorLayerMapping = customData.get("colorLayerMapping") or []
+        for shortLayerName, colorID in colorLayerMapping:
+            for layerName, layer in layers.items():
+                if layerName == shortLayerName or layerName.endswith(
+                    f"^{shortLayerName}"
+                ):
+                    layer.glyph.customData = dict(layer.glyph.customData)
+                    layer.glyph.customData["fontra.colrv0.colorID"] = colorID
+                    break
         for source in sources:
             source.name = sourceNameMapping.get(source.name, source.name)
             source.customData = sourcesCustomData.get(source.layerName, {})
+        if "colorLayerMapping" in customData:
+            import sys
+
+            print(
+                f"\n>>> DEBUG getGlyph({glyphName}): colorLayerMapping present",
+                file=sys.stderr,
+            )
+            print(
+                f"    colorLayerMapping = {customData['colorLayerMapping']}",
+                file=sys.stderr,
+            )
+            print(f"    glyph.layers.keys() = {list(layers.keys())}", file=sys.stderr)
+            for layerName, layer in layers.items():
+                if "color" in layerName:
+                    print(
+                        f"      {layerName}: customData={layer.glyph.customData}",
+                        file=sys.stderr,
+                    )
+            print(
+                f"    glyph.sources = [{', '.join(f'{s.name}@{s.layerName}' for s in sources)}]",
+                file=sys.stderr,
+            )
 
         return VariableGlyph(
             name=glyphName,
