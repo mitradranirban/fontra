@@ -898,6 +898,11 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
                 layerGlyph = defaultLayerGlyph
                 storeInLib(layerGlyph, GLYPH_DESIGNSPACE_LIB_KEY, localDS)
                 storeInLib(layerGlyph, SOURCE_NAME_MAPPING_LIB_KEY, sourceNameMapping)
+                layerNameMapping = {
+                    k: v
+                    for k, v in layerNameMapping.items()
+                    if k != "default" and v != "default"
+                }
                 storeInLib(layerGlyph, LAYER_NAME_MAPPING_LIB_KEY, layerNameMapping)
                 layerGlyph.note = glyph.customData.pop(GLYPH_NOTE_LIB_KEY, None)
                 # Strip colorLayerMapping from customData in both possible key forms
