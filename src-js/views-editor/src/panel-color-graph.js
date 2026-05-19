@@ -10,7 +10,7 @@ import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
 import { PAINT_PARAM_SCHEMA, normalizePaintType } from "./panel-color-layers.js";
 import Panel from "./panel.js";
-
+import { setActivePaletteIndex } from "./visualization-layers.js";
 const PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes";
 const CUSTOM_DATA_KEY = "colorLayerMapping";
 const COLRV1_KEY = "colorv1";
@@ -625,30 +625,6 @@ export default class ColorGraphPanel extends Panel {
     if (!scrollArea) return;
     scrollArea.innerHTML = "";
 
-    // --- Palette ---
-    let palette = [];
-    try {
-      const cd = this.fontController?.customData ?? {};
-      const raw = cd[PALETTES_KEY]?.[0] ?? [];
-      palette = raw.map((entry) => {
-        if (Array.isArray(entry)) {
-          const [r, g, b] = entry;
-          const rInt = Math.round(r * 255);
-          const gInt = Math.round(g * 255);
-          const bInt = Math.round(b * 255);
-          return `#${rInt.toString(16).padStart(2, "0")}${gInt
-            .toString(16)
-            .padStart(2, "0")}${bInt.toString(16).padStart(2, "0")}`;
-        }
-        return entry;
-      });
-    } catch (_) {}
-
-    if (!palette.length) {
-      scrollArea.appendChild(makeEmptyState(translate("color-graph.no-palette")));
-      return;
-    }
-
     const glyphName = this.sceneController?.sceneSettings?.selectedGlyphName;
     if (!glyphName) {
       scrollArea.appendChild(
@@ -689,6 +665,7 @@ export default class ColorGraphPanel extends Panel {
         `${translate("color-graph.paint-graph")} — ${glyphName}`
       )
     );
+
     headerBar.appendChild(
       html.button(
         {
@@ -699,6 +676,56 @@ export default class ColorGraphPanel extends Panel {
         translate("color-graph.refresh")
       )
     );
+    let palettes = [];
+    try {
+      const cd = this.fontController?.customData ?? {};
+      palettes = cd[PALETTES_KEY] ?? [];
+    } catch (_) {}
+
+    if (!palettes.length) {
+      scrollArea.appendChild(makeEmptyState(translate("color-graph.no-palette")));
+      return;
+    }
+
+    const paletteIndex = Math.max(
+      0,
+      Math.min(this.activePaletteIndex, palettes.length - 1)
+    );
+    setActivePaletteIndex(paletteIndex);
+    const palette = (palettes[paletteIndex] ?? []).map((entry) => {
+      if (Array.isArray(entry)) {
+        const [r, g, b] = entry;
+        return `#${Math.round(r * 255)
+          .toString(16)
+          .padStart(2, "0")}${Math.round(g * 255)
+          .toString(16)
+          .padStart(2, "0")}${Math.round(b * 255)
+          .toString(16)
+          .padStart(2, "0")}`;
+      }
+      return entry;
+    });
+    if (palettes.length > 1) {
+      const paletteSelect = html.select({
+        style: "font-size:0.78em; padding:2px 6px; border-radius:4px;",
+      });
+
+      palettes.forEach((_, i) => {
+        paletteSelect.appendChild(
+          html.option({ value: String(i) }, `Palette ${i + 1}`)
+        );
+      });
+
+      paletteSelect.value = String(paletteIndex);
+      paletteSelect.addEventListener("change", async () => {
+        this.activePaletteIndex = Number(paletteSelect.value) || 0;
+        setActivePaletteIndex(this.activePaletteIndex);
+        this.sceneController.canvasController.requestUpdate();
+        await this.update();
+      });
+
+      headerBar.appendChild(paletteSelect);
+    }
 
     scrollArea.appendChild(headerBar);
     scrollArea.appendChild(makePaletteStrip(palette));

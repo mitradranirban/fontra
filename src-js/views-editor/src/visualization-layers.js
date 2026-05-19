@@ -125,8 +125,14 @@ export class VisualizationContext {
 // COLRv1 inline layer definition
 //
 // ---------------------------------------------------------------------------
-export function setColrv1AxisValues(axisValues) {
-  /* no-op — now read live in draw() */
+let _activePaletteIndex = 0;
+
+export function getActivePaletteIndex() {
+  return _activePaletteIndex;
+}
+
+export function setActivePaletteIndex(index) {
+  _activePaletteIndex = index;
 }
 const colrPathCache = new Map();
 export const colrv1PaintOverlayDefinition = {
@@ -134,7 +140,7 @@ export const colrv1PaintOverlayDefinition = {
   name: "COLRv1 Paint",
 
   draw(context, positionedGlyph, parameters, model, controller) {
-    // Resolve paint from all possible data paths
+    const activePaletteIndex = getActivePaletteIndex();
     const instanceCd = positionedGlyph?.glyph?.instance?.customData;
     const varGlyphCd =
       positionedGlyph?.varGlyph?.glyph?.customData ?? // VariableGlyphController.glyph.customData
@@ -151,13 +157,18 @@ export const colrv1PaintOverlayDefinition = {
         positionedGlyph,
         model.fontController,
         axisValues,
-        0,
+        activePaletteIndex,
         controller,
         colrPathCache
       );
     } else {
       // COLRv0: draw directly from color.N UFO layers + CPAL palette
-      renderCOLRv0FromLayers(context, positionedGlyph, model.fontController, 0);
+      renderCOLRv0FromLayers(
+        context,
+        positionedGlyph,
+        model.fontController,
+        activePaletteIndex
+      );
     }
   },
 };

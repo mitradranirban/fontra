@@ -905,10 +905,6 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
                 }
                 storeInLib(layerGlyph, LAYER_NAME_MAPPING_LIB_KEY, layerNameMapping)
                 layerGlyph.note = glyph.customData.pop(GLYPH_NOTE_LIB_KEY, None)
-                # Strip colorLayerMapping from customData in both possible key forms
-                # so it never leaks into xyz.fontra.customData.
-                # Fall back to the value already resolved above (from top-level lib)
-                # so pre-existing color data is never lost.
                 colorLayerMapping = (
                     glyph.customData.pop("colorLayerMapping", None)
                     or glyph.customData.pop(
