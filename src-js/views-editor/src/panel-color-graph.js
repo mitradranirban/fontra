@@ -625,6 +625,9 @@ export default class ColorGraphPanel extends Panel {
     if (!scrollArea) return;
     scrollArea.innerHTML = "";
 
+    this.activePaletteIndex ??= 0;
+    setActivePaletteIndex(this.activePaletteIndex);
+
     const glyphName = this.sceneController?.sceneSettings?.selectedGlyphName;
     if (!glyphName) {
       scrollArea.appendChild(

@@ -107,9 +107,9 @@ export function renderCOLRv0FromLayers(
     return;
   }
 
-  const palette =
-    palettes[Math.max(0, Math.min(activePaletteIndex, palettes.length - 1))];
-
+  const paletteIndex = Math.max(0, Math.min(activePaletteIndex, palettes.length - 1));
+  const palette = palettes[paletteIndex];
+  if (!Array.isArray(palette)) return;
   const colorLayers = _collectColorLayers(varGlyph);
 
   if (!colorLayers.length) {
@@ -120,8 +120,9 @@ export function renderCOLRv0FromLayers(
   ctx.save();
   for (const { layerIndex, source } of colorLayers) {
     const path2d = _getLayerPath2D(source);
-    if (!palette[layerIndex] || !path2d) continue;
-    const [r, g, b, a = 1.0] = palette[layerIndex];
+    const paletteEntry = palette[layerIndex];
+    if (!Array.isArray(paletteEntry) || !path2d) continue;
+    const [r, g, b, a = 1.0] = paletteEntry;
     ctx.fillStyle = `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(
       b * 255
     )}, ${a.toFixed(4)})`;

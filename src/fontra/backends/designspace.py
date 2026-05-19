@@ -2149,7 +2149,7 @@ class UFOBackend(DesignspaceBackend):
             ufolib[COLOR_PALETTES_KEY] = color_palettes
         else:
             ufolib.pop(COLOR_PALETTES_KEY, None)
-        self.defaultReader.writeLib(ufolib)
+        self.defaultWriter.writeLib(ufolib)
         self.fileWatcherIgnoreNextChange(
             os.path.join(self.defaultUFOLayer.path, LIB_FILENAME)
         )
