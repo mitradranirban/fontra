@@ -2226,30 +2226,133 @@ export default class ColorLayersPanel extends Panel {
   }
 
   async _convertV0toV1(glyphName, mapping, palette) {
-    const layers = mapping.map(([layerName, colorIndex]) => ({
+    // ─── Step 1: Read the current varGlyph ───────────────────────────────────
+    const varGlyphController =
+      await this.sceneController.sceneModel.getSelectedVariableGlyphController();
+    const varGlyph = varGlyphController?.glyph;
+    if (!varGlyph) return;
+
+    // Find the "default" / base source — the one with no inactive flag and
+    // no locationBase offset. Falls back to sources[0] for static fonts.
+    const defaultSource =
+      varGlyph.sources?.find((s) => !s.inactive && !s.locationBase) ??
+      varGlyph.sources?.[0];
+    const defaultLayerName = defaultSource?.layerName; // e.g. "default"
+
+    if (!defaultLayerName) {
+      console.error("convertV0toV1: could not determine default layer name");
+      return;
+    }
+
+    // ─── Step 2: Build V1 paint tree from the V0 mapping ────────────────────
+    const v1Layers = mapping.map(([layerName, colorIndex]) => ({
       type: "PaintGlyph",
-      glyph: layerName, // In V1, this usually refers to the glyph name itself or a component
-      paint: { type: "PaintSolid", paletteIndex: colorIndex, alpha: 1.0 },
+      glyph: `${glyphName}.${layerName}`, // e.g. "color.0" — the referenced glyph name
+      paint: {
+        type: "PaintSolid",
+        paletteIndex: colorIndex,
+        alpha: 1.0,
+      },
     }));
+    const newPaint = { type: "PaintColrLayers", layers: v1Layers };
 
+    // ─── Step 3: Create the referenced glyphs (static AND variable) ─────────
+    //
+    // V0 stores color-layer geometry as sibling layers inside the parent glyph:
+    //   "default^color.0", "default^color.1", ...  (one per source per layer)
+    //
+    // V1 expects these as independent top-level glyphs in the font, with one
+    // source+layer entry per master mirroring the parent glyph's source list.
+    //
+    // For a STATIC font: varGlyph.sources has 1 entry → 1 layer created.
+    // For a VARIABLE font: varGlyph.sources has N entries → N layers created,
+    //   one per master so the referenced glyph can interpolate correctly.
+
+    for (const [layerName] of mapping) {
+      // ✅ Namespace the new glyph name under the parent glyph
+      const referencedGlyphName = `${glyphName}.${layerName}`;
+      // e.g. "A.color.0", "A.color.1", "A.color.2"
+
+      const newSources = [];
+      const newLayers = {};
+
+      for (const source of varGlyph.sources ?? []) {
+        if (source.inactive) continue;
+
+        // Sibling layer key is still "default^color.0" etc. — unchanged
+        const siblingKey = `${source.layerName}^${layerName}`;
+        const siblingLayerGlyph = varGlyph.layers?.[siblingKey]?.glyph;
+
+        if (!siblingLayerGlyph) {
+          console.warn(
+            `convertV0toV1: sibling layer "${siblingKey}" not found, skipping master`
+          );
+          continue;
+        }
+
+        newSources.push({
+          name: source.name,
+          layerName: source.layerName,
+          locationBase: source.locationBase,
+          ...(source.location ? { location: structuredClone(source.location) } : {}),
+        });
+
+        newLayers[source.layerName] = {
+          glyph: {
+            path: structuredClone(siblingLayerGlyph.path ?? { contours: [] }),
+            xAdvance: siblingLayerGlyph.xAdvance ?? 0,
+            customData: {},
+          },
+        };
+      }
+
+      if (newSources.length === 0) {
+        console.warn(
+          `convertV0toV1: no masters found for "${referencedGlyphName}", skipping`
+        );
+        continue;
+      }
+
+      const alreadyExists =
+        typeof this.fontController.hasGlyph === "function"
+          ? await this.fontController.hasGlyph(referencedGlyphName)
+          : !!(await this.fontController.getGlyph?.(referencedGlyphName));
+
+      if (alreadyExists) continue;
+
+      const newGlyphData = {
+        name: referencedGlyphName,
+        sources: newSources,
+        layers: newLayers,
+        customData: {},
+      };
+
+      // null codePoint — color sub-glyphs have no Unicode assignment
+      await this.fontController.newGlyph(referencedGlyphName, null, newGlyphData);
+    }
+
+    // ─── Step 4: Write the V1 paint via the standard writeV1Paint path ───────
+    // This handles:
+    //   • Finding defaultSource → layerName → layerGlyph
+    //   • Writing colorv1 to layerGlyph.customData[COLRV1KEY]
+    //   • Populating fontra.colrv1.referencedGlyphs via collectReferencedGlyphs
+    //   • Removing any stale root-level colorv1 key
+    await this._writeV1Paint(newPaint);
+
+    // ─── Step 5: Clean up the V0 colorLayerMapping from root customData ──────
+    // Done in a separate editGlyphAndRecordChanges so it gets its own undo entry
+    // and cannot interfere with writeV1Paint's transaction.
     await this.sceneController.editGlyphAndRecordChanges((varGlyph) => {
-      // 1. Find the target layer (C.json style)
-      const defaultSource =
-        varGlyph.sources?.find((s) => !s.inactive && !s.locationBase) ??
-        varGlyph.sources?.[0];
-      const layerName = defaultSource?.layerName;
-      const layerGlyph = varGlyph.layers?.[layerName]?.glyph;
-
-      if (layerGlyph) {
-        // 2. Attach the new COLRv1 paint to the specific layer
-        if (!layerGlyph.customData) layerGlyph.customData = {};
-        layerGlyph.customData[COLRV1_KEY] = { type: "PaintColrLayers", layers };
-
-        // 3. Clean up the old COLRv0 data (usually stored in 'colorv0')
-        delete varGlyph.customData[CUSTOM_DATA_KEY];
-
-        // 4. Safety: Ensure no "D.json" style root data exists
-        if (varGlyph.customData?.[COLRV1_KEY]) delete varGlyph.customData[COLRV1_KEY];
+      delete varGlyph.customData[CUSTOM_DATA_KEY];
+      if (varGlyph.customData?.[COLRV1_KEY]) {
+        delete varGlyph.customData[COLRV1_KEY];
+      }
+      for (const [layerName] of mapping) {
+        for (const source of varGlyph.sources ?? []) {
+          if (source.inactive) continue;
+          const siblingKey = `${source.layerName}^${layerName}`;
+          delete varGlyph.layers[siblingKey];
+        }
       }
 
       return translate("color-layers.convert-v0-to-v1");
