@@ -8,7 +8,7 @@ import {
   dumpURLFragment,
   isObjectEmpty,
   readObjectFromURLFragment,
-} from "./utils.js";
+} from "./utils.ts";
 
 const mapMenuItemKeyToFunction = {
   File: getFileMenuItems,

@@ -1,10 +1,26 @@
 # Changelog for Fontra
 
-## 2026-05-?? [version 2026.5.1]
+## 2026-05-?? [version 2026.5.2]
+
+### Improvements
+
+- [shaping] Gracefully handle invalid conditional substitution rules that use unknown axes. [PR 2598](https://github.com/fontra/fontra/pull/2598)
+- [glyph search] Allow `U+`- or `0x`-prefixed hex code points in various glyph search fields, to find glyphs by their hexadecimal code point. [Issue 2606](https://github.com/fontra/fontra/issues/2606), [PR 2608](https://github.com/fontra/fontra/pull/2608)
+
+## 2026-05-12 [version 2026.5.1]
 
 ### New features
 
+- [Designspace navigation panel] Add a new accordion section for hidden axes. Add an associated view option (under its hamburger menu button) "Show only effective location", similar to "Show effective location", but that will only show (inactive) sliders for the effective location. This is useful when the hidden axes are all controlled by the non-hidden axes via cross-axis mappings (aka `avar-2`). [Issue 2553](https://github.com/fontra/fontra/issues/2553), [PR 2584](https://github.com/fontra/fontra/pull/2584)
 - [Axes panel] Add "Hidden" checkbox to Axis box and New Axis dialog, so we can finally edit the "hidden" axis flag. [Issue 1373](https://github.com/fontra/fontra/issues/1373), [PR 2582](https://github.com/fontra/fontra/pull/2582)
+
+### Improvements
+
+- [front-end code] Our highly competent contributor Qwerasd started to convert part of the front-end code base from JavaScript to TypeScript. This process will in the long term improve maintainability and stability. [PR 2585](https://github.com/fontra/fontra/pull/2585), [PR 2590](https://github.com/fontra/fontra/pull/2590)
+
+### Fixes
+
+- [fontra-pak] Fix "Open fonts in read-only mode" on Windows: this new checkbox sometimes had an unpredictable effect. [PR 249](https://github.com/fontra/fontra-pak/pull/249)
 
 ## 2026-05-06 [version 2026.5.0]
 
@@ -376,7 +392,6 @@
 ## 2025-07-08
 
 - Herlan/navv-1 contributed several improvements and additions for the OpenType Features panel:
-
   - added syntax coloring
   - added comment toggle (command/control /)
   - fixed undo/redo

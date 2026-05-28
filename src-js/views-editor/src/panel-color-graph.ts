@@ -1,5 +1,5 @@
 /**
- * panel-color-graph.js
+ * panel-color-graph.ts
  * Visual Color Graph Panel for ColorPak v0.7.0
  *
  * Renders COLRv1 paint trees as interactive visual graphs with live color previews,
@@ -15,10 +15,29 @@ const PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes";
 const CUSTOM_DATA_KEY = "colorLayerMapping";
 const COLRV1_KEY = "colorv1";
 
+interface PaintNodeOptions {
+  label?: string;
+  onSelectPaint?: (paint: any, layerIdx: number, nodeId: number) => void;
+  selectedPaintId?: { current: number | null };
+  nodeId?: number;
+  layerIdx?: number;
+}
+
+interface FieldDescriptor {
+  key: string;
+  type?: string;
+  paired?: boolean;
+  pairWith?: string;
+  sourceKey?: string;
+  min?: number;
+  max?: number;
+  integer?: boolean;
+  itemSchema?: FieldDescriptor[];
+}
 // ---------------------------------------------------------------------------
 // Paint type → display color category
 // ---------------------------------------------------------------------------
-const PAINT_CATEGORY_COLORS = {
+const PAINT_CATEGORY_COLORS: Record<string, string> = {
   PaintSolid: "#4f98a3",
   PaintLinearGradient: "#6daa45",
   PaintRadialGradient: "#a86fdf",
@@ -38,10 +57,10 @@ const PAINT_CATEGORY_COLORS = {
 // ---------------------------------------------------------------------------
 // Render a CSS gradient preview for gradient paints
 // ---------------------------------------------------------------------------
-function buildGradientPreview(paint, palette) {
+function buildGradientPreview(paint: any, palette: string[]) {
   const stops = paint?.colorLine?.colorStops ?? [];
   if (!stops.length) return "transparent";
-  const cssStops = stops.map((s) => {
+  const cssStops = stops.map((s: any) => {
     const hex = palette[s.paletteIndex] ?? "#888";
     const alpha = s.alpha ?? 1.0;
     const pct = Math.round((s.stopOffset ?? 0) * 100);
@@ -60,7 +79,7 @@ function buildGradientPreview(paint, palette) {
   return `linear-gradient(to right, ${cssStops.join(", ")})`;
 }
 
-function hexWithAlpha(hex, alpha) {
+function hexWithAlpha(hex: string, alpha: number): string {
   if (!hex || !hex.startsWith("#")) return `rgba(128,128,128,${alpha})`;
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
@@ -71,7 +90,7 @@ function hexWithAlpha(hex, alpha) {
 // ---------------------------------------------------------------------------
 // Build a paint swatch element for a given paint + palette
 // ---------------------------------------------------------------------------
-function makePaintSwatch(paint, palette) {
+function makePaintSwatch(paint: any, palette: string[]): HTMLElement {
   const type = normalizePaintType(paint?.type ?? "");
   const size = "28px";
   const style = `
@@ -102,7 +121,7 @@ function makePaintSwatch(paint, palette) {
 // ---------------------------------------------------------------------------
 // Build a color-stop row list for gradient paints
 // ---------------------------------------------------------------------------
-function makeColorStopsPreview(paint, palette) {
+function makeColorStopsPreview(paint: any, palette: string[]): HTMLElement {
   const stops = paint?.colorLine?.colorStops ?? [];
   if (!stops.length)
     return html.span({ style: "font-size:0.75em;opacity:0.5;" }, "no stops");
@@ -137,7 +156,12 @@ function makeColorStopsPreview(paint, palette) {
 // ---------------------------------------------------------------------------
 // Render a single paint node as a visual card in the graph
 // ---------------------------------------------------------------------------
-function makePaintNode(paint, depth, palette, opts = {}) {
+function makePaintNode(
+  paint: any,
+  depth: number,
+  palette: string[],
+  opts: PaintNodeOptions = {}
+): HTMLElement {
   const { label = "", onSelectPaint, selectedPaintId, nodeId, layerIdx } = opts;
   const type = normalizePaintType(paint?.type ?? translate("color-graph.unknown"));
   const catColor = PAINT_CATEGORY_COLORS[type] ?? "#888";
@@ -153,7 +177,7 @@ function makePaintNode(paint, depth, palette, opts = {}) {
       padding: 6px 10px;
       cursor: pointer;
     `,
-    onclick: () => onSelectPaint && onSelectPaint(paint, layerIdx, nodeId),
+    onclick: () => onSelectPaint && onSelectPaint(paint, layerIdx ?? 0, nodeId ?? 0),
   });
 
   // Header row
@@ -281,7 +305,14 @@ function makePaintNode(paint, depth, palette, opts = {}) {
 // ---------------------------------------------------------------------------
 // Recursively walk a paint tree and produce node elements
 // ---------------------------------------------------------------------------
-function renderPaintTree(paint, depth, palette, container, opts, counter = { n: 0 }) {
+function renderPaintTree(
+  paint: any,
+  depth: number,
+  palette: string[],
+  container: HTMLElement,
+  opts: PaintNodeOptions,
+  counter: { n: number } = { n: 0 }
+): void {
   if (!paint) return;
   const nodeId = counter.n++;
   const layerIdx = opts.layerIdx ?? 0;
@@ -296,7 +327,7 @@ function renderPaintTree(paint, depth, palette, container, opts, counter = { n: 
       // Each layer can be a PaintGlyph-like struct (has .glyph + .paint) or a raw paint
       const isGlyphLayer =
         layer.type === "PaintGlyph" || layer.type === "PaintVarGlyph";
-      const childPaint = isGlyphLayer ? layer : layer.paint ?? layer;
+      const childPaint = isGlyphLayer ? layer : (layer.paint ?? layer);
       const glyph = layer.glyph ?? layer.paint?.glyph ?? "";
       renderPaintTree(
         isGlyphLayer ? layer : childPaint,
@@ -351,7 +382,7 @@ function renderPaintTree(paint, depth, palette, container, opts, counter = { n: 
 // ---------------------------------------------------------------------------
 // Palette color tile strip (top of panel)
 // ---------------------------------------------------------------------------
-function makePaletteStrip(palette) {
+function makePaletteStrip(palette: string[]): HTMLElement {
   const strip = html.div({
     style: `display:flex; flex-wrap:wrap; gap:4px; padding:6px 10px;
             background:var(--color-surface-offset, #1d1c1a);
@@ -381,7 +412,7 @@ function makePaletteStrip(palette) {
 // ---------------------------------------------------------------------------
 // Legend bar
 // ---------------------------------------------------------------------------
-function makeLegend() {
+function makeLegend(): HTMLElement {
   const entries = [
     ["PaintSolid", translate("color-graph.solid")],
     ["PaintLinearGradient", translate("color-graph.linear-gradient")],
@@ -415,7 +446,7 @@ function makeLegend() {
 // ---------------------------------------------------------------------------
 // Empty / no-data placeholder
 // ---------------------------------------------------------------------------
-function makeEmptyState(message) {
+function makeEmptyState(message: string | Node): HTMLElement {
   const msgNode =
     message instanceof Node ? message : document.createTextNode(String(message ?? ""));
 
@@ -428,11 +459,17 @@ function makeEmptyState(message) {
   );
 }
 
-function buildDetailPane(pane, paint, layerIdx, palette, graphPanel) {
+function buildDetailPane(
+  pane: HTMLElement,
+  paint: any,
+  layerIdx: number,
+  palette: string[],
+  graphPanel: ColorGraphPanel
+): void {
   pane.innerHTML = "";
   const type = normalizePaintType(paint?.type ?? "");
-  const schema = PAINT_PARAM_SCHEMA[type];
-
+  const paintParamSchema = PAINT_PARAM_SCHEMA as Record<string, FieldDescriptor[]>;
+  const schema = paintParamSchema[type] ?? [];
   // Header
   pane.appendChild(
     html.div(
@@ -473,7 +510,7 @@ function buildDetailPane(pane, paint, layerIdx, palette, graphPanel) {
       );
       pane.appendChild(stopHeader);
 
-      stops.forEach((stop, si) => {
+      stops.forEach((stop: any, _si: number) => {
         const row = html.div({
           style: "display:flex; gap:6px; align-items:center; margin-bottom:4px;",
         });
@@ -482,8 +519,8 @@ function buildDetailPane(pane, paint, layerIdx, palette, graphPanel) {
             stop[sf.key] ?? 0,
             sf.min,
             sf.max,
-            sf.integer,
-            async (val) => {
+            sf.integer ?? false,
+            async (val: number) => {
               stop[sf.key] = val;
               const layersPanel = graphPanel.editorController.panels?.["color-layers"];
               if (layersPanel) await layersPanel._writeV1Paint(graphPanel.currentPaint);
@@ -524,7 +561,7 @@ function buildDetailPane(pane, paint, layerIdx, palette, graphPanel) {
         ? 1.0
         : 0);
     row.appendChild(
-      makeNumberInput(rawVal, fd.min, fd.max, fd.integer, async (val) => {
+      makeNumberInput(rawVal, fd.min, fd.max, fd.integer ?? false, async (val) => {
         sourceObj[fd.key] = val; // Mutate the node directly
         const layersPanel = graphPanel.editorController.panels?.["color-layers"];
         if (layersPanel) await layersPanel._writeV1Paint(graphPanel.currentPaint);
@@ -547,7 +584,7 @@ function buildDetailPane(pane, paint, layerIdx, palette, graphPanel) {
           rawB,
           partner.min,
           partner.max,
-          partner.integer,
+          partner.integer ?? false,
           async (val) => {
             sourceObj[partner.key] = val; // Mutate the node directly
             const layersPanel = graphPanel.editorController.panels?.["color-layers"];
@@ -562,7 +599,13 @@ function buildDetailPane(pane, paint, layerIdx, palette, graphPanel) {
 }
 
 // Small helper — native number input wired to async callback
-function makeNumberInput(value, min, max, integer, onChange) {
+function makeNumberInput(
+  value: number,
+  min: number | undefined,
+  max: number | undefined,
+  integer: boolean,
+  onChange: (val: number) => void
+): HTMLInputElement {
   const input = html.input({
     type: "number",
     value: String(value),
@@ -584,14 +627,24 @@ function makeNumberInput(value, min, max, integer, onChange) {
 // The Panel class
 // ---------------------------------------------------------------------------
 export default class ColorGraphPanel extends Panel {
-  identifier = "color-graph";
-  iconPath = "images/color-graph.svg";
+  static identifier = "color-graph";
+  static iconPath = "images/color-graph.svg";
 
-  constructor(editorController) {
+  sceneController: any;
+  _selectedPaintId: { current: number | null };
+  _layersPanel: any;
+  currentGlyphName?: string;
+  currentPaint?: any;
+  activePaletteIndex: number;
+  _scrollArea!: HTMLElement;
+  _detailPane!: HTMLElement;
+
+  constructor(editorController: any) {
     super(editorController);
     this.sceneController = editorController.sceneController;
     this._selectedPaintId = { current: null };
     this._layersPanel = editorController.panels?.["color-layers"] ?? null;
+    this.activePaletteIndex = 0;
 
     this.sceneController.sceneSettingsController.addKeyListener(
       "selectedGlyphName",
@@ -612,14 +665,14 @@ export default class ColorGraphPanel extends Panel {
     return html.div({ class: "panel" }, [this._scrollArea, this._detailPane]);
   }
 
-  async toggle(on, focus) {
+  async toggle(on: boolean, _focus: boolean): Promise<void> {
     if (on) await this.update();
   }
 
   // -------------------------------------------------------------------------
   // Main render method
   // -------------------------------------------------------------------------
-  async update() {
+  async update(): Promise<void> {
     const scrollArea = this._scrollArea;
     const detailPane = this._detailPane;
     if (!scrollArea) return;
@@ -695,7 +748,7 @@ export default class ColorGraphPanel extends Panel {
       Math.min(this.activePaletteIndex, palettes.length - 1)
     );
     setActivePaletteIndex(paletteIndex);
-    const palette = (palettes[paletteIndex] ?? []).map((entry) => {
+    const palette = (palettes[paletteIndex] ?? []).map((entry: any) => {
       if (Array.isArray(entry)) {
         const [r, g, b] = entry;
         return `#${Math.round(r * 255)
@@ -713,7 +766,7 @@ export default class ColorGraphPanel extends Panel {
         style: "font-size:0.78em; padding:2px 6px; border-radius:4px;",
       });
 
-      palettes.forEach((_, i) => {
+      palettes.forEach((_: any, i: number) => {
         paletteSelect.appendChild(
           html.option({ value: String(i) }, `Palette ${i + 1}`)
         );
@@ -748,7 +801,7 @@ export default class ColorGraphPanel extends Panel {
       );
     } else {
       renderPaintTree(paint, 0, palette, scrollArea, {
-        onSelectPaint: (selectedPaint, layerIdx, nodeId) => {
+        onSelectPaint: (selectedPaint: any, layerIdx: number, nodeId: number) => {
           this._selectedPaintId.current =
             this._selectedPaintId.current === nodeId ? null : nodeId;
           if (this._selectedPaintId.current === null) {

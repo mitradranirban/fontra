@@ -1,6 +1,4 @@
-// src-js/views-editor/src/visualization-layers.js
-
-import { withSavedState } from "@fontra/core/utils.js";
+import { withSavedState } from "@fontra/core/utils.ts";
 import { mulScalar } from "@fontra/core/var-funcs.js";
 import {
   COLRV1_KEY,

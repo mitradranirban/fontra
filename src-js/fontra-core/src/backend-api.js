@@ -1,5 +1,5 @@
 import { getRemoteProxy } from "@fontra/core/remote.js";
-import { fetchJSON } from "./utils.js";
+import { fetchJSON } from "./utils.ts";
 import { StaticGlyph } from "./var-glyph.js";
 import { VarPackedPath } from "./var-path.js";
 /** @import { RemoteFont } from "remotefont" */

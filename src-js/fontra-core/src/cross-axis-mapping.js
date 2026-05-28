@@ -1,6 +1,6 @@
 // avar-2-style Cross-Axis Mapping
 
-import { zip } from "./utils.js";
+import { zip } from "./utils.ts";
 import {
   VariationModel,
   makeSparseNormalizedLocation,

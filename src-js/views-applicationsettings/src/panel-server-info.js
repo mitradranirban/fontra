@@ -1,7 +1,7 @@
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
 import { MultiPanelBasePanel } from "@fontra/core/multi-panel.js";
-import { fetchJSON } from "@fontra/core/utils.js";
+import { fetchJSON } from "@fontra/core/utils.ts";
 
 const serverInfo = await fetchJSON("/serverinfo");
 

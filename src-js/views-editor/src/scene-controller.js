@@ -21,7 +21,7 @@ import {
 } from "@fontra/core/glyphsets-controller.js";
 import { translate, translatePlural } from "@fontra/core/localization.js";
 import { MouseTracker } from "@fontra/core/mouse-tracker.js";
-import { ObservableController } from "@fontra/core/observable-object.js";
+import { ObservableController } from "@fontra/core/observable-object.ts";
 import {
   connectContours,
   scalePoint,
@@ -34,7 +34,7 @@ import {
   rectFromArray,
   rectRound,
   rectToArray,
-} from "@fontra/core/rectangle.js";
+} from "@fontra/core/rectangle.ts";
 import {
   difference,
   isSuperset,
@@ -56,7 +56,7 @@ import {
   reversed,
   withTimeout,
   zip,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { GlyphSource, Layer } from "@fontra/core/var-glyph.js";
 import { isLocationAtDefault } from "@fontra/core/var-model.js";
 import { VarPackedPath, packContour } from "@fontra/core/var-path.js";
@@ -1856,6 +1856,7 @@ const persistentSceneSettings = [
   // "glyphLocations", // handled separately
   { key: "fontAxesUseSourceCoordinates" },
   { key: "fontAxesShowEffectiveLocation" },
+  { key: "hiddenFontAxesShowEffectiveLocation" },
   { key: "fontAxesShowHidden" },
   { key: "fontAxesSkipMapping" },
   { key: "fontLocationUser", infoKey: "location" },
@@ -1883,6 +1884,7 @@ function getSceneSettingsDefaults() {
     fontLocationSourceMapped: {},
     fontAxesUseSourceCoordinates: false,
     fontAxesShowEffectiveLocation: false,
+    hiddenFontAxesShowEffectiveLocation: false,
     fontAxesShowHidden: false,
     fontAxesSkipMapping: false,
     glyphLocation: {},

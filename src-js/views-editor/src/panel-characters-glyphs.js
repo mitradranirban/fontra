@@ -10,7 +10,7 @@ import {
   range,
   round,
   throttleCalls,
-} from "@fontra/core/utils.js";
+} from "@fontra/core/utils.ts";
 import { showMenu } from "@fontra/web-components/menu-panel.js";
 import {
   Accordion,

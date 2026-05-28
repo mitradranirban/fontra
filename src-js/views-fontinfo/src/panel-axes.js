@@ -3,7 +3,7 @@ import { NumberFormatter, OptionalNumberFormatter } from "@fontra/core/formatter
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
-import { ObservableController } from "@fontra/core/observable-object.js";
+import { ObservableController } from "@fontra/core/observable-object.ts";
 import * as svg from "@fontra/core/svg-utils.js";
 import {
   checkboxListCell,
@@ -11,7 +11,7 @@ import {
   labeledTextInput,
   setupSortableList,
 } from "@fontra/core/ui-utils.js";
-import { enumerate, range, zip } from "@fontra/core/utils.js";
+import { enumerate, range, zip } from "@fontra/core/utils.ts";
 import { piecewiseLinearMap } from "@fontra/core/var-model.js";
 import "@fontra/web-components/add-remove-buttons.js";
 import { IconButton } from "@fontra/web-components/icon-button.js"; // for <icon-button>

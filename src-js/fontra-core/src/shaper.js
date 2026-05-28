@@ -1,5 +1,5 @@
 import * as hb from "harfbuzzjs";
-import { assert, enumerate, mapObjectValues, range, reversed } from "./utils.js";
+import { assert, enumerate, mapObjectValues, range, reversed } from "./utils.ts";
 
 export function getShaper(shaperSupport) {
   const shaperClass = shaperSupport.fontData ? HBShaper : DumbShaper;
@@ -175,7 +175,11 @@ class HBShaper extends ShaperBase {
 
     buffer.guessSegmentProperties(); // Guess script, language and direction if not provided.
 
-    this.font.setVariations(variations || {});
+    this.font.setVariations(
+      Object.entries(variations || {}).map(
+        ([axis, value]) => new hb.Variation(axis, value)
+      )
+    );
 
     this._messages = options.trace ? [] : null;
     this._glyphsAtBreakIndex = null;
@@ -197,7 +201,11 @@ class HBShaper extends ShaperBase {
       messageFunc(buffer, this.font, "start processing");
     }
 
-    hb.shape(this.font, buffer, features);
+    hb.shape(
+      this.font,
+      buffer,
+      (features ?? []).map(([tag, value]) => new hb.Feature(tag, value))
+    );
 
     const glyphs = this.getGlyphInfoFromBuffer(buffer);
 
@@ -244,7 +252,7 @@ class HBShaper extends ShaperBase {
       // Convert Unicode code points to glyph IDs
       glyphs.forEach((glyph) => {
         const glyphName = this.nominalGlyph(glyph.codepoint);
-        glyph.codepoint = glyphName ? this.glyphNameToID[glyphName] ?? 0 : 0;
+        glyph.codepoint = glyphName ? (this.glyphNameToID[glyphName] ?? 0) : 0;
       });
     }
 
@@ -412,7 +420,7 @@ class HBShaper extends ShaperBase {
 
   _getNominalGlyph(font, codePoint) {
     const glyphName = this.nominalGlyph(codePoint);
-    return glyphName ? this.glyphNameToID[glyphName] ?? 0 : 0;
+    return glyphName ? (this.glyphNameToID[glyphName] ?? 0) : 0;
   }
 
   _getHAdvanceFunc(font, glyphID) {
@@ -547,6 +555,7 @@ class DumbShaper extends ShaperBase {
       glyphs.push({
         codepoint: glyphName ? this.glyphNameToID[glyphName] : 0,
         cluster: i,
+        flags: 0,
         glyphname: glyphName ?? ".notdef",
         mark: false,
         xAdvance: Math.round(

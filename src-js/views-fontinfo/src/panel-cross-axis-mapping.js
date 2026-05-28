@@ -2,13 +2,13 @@ import { recordChanges } from "@fontra/core/change-recorder.js";
 import * as html from "@fontra/core/html-utils.js";
 import { addStyleSheet } from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
-import { ObservableController } from "@fontra/core/observable-object.js";
+import { ObservableController } from "@fontra/core/observable-object.ts";
 import {
   labeledCheckbox,
   labeledTextInput,
   setupSortableList,
 } from "@fontra/core/ui-utils.js";
-import { enumerate, range } from "@fontra/core/utils.js";
+import { enumerate, range } from "@fontra/core/utils.ts";
 import { mapAxesFromUserSpaceToSourceSpace } from "@fontra/core/var-model.js";
 import "@fontra/web-components/add-remove-buttons.js";
 import "@fontra/web-components/designspace-location.js";
