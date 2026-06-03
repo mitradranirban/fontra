@@ -12,6 +12,107 @@ export const PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes";
 export const COLRV1_KEY = "colorv1";
 
 // ---------------------------------------------------------------------------
+// Variant family interpolation
+//
+// `^background`, `^bg2`, etc. live outside Fontra's variation model. To make
+// them morph smoothly across the axis we build a parallel deltas cache per
+// suffix, reusing varGlyph.model (every source must carry the variant for
+// this to work).
+// ---------------------------------------------------------------------------
+
+const _variantDeltasCache = new WeakMap();
+const _variantPaintDeltasCache = new WeakMap();
+
+export function getInterpolatedVariantPaint(varGlyphController, suffix, sourceLocation) {
+  const varGlyph = varGlyphController?.glyph;
+  const model = varGlyphController?.model;
+  if (!varGlyph || !model || !varGlyph.layers) return null;
+
+  const sources = varGlyphController.sources ?? [];
+  const masterPaints = [];
+  for (const src of sources) {
+    const cd = varGlyph.layers?.[src.layerName + suffix]?.glyph?.customData;
+    const paint = getPaintGraph(cd);
+    if (!paint) return null;
+    masterPaints.push(paint);
+  }
+
+  let bySuffix = _variantPaintDeltasCache.get(varGlyphController);
+  if (!bySuffix) {
+    bySuffix = new Map();
+    _variantPaintDeltasCache.set(varGlyphController, bySuffix);
+  }
+  let entry = bySuffix.get(suffix);
+  const stale =
+    !entry ||
+    entry.paints.length !== masterPaints.length ||
+    entry.paints.some((p, i) => p !== masterPaints[i]);
+  if (stale) {
+    let deltas;
+    try {
+      deltas = model.getDeltas(masterPaints);
+    } catch (_) {
+      return null;
+    }
+    entry = { paints: masterPaints, deltas };
+    bySuffix.set(suffix, entry);
+  }
+  try {
+    const result = model.interpolateFromDeltas(sourceLocation, entry.deltas);
+    return result?.instance ?? result;
+  } catch (_) {
+    return null;
+  }
+}
+
+export function getInterpolatedVariantPath(varGlyphController, suffix, sourceLocation) {
+  const varGlyph = varGlyphController?.glyph;
+  const model = varGlyphController?.model;
+  if (!varGlyph || !model || !varGlyph.layers) return null;
+
+  const sources = varGlyphController.sources ?? [];
+  const masterPaths = [];
+  for (const src of sources) {
+    const path = varGlyph.layers?.[src.layerName + suffix]?.glyph?.path;
+    if (!path) return null; // sparse — caller falls back to raw
+    masterPaths.push(path);
+  }
+
+  let bySuffix = _variantDeltasCache.get(varGlyphController);
+  if (!bySuffix) {
+    bySuffix = new Map();
+    _variantDeltasCache.set(varGlyphController, bySuffix);
+  }
+  let entry = bySuffix.get(suffix);
+  // Invalidate when any master path reference changed (Fontra edits replace
+  // path objects rather than mutating in place).
+  const stale =
+    !entry ||
+    entry.paths.length !== masterPaths.length ||
+    entry.paths.some((p, i) => p !== masterPaths[i]);
+  if (stale) {
+    let deltas;
+    try {
+      deltas = model.getDeltas(masterPaths);
+    } catch (_) {
+      return null;
+    }
+    entry = { paths: masterPaths, deltas };
+    bySuffix.set(suffix, entry);
+  }
+  try {
+    const result = model.interpolateFromDeltas(sourceLocation, entry.deltas);
+    return result?.instance ?? result;
+  } catch (_) {
+    return null;
+  }
+}
+
+export function clearVariantDeltasCache(varGlyphController) {
+  if (varGlyphController) _variantDeltasCache.delete(varGlyphController);
+}
+
+// ---------------------------------------------------------------------------
 // Tag location builder
 // ---------------------------------------------------------------------------
 
@@ -48,6 +149,21 @@ export function getPaintGraph(customData) {
   if (paintGraph) return paintGraph;
 
   return null;
+}
+
+export function getLayerPaintGraph(positionedGlyph, sceneSettings = null) {
+  const varGlyph = positionedGlyph?.varGlyph?.glyph ?? positionedGlyph?.varGlyph;
+  const sources = varGlyph?.sources ?? [];
+  const editLayerName = sceneSettings?.editLayerName;
+  if (editLayerName && varGlyph?.layers?.[editLayerName]) {
+    return getPaintGraph(varGlyph?.layers?.[editLayerName]?.glyph?.customData);
+  }
+  const source =
+    sources.find((s) => !s.inactive && !s.locationBase) ??
+    sources.find((s) => !s.inactive) ??
+    sources[0];
+  const layerGlyph = varGlyph?.layers?.[source?.layerName]?.glyph;
+  return getPaintGraph(layerGlyph?.customData);
 }
 
 // ---------------------------------------------------------------------------
@@ -261,7 +377,9 @@ export function renderCOLRv1(
   axisValues,
   activePaletteIndex = 0,
   controller = null,
-  externalCache
+  externalCache,
+  sceneSettings = null,
+  options = {}
 ) {
   const glyphController = positionedGlyph?.glyph;
   if (!glyphController) {
@@ -269,12 +387,19 @@ export function renderCOLRv1(
     return;
   }
 
-  const instanceCd = glyphController.instance?.customData;
-  const varGlyphCd =
-    positionedGlyph?.varGlyph?.glyph?.customData ??
-    positionedGlyph?.varGlyph?.customData;
+  const { paintOverride = null, selfRefPath = null } = options;
 
-  const resolvedPaint = getPaintGraph(instanceCd) ?? getPaintGraph(varGlyphCd);
+  let resolvedPaint = paintOverride;
+  if (!resolvedPaint) {
+    const instanceCd = glyphController.instance?.customData;
+    const varGlyphCd =
+      positionedGlyph?.varGlyph?.glyph?.customData ??
+      positionedGlyph?.varGlyph?.customData;
+    resolvedPaint =
+      getPaintGraph(instanceCd) ??
+      getLayerPaintGraph(positionedGlyph, sceneSettings) ??
+      getPaintGraph(varGlyphCd);
+  }
   if (!resolvedPaint) {
     console.warn("No resolvedPaint found");
     return;
@@ -292,14 +417,29 @@ export function renderCOLRv1(
   // Create or reuse cache for glyph outlines
   const cache = externalCache instanceof Map ? externalCache : new Map();
 
+  // Build render controller wrapper carrying sceneSettings + selfRefPath
+  // override for self-references inside _renderPaint / _getOutlinePath2D.
+  const needsWrapper =
+    (sceneSettings && controller?.sceneSettings !== sceneSettings) || !!selfRefPath;
+  const renderController = needsWrapper
+    ? Object.assign(Object.create(controller ?? null), {
+        sceneSettings: sceneSettings ?? controller?.sceneSettings,
+        selfRefPath,
+      })
+    : controller;
+
   // Collect ALL clip glyph names from the paint graph and wait until ready
   const clipGlyphs = _collectClipGlyphs(resolvedPaint);
+  const currentGlyphName =
+    positionedGlyph?.varGlyph?.name ?? positionedGlyph?.varGlyph?.glyph?.name;
   let allReady = true;
   for (const name of clipGlyphs) {
+    // Self-ref clip is satisfied by selfRefPath override; skip prefetch.
+    if (selfRefPath && name === currentGlyphName) continue;
     const p = _getOutlinePath2D(
       name,
       fontController,
-      controller,
+      renderController,
       cache,
       positionedGlyph
     );
@@ -308,7 +448,6 @@ export function renderCOLRv1(
 
   if (!allReady) return;
 
-  // Render the paint graph
   ctx.save();
   _renderPaint(
     ctx,
@@ -319,7 +458,7 @@ export function renderCOLRv1(
     cache,
     positionedGlyph,
     0,
-    controller
+    renderController
   );
   ctx.restore();
 }
@@ -391,10 +530,14 @@ function _renderPaint(
     case "PaintGlyph":
     case "PaintVarGlyph": {
       const glyphName = paint.glyph ?? "";
+      const currentGlyphName =
+        positionedGlyph?.varGlyph?.name ?? positionedGlyph?.varGlyph?.glyph?.name;
 
-      // Check if the referenced glyph has its own COLRv1 data
+      // Check if the referenced glyph has its own COLRv1 data. If the paint
+      // references the current glyph, use its outline as a clip path instead
+      // of recursing into the same paint graph.
       const refGlyph = fontController.getCachedGlyph?.(glyphName);
-      const refPaint = getPaintGraph(refGlyph);
+      const refPaint = glyphName === currentGlyphName ? null : getPaintGraph(refGlyph);
 
       if (refPaint) {
         // Render the referenced color glyph directly
@@ -873,6 +1016,11 @@ function _applyColorLine(gradient, colorLine, palette, axisValues) {
 }
 
 function _paletteColor(palette, index, alphaOverride = 1.0, ctx = null) {
+  // Interpolation can produce fractional palette indices when all masters
+  // happen to share the same index; round before CPAL lookup.
+  if (typeof index === "number" && !Number.isInteger(index)) {
+    index = Math.round(index);
+  }
   // 0xFFFF = COLRv1 "use foreground color" — same as what the editor set on ctx
   if (index === 0xffff || index === 65535) {
     const fg = ctx?.fillStyle ?? "rgba(0,0,0,1)";
@@ -938,27 +1086,39 @@ function _getOutlinePath2D(
   positionedGlyph
 ) {
   if (!cache || typeof cache.has !== "function") return null;
+  const currentGlyphName =
+    positionedGlyph?.varGlyph?.name ?? positionedGlyph?.varGlyph?.glyph?.name;
+  const editLayerName =
+    glyphName === currentGlyphName ? controller?.sceneSettings?.editLayerName : null;
+  const cacheKey = editLayerName ? `${glyphName}\u0000${editLayerName}` : glyphName;
+
+  // Per-call selfRefPath override bypasses all caching — different stacked
+  // sibling-layer renders pass different override paths under the same key.
+  if (glyphName === currentGlyphName && controller?.selfRefPath) {
+    return controller.selfRefPath;
+  }
 
   // 1. Check frame cache
-  if (cache.has(glyphName)) return cache.get(glyphName);
+  if (cache.has(cacheKey)) return cache.get(cacheKey);
 
   // 2. Check module-level resolved cache (survives across frames)
-  if (_resolvedPathCache.has(glyphName)) {
-    const p = _resolvedPathCache.get(glyphName);
-    cache.set(glyphName, p);
+  if (_resolvedPathCache.has(cacheKey)) {
+    const p = _resolvedPathCache.get(cacheKey);
+    cache.set(cacheKey, p);
     return p;
   }
 
-  // 3. Self-reference: clip glyph IS the glyph being rendered
-  const currentGlyphName =
-    positionedGlyph?.varGlyph?.name ?? positionedGlyph?.varGlyph?.glyph?.name;
-
+  // 3. Self-reference: clip glyph IS the glyph being rendered.
+  // selfRefPath override (set when stacking sibling layers out of edit mode)
+  // takes priority; otherwise gc.flattenedPath2d already reflects the active
+  // edit layer (the StaticGlyphController is rebuilt per layerName).
   if (glyphName === currentGlyphName) {
     const gc = positionedGlyph?.glyph;
-    const path = gc?.flattenedPath2d ?? _convertFontraPathToPath2D(gc?.instance?.path);
+    const path =
+      gc?.flattenedPath2d ?? _convertFontraPathToPath2D(gc?.instance?.path);
     if (path) {
-      _resolvedPathCache.set(glyphName, path);
-      cache.set(glyphName, path);
+      _resolvedPathCache.set(cacheKey, path);
+      cache.set(cacheKey, path);
       return path;
     }
   }
@@ -991,7 +1151,7 @@ function _getOutlinePath2D(
             staticGc?.flattenedPath2d ??
             _convertFontraPathToPath2D(staticGc?.instance?.path);
           if (path) {
-            _resolvedPathCache.set(glyphName, path);
+            _resolvedPathCache.set(cacheKey, path);
             controller?.requestUpdate?.();
           } else {
             console.warn(`No path from getGlyphInstance for ${glyphName}`, staticGc);
@@ -1011,6 +1171,10 @@ function _getOutlinePath2D(
 // ---------------------------------------------------------------------------
 // Path conversion helpers
 // ---------------------------------------------------------------------------
+
+export function convertFontraPathToPath2D(pathData) {
+  return _convertFontraPathToPath2D(pathData);
+}
 
 function _convertFontraPathToPath2D(pathData) {
   if (!pathData) return new Path2D();
@@ -1081,11 +1245,15 @@ function _convertPackedPathToPath2D(p, path) {
 
   let pointIndex = 0;
   let coordIndex = 0;
+  let startPoint = 0;
 
   for (let contourIdx = 0; contourIdx < contourInfo.length; contourIdx++) {
     const info = contourInfo[contourIdx];
-    const numPoints = info.length;
+    // VarPackedPath contour entries store {endPoint, isClosed}; derive count.
+    const numPoints =
+      typeof info.length === "number" ? info.length : info.endPoint - startPoint + 1;
     const isClosed = info.isClosed;
+    startPoint = (info.endPoint ?? startPoint + numPoints - 1) + 1;
 
     if (numPoints === 0) continue;
 
@@ -1097,9 +1265,11 @@ function _convertPackedPathToPath2D(p, path) {
 
     let i = 1;
     while (i < numPoints) {
-      const pointType = types[pointIndex];
-      const isOnCurve = !!(pointType & 0x01);
-      const isCubic = !!(pointType & 0x02);
+      // VarPackedPath encoding: ON_CURVE=0x00, OFF_CURVE_QUAD=0x01,
+      // OFF_CURVE_CUBIC=0x02 (mask 0x07; high bits are flags like SMOOTH).
+      const pointType = types[pointIndex] & 0x07;
+      const isOnCurve = pointType === 0x00;
+      const isCubic = pointType === 0x02;
 
       x = coords[coordIndex];
       y = coords[coordIndex + 1];
