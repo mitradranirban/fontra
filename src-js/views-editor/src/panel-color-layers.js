@@ -327,7 +327,7 @@ export default class ColorLayersPanel extends Panel {
     super(editorController);
     this.sceneController = this.editorController.sceneController;
     this.sceneController.sceneSettingsController.addKeyListener(
-      ["selectedGlyphName"],
+      ["selectedGlyphName", "editLayerName"],
       () => this.update()
     );
     this.sceneController.addCurrentGlyphChangeListener(() => this.update());
@@ -737,10 +737,14 @@ export default class ColorLayersPanel extends Panel {
     const varGlyph = varGlyphController?.glyph;
     const pg = this.sceneController.sceneModel.getSelectedPositionedGlyph();
     const instanceGlyph = pg?.glyph?.instance;
+    const layerName = this._getTargetV1LayerName(varGlyph);
+    const layerGlyph = varGlyph?.layers?.[layerName]?.glyph;
 
-    // Check both instance and varGlyph for colorv1 data
+    // Check instance, layer, and root glyph data for colorv1 data
     const colorV1Data =
-      instanceGlyph?.customData?.[COLRV1_KEY] ?? varGlyph?.customData?.[COLRV1_KEY];
+      instanceGlyph?.customData?.[COLRV1_KEY] ??
+      layerGlyph?.customData?.[COLRV1_KEY] ??
+      varGlyph?.customData?.[COLRV1_KEY];
 
     const hasV1 = !!colorV1Data;
     const hasV0 = !!varGlyph?.customData?.[CUSTOM_DATA_KEY]?.length;
@@ -776,7 +780,7 @@ export default class ColorLayersPanel extends Panel {
           html.button(
             {
               title: translate("color-layers.start-v1"),
-              onclick: () => this._initV1(glyphName),
+              onclick: () => this._initV1(glyphName, palette.length),
             },
             ["v1"]
           ),
@@ -789,6 +793,7 @@ export default class ColorLayersPanel extends Panel {
     this._currentPaint = paint;
     const layers = paint.layers ?? [];
     const formContents = [];
+    const targetLayerName = this.sceneController.sceneSettings.editLayerName;
 
     formContents.push({
       type: "header",
@@ -800,9 +805,23 @@ export default class ColorLayersPanel extends Panel {
             () => this._addV1Layer(glyphName, paint, palette.length),
             translate("color-layers.add-layer")
           ),
+          html.button(
+            {
+              style: "font-size:0.75em;opacity:0.7;",
+              title: "Apply this COLRv1 graph to all active sources",
+              onclick: () => this._applyV1PaintToAllSources(paint),
+            },
+            ["all sources"]
+          ),
         ]
       ),
     });
+    if (targetLayerName) {
+      formContents.push({
+        type: "text",
+        value: `Source layer: ${targetLayerName}`,
+      });
+    }
 
     if (layers.length === 0) {
       formContents.push({
@@ -914,7 +933,7 @@ export default class ColorLayersPanel extends Panel {
 
         const fillPaint =
           layer.type === "PaintGlyph" || layer.type === "PaintVarGlyph"
-            ? layer.paint ?? layer
+            ? (layer.paint ?? layer)
             : layer;
         const normalType = normalizePaintType(fillPaint?.type ?? layer.type);
         this._pushParamFields(
@@ -952,8 +971,8 @@ export default class ColorLayersPanel extends Panel {
         fd.key === "alpha"
           ? 1.0
           : ["scaleX", "scaleY", "scale", "xx", "yy"].includes(fd.key)
-          ? 1.0
-          : 0;
+            ? 1.0
+            : 0;
       const fieldSource = fd.sourceKey ? targetObj?.[fd.sourceKey] : targetObj;
       const rawVal = fieldSource?.[fd.key] ?? defaultVal;
       const displayVal = isVariable(rawVal) ? rawVal.default : rawVal;
@@ -1036,7 +1055,7 @@ export default class ColorLayersPanel extends Panel {
             value: displayVal,
             integer: fd.integer ?? false,
             minValue: fd.min ?? (isIndex ? 0 : undefined),
-            maxValue: isIndex ? palette.length - 1 : fd.max ?? undefined,
+            maxValue: isIndex ? palette.length - 1 : (fd.max ?? undefined),
             auxiliaryElement: html.div({ style: "display:flex; gap:4px;" }, [
               makeVaryToggle(rawVal, layerIdx, fd.key, this),
               html.button(
@@ -1594,8 +1613,8 @@ export default class ColorLayersPanel extends Panel {
       const label = isTransform
         ? `${subIndex}: PaintTransform → ${subLayer.paint?.glyph ?? ""}`
         : isGlyph
-        ? `${subIndex}: PaintGlyph "${subLayer.glyph ?? ""}"`
-        : `${subIndex}: ${subLayer.type ?? "Paint"}`;
+          ? `${subIndex}: PaintGlyph "${subLayer.glyph ?? ""}"`
+          : `${subIndex}: ${subLayer.type ?? "Paint"}`;
       formContents.push({
         type: "header",
         label,
@@ -1844,7 +1863,7 @@ export default class ColorLayersPanel extends Panel {
           value: item?.[itemField.key] ?? (itemField.key === "alpha" ? 1.0 : 0),
           integer: itemField.integer ?? false,
           minValue: itemField.min ?? (isIndex ? 0 : undefined),
-          maxValue: isIndex ? palette.length - 1 : itemField.max ?? undefined,
+          maxValue: isIndex ? palette.length - 1 : (itemField.max ?? undefined),
         });
       }
     }
@@ -1905,8 +1924,23 @@ export default class ColorLayersPanel extends Panel {
 
   // ── COLRv1 mutations ──────────────────────────────────────────────────────
 
-  async _initV1(glyphName) {
-    await this._writeV1Paint({ type: "PaintColrLayers", layers: [] });
+  _makeDefaultV1Layer(glyphName, layerIndex, paletteSize) {
+    return {
+      type: "PaintGlyph",
+      glyph: glyphName,
+      paint: {
+        type: "PaintSolid",
+        paletteIndex: Math.min(layerIndex, Math.max(paletteSize - 1, 0)),
+        alpha: 1.0,
+      },
+    };
+  }
+
+  async _initV1(glyphName, paletteSize) {
+    await this._writeV1Paint({
+      type: "PaintColrLayers",
+      layers: [this._makeDefaultV1Layer(glyphName, 0, paletteSize)],
+    });
   }
 
   async _addV1Layer(glyphName, paint, paletteSize) {
@@ -1915,15 +1949,7 @@ export default class ColorLayersPanel extends Panel {
       ...paint,
       layers: [
         ...layers,
-        {
-          type: "PaintGlyph",
-          glyph: glyphName,
-          paint: {
-            type: "PaintSolid",
-            paletteIndex: Math.min(layers.length, paletteSize - 1),
-            alpha: 1.0,
-          },
-        },
+        this._makeDefaultV1Layer(glyphName, layers.length, paletteSize),
       ],
     });
   }
@@ -2127,26 +2153,77 @@ export default class ColorLayersPanel extends Panel {
 
   async _writeV1Paint(newPaint) {
     await this.sceneController.editGlyphAndRecordChanges((varGlyph) => {
-      const defaultSource =
-        varGlyph.sources?.find((s) => !s.inactive && !s.locationBase) ??
-        varGlyph.sources?.[0];
-      const layerName = defaultSource?.layerName;
-      const layerGlyph = varGlyph.layers?.[layerName]?.glyph;
+      const referencedGlyphs = collectReferencedGlyphs(newPaint);
+      const layerName = this._getTargetV1LayerName(varGlyph);
+      const layerNames = layerName ? [layerName] : [];
 
-      if (layerGlyph) {
+      let wrotePaint = false;
+      for (const layerName of layerNames) {
+        const layerGlyph = varGlyph.layers?.[layerName]?.glyph;
+        if (!layerGlyph) continue;
         if (!layerGlyph.customData) layerGlyph.customData = {};
         layerGlyph.customData[COLRV1_KEY] = newPaint;
-        layerGlyph.customData["fontra.colrv1.referencedGlyphs"] =
-          collectReferencedGlyphs(newPaint);
+        layerGlyph.customData["fontra.colrv1.referencedGlyphs"] = referencedGlyphs;
+        wrotePaint = true;
+      }
 
-        if (varGlyph.customData?.[COLRV1_KEY]) {
-          delete varGlyph.customData[COLRV1_KEY];
-        }
-      } else {
+      if (varGlyph.customData?.[COLRV1_KEY]) {
+        delete varGlyph.customData[COLRV1_KEY];
+      }
+
+      if (!wrotePaint) {
         console.error("Paint Tool Error: Could not find target layer for data write.");
       }
       return translate("color-layers.edit-colrv1-paint");
     });
+    await this.update();
+  }
+
+  async _applyV1PaintToAllSources(paint) {
+    await this.sceneController.editGlyphAndRecordChanges((varGlyph) => {
+      const referencedGlyphs = collectReferencedGlyphs(paint);
+      let wrotePaint = false;
+      for (const layerName of this._getActiveSourceLayerNames(varGlyph)) {
+        const layerGlyph = varGlyph.layers?.[layerName]?.glyph;
+        if (!layerGlyph) continue;
+        if (!layerGlyph.customData) layerGlyph.customData = {};
+        layerGlyph.customData[COLRV1_KEY] = structuredClone(paint);
+        layerGlyph.customData["fontra.colrv1.referencedGlyphs"] = referencedGlyphs;
+        wrotePaint = true;
+      }
+
+      if (varGlyph.customData?.[COLRV1_KEY]) {
+        delete varGlyph.customData[COLRV1_KEY];
+      }
+
+      if (!wrotePaint) {
+        console.error("Paint Tool Error: Could not find source layers for data write.");
+      }
+      return "Apply COLRv1 paint to all sources";
+    });
+    await this.update();
+  }
+
+  _getActiveSourceLayerNames(varGlyph) {
+    return [
+      ...new Set(
+        (varGlyph?.sources ?? [])
+          .filter((source) => !source.inactive && source.layerName)
+          .map((source) => source.layerName)
+      ),
+    ];
+  }
+
+  _getTargetV1LayerName(varGlyph) {
+    const editLayerName = this.sceneController.sceneSettings.editLayerName;
+    if (editLayerName && varGlyph?.layers?.[editLayerName]) {
+      return editLayerName;
+    }
+    const source =
+      varGlyph?.sources?.find((s) => !s.inactive && !s.locationBase) ??
+      varGlyph?.sources?.find((s) => !s.inactive) ??
+      varGlyph?.sources?.[0];
+    return source?.layerName;
   }
   // ── COLRv0 mutations (unchanged) ─────────────────────────────────────────
 

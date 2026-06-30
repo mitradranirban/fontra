@@ -2,6 +2,10 @@ import { withSavedState } from "@fontra/core/utils.ts";
 import { mulScalar } from "@fontra/core/var-funcs.js";
 import {
   COLRV1_KEY,
+  convertFontraPathToPath2D,
+  getInterpolatedVariantPaint,
+  getInterpolatedVariantPath,
+  getLayerPaintGraph,
   getPaintGraph,
   getTagLocation,
   renderCOLRv0FromLayers,
@@ -146,19 +150,127 @@ export const colrv1PaintOverlayDefinition = {
       positionedGlyph?.glyph?.varGlyph?.customData ?? // glyph-side nesting
       positionedGlyph?.varGlyph?.instance?.customData; // interpolated instance
 
-    const paint = getPaintGraph(instanceCd) ?? getPaintGraph(varGlyphCd);
+    const paint =
+      getPaintGraph(instanceCd) ??
+      getLayerPaintGraph(positionedGlyph, model.sceneSettings) ??
+      getPaintGraph(varGlyphCd);
     if (paint) {
       // COLRv1: existing paint graph path
       const axisValues = getTagLocation(model.fontController, model.sceneSettings);
-      renderCOLRv1(
-        context,
-        positionedGlyph,
-        model.fontController,
-        axisValues,
-        activePaletteIndex,
-        controller,
-        colrPathCache
-      );
+
+      const selectedPositionedGlyph = model.getSelectedPositionedGlyph?.();
+      const isEditingThisGlyph =
+        !!model.selectedGlyph?.isEditing &&
+        positionedGlyph === selectedPositionedGlyph;
+
+      if (isEditingThisGlyph) {
+        // Edit mode: render the active layer's paint only, using
+        // gc.flattenedPath2d for self-references.
+        renderCOLRv1(
+          context,
+          positionedGlyph,
+          model.fontController,
+          axisValues,
+          activePaletteIndex,
+          controller,
+          colrPathCache,
+          model.sceneSettings
+        );
+      } else {
+        // Out of edit mode: stack the active source's layer + its
+        // ^variants. Order approximates COLR semantics (first drawn =
+        // bottom): ^background variants first.
+        const varGlyph =
+          positionedGlyph?.varGlyph?.glyph ?? positionedGlyph?.varGlyph;
+        const allLayers = varGlyph?.layers ?? {};
+
+        // Resolve a "primary" layer name for the displayed instance, then
+        // collect all unique ^suffixes that share that primary family.
+        const gc = positionedGlyph?.glyph;
+        const varGlyphController = positionedGlyph?.varGlyph;
+        let primaryLayerName = gc?.layerName;
+        if (!primaryLayerName && gc?.sourceIndex != null) {
+          primaryLayerName = varGlyph?.sources?.[gc.sourceIndex]?.layerName;
+        }
+        if (!primaryLayerName) {
+          const defaultSource =
+            varGlyph?.sources?.find((s) => !s.inactive && !s.locationBase) ??
+            varGlyph?.sources?.find((s) => !s.inactive) ??
+            varGlyph?.sources?.[0];
+          primaryLayerName = defaultSource?.layerName;
+        }
+        const primaryRoot = primaryLayerName?.split("^")[0];
+
+        const familyNames = primaryRoot
+          ? Object.keys(allLayers).filter(
+              (n) => n === primaryRoot || n.startsWith(primaryRoot + "^")
+            )
+          : Object.keys(allLayers);
+        familyNames.sort((a, b) => {
+          const aBg = a.includes("^background");
+          const bBg = b.includes("^background");
+          return aBg === bBg ? 0 : aBg ? -1 : 1;
+        });
+
+        const sourceLocation = model.sceneSettings?.fontLocationSourceMapped ?? {};
+
+        let renderedAny = false;
+        for (const name of familyNames) {
+          const layerGlyph = allLayers[name]?.glyph;
+          const layerPaint = getPaintGraph(layerGlyph?.customData);
+          if (!layerPaint) continue;
+          const rawPath = layerGlyph?.path;
+          const hasContent =
+            rawPath?.coordinates?.length > 0 || rawPath?.contours?.length > 0;
+          if (!hasContent) continue;
+
+          // Interpolate path + paint for this variant across all sources
+          // sharing the suffix.
+          const suffix = name.slice(primaryRoot.length); // "" for main
+          const interpolatedPath = getInterpolatedVariantPath(
+            varGlyphController,
+            suffix,
+            sourceLocation
+          );
+          const interpolatedPaint = getInterpolatedVariantPaint(
+            varGlyphController,
+            suffix,
+            sourceLocation
+          );
+          const path2d = convertFontraPathToPath2D(interpolatedPath ?? rawPath);
+          if (!path2d) continue;
+          renderCOLRv1(
+            context,
+            positionedGlyph,
+            model.fontController,
+            axisValues,
+            activePaletteIndex,
+            controller,
+            colrPathCache,
+            model.sceneSettings,
+            {
+              paintOverride: interpolatedPaint ?? layerPaint,
+              selfRefPath: path2d,
+            }
+          );
+          renderedAny = true;
+        }
+
+        // Fallback to single-paint render (e.g., for glyphs whose paint
+        // lives only on the interpolated instance or varGlyph customData).
+        if (!renderedAny) {
+          renderCOLRv1(
+            context,
+            positionedGlyph,
+            model.fontController,
+            axisValues,
+            activePaletteIndex,
+            controller,
+            colrPathCache,
+            model.sceneSettings
+          );
+        }
+      }
     } else {
       // COLRv0: draw directly from color.N UFO layers + CPAL palette
       renderCOLRv0FromLayers(

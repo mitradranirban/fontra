@@ -8,12 +8,11 @@
 
 import * as html from "@fontra/core/html-utils.js";
 import { translate } from "@fontra/core/localization.js";
+import { getLayerPaintGraph, getPaintGraph } from "./colrv1-canvas-renderer.js";
 import { PAINT_PARAM_SCHEMA, normalizePaintType } from "./panel-color-layers.js";
 import Panel from "./panel.js";
 import { setActivePaletteIndex } from "./visualization-layers.js";
 const PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes";
-const CUSTOM_DATA_KEY = "colorLayerMapping";
-const COLRV1_KEY = "colorv1";
 
 interface PaintNodeOptions {
   label?: string;
@@ -628,7 +627,9 @@ function makeNumberInput(
 // ---------------------------------------------------------------------------
 export default class ColorGraphPanel extends Panel {
   static identifier = "color-graph";
-  static iconPath = "images/color-graph.svg";
+  static iconPath = "/images/color-graph.svg";
+  identifier = ColorGraphPanel.identifier;
+  iconPath = ColorGraphPanel.iconPath;
 
   sceneController: any;
   _selectedPaintId: { current: number | null };
@@ -649,6 +650,9 @@ export default class ColorGraphPanel extends Panel {
     this.sceneController.sceneSettingsController.addKeyListener(
       "selectedGlyphName",
       () => this.update()
+    );
+    this.sceneController.sceneSettingsController.addKeyListener("editLayerName", () =>
+      this.update()
     );
     this.sceneController.addCurrentGlyphChangeListener(() => this.update());
   }
@@ -697,7 +701,9 @@ export default class ColorGraphPanel extends Panel {
       const pg = this.sceneController.sceneModel?.getSelectedPositionedGlyph?.();
       const instanceGlyph = pg?.glyph?.instance;
       const colorV1Data =
-        instanceGlyph?.customData?.[COLRV1_KEY] ?? varGlyph?.customData?.[COLRV1_KEY];
+        getPaintGraph(instanceGlyph?.customData) ??
+        getLayerPaintGraph(pg, this.sceneController.sceneSettings) ??
+        getPaintGraph(varGlyph?.customData);
       if (colorV1Data) {
         paint = colorV1Data;
         if (paint.type !== "PaintColrLayers") {

@@ -31,7 +31,11 @@ export function registerVisualizationLayerDefinition(newLayerDef) {
 }
 registerVisualizationLayerDefinition({
   ...colrv1PaintOverlayDefinition,
-  zIndex: 10,
+  // Above fontra.context.glyphs / fontra.selected.glyph (both zIndex 200)
+  // so colored paint isn't hidden by their opaque fill when the glyph is
+  // not in editing mode. Still below fontra.edit.path.fill (500), whose
+  // translucent overlay only tints when editing.
+  zIndex: 201,
   selectionFunc: glyphSelector("all"),
 });
 export function glyphSelector(selectionMode) {
