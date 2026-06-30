@@ -33,12 +33,14 @@ export const ensureLanguageHasLoaded = new Promise((resolve) => {
   resolveLanguageHasLoaded = resolve;
 });
 
+const importTimeStamp = Date.now(); /* for cache busting */
+
 function languageChanged(locale) {
   // Do explicit .replace() because our cache busting mechanism is simplistic,
   // and backtick strings don't work.
   const translationsPath = "/lang/locale.js".replace("locale", locale);
 
-  import(/*webpackIgnore: true*/ translationsPath)
+  import(/*webpackIgnore: true*/ translationsPath + `?t=${importTimeStamp}`)
     .then((mod) => {
       localizationData = mod.strings;
       resolveLanguageHasLoaded();

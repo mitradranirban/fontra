@@ -1,11 +1,69 @@
 # Changelog for Fontra
 
-## 2026-05-?? [version 2026.5.2]
+## 2026-06-?? [version 2026.6.6]
 
 ### Improvements
 
+- [glyphsets] Updated the Google Fonts glyphsets to 1.1.3. [Issue 2673](https://github.com/fontra/fontra/issues/2673), [PR 2675](https://github.com/fontra/fontra/pull/2675)
+- [languages] Some new strings and some improved strings for Simplified Chinese and Traditional Chinese, contributed by 湖远星（Lake桑）. [PR 2674](https://github.com/fontra/fontra/pull/2674)
+
+## 2026-06-28 [version 2026.6.5]
+
+### Fixes
+
+- [languages] Fix caching behavior for language files (UI strings), to ensure we always see the latest version. [Issue 2668](https://github.com/fontra/fontra/issues/2668), [PR 2669](https://github.com/fontra/fontra/pull/2669)
+- [tests] Ensure tests written in TypeScript are run as part of the test suite. [Issue 2664](https://github.com/fontra/fontra/issues/2664), [PR 2670](https://github.com/fontra/fontra/pull/2670)
+
+## 2026-06-26 [version 2026.6.4]
+
+### New features
+
+- [editor] Add contextual menus for curve type conversion (to cubic, to quadratic). [Issue 151](https://github.com/fontra/fontra/issues/151), [Issue 2662](https://github.com/fontra/fontra/issues/2662), [PR 2666](https://github.com/fontra/fontra/pull/2666)
+- [editor] Use tab key to cycle through the selectable items (points, components, anchors, guidelines). [Issue 2638](https://github.com/fontra/fontra/issues/2638), [PR 2645](https://github.com/fontra/fontra/pull/2645)
+
+### Improvements
+
+- [Safari] Work around Safari performance problem with long canvas texts. Found and fixed by Qwerasd [Issue 2654](https://github.com/fontra/fontra/issues/2654), [PR 2665](https://github.com/fontra/fontra/pull/2665)
+- [editor] Make the middle mouse button a shortcut for the hand tool (for panning), as is common in drawing applications. [Issue 2659](https://github.com/fontra/fontra/issues/2659), [PR 2661](https://github.com/fontra/fontra/pull/2661)
+- [browser] Keep forward history when using the browser back button. [PR 2660](https://github.com/fontra/fontra/pull/2660)
+- Make page/view titles more consistent, remove "Fontra" prefixes. [Issue 2650](https://github.com/fontra/fontra/issues/2650), [PR 2657](https://github.com/fontra/fontra/pull/2657)
+
+### Fixes
+
+- Work around a problem with dead-key text input on Chromium browsers on Windows. [Issue 2628](https://github.com/fontra/fontra/issues/2628), [PR 2631](https://github.com/fontra/fontra/pull/2631)
+
+## 2026-06-15 [version 2026.6.3]
+
+### Fixes
+
+- Fix erratic behavior when .fontra data is stored in a folder that is managed by iCloud. [Issue 2626](https://github.com/fontra/fontra/issues/2626), [PR 2630](https://github.com/fontra/fontra/pull/2630)
+
+## 2026-06-11 [version 2026.6.2]
+
+### Improvements
+
+- [cross-axis-mappings] Add checkbox to deactivate individual mappings. [PR 2627](https://github.com/fontra/fontra/pull/2627)
+- [cross-axis-mappings] Improve behavior in the presence of discrete axes, by ignoring them. [Issue 2623](https://github.com/fontra/fontra/issues/2623), [PR 2624](https://github.com/fontra/fontra/pull/2624), [PR 2625](https://github.com/fontra/fontra/pull/2625)
+- [fontra-workflow] Add a `drop-kerning` filter. [PR 2622](https://github.com/fontra/fontra/pull/2622)
+- [fontra-pak] Fix "check for updates" functionality. [fontra-pak PR 252](https://github.com/fontra/fontra-pak/pull/252)
+
+## 2026-06-08 [version 2026.6.1]
+
+### Improvements
+
+- [fontra-workflow] Improve performance of full instantiation, especially when there are many axes. [PR 2621](https://github.com/fontra/fontra/pull/2621)
+
+## 2026-06-07 [version 2026.6.0]
+
+### Improvements
+
+- [fontra-workflow] Reformatted the .yaml test files so that each step starts with its operational keyword, which reads a lot better. [PR 2620](https://github.com/fontra/fontra/pull/2620)
+- [fontra-workflow] Add support for instantiating with cross-axis mappings [PR 2619](https://github.com/fontra/fontra/pull/2619)
+- [fontra-workflow] Make the fontra-workflow backend respond to external changes to the .yaml file. [PR 2618](https://github.com/fontra/fontra/pull/2618)
 - [shaping] Gracefully handle invalid conditional substitution rules that use unknown axes. [PR 2598](https://github.com/fontra/fontra/pull/2598)
 - [glyph search] Allow `U+`- or `0x`-prefixed hex code points in various glyph search fields, to find glyphs by their hexadecimal code point. [Issue 2606](https://github.com/fontra/fontra/issues/2606), [PR 2608](https://github.com/fontra/fontra/pull/2608)
+- [cross-axis mappings] When a font has cross axis mappings, activate "show effective location" by default. [PR 2609](https://github.com/fontra/fontra/pull/2609)
+- [cross-axis mappings] When creating a new cross-axis mapping, make sure it is in view by scrolling to the end. This improves the experience when there are many mappings. [PR 2610](https://github.com/fontra/fontra/pull/2610)
 
 ## 2026-05-12 [version 2026.5.1]
 

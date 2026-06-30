@@ -28,6 +28,7 @@ import {
   asyncMap,
   consolidateCalls,
   dumpURLFragment,
+  eventIsCausedByWritingURLFragment,
   glyphMapToItemList,
   isActiveElementTypeable,
   modulo,
@@ -146,7 +147,9 @@ export class FontOverviewController extends ViewController {
     window.name = `fontra.fontoverview.${this.projectIdentifier}`;
 
     window.addEventListener("popstate", (event) => {
-      this._updateFromWindowLocation();
+      if (!eventIsCausedByWritingURLFragment()) {
+        this._updateFromWindowLocation();
+      }
     });
 
     this.fontOverviewSettingsController = new ObservableController({

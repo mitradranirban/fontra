@@ -35,12 +35,13 @@ export class CrossAxisMappingPanel extends BaseInfoPanel {
     );
   }
 
-  async setupUI() {
+  async setupUI(scrollToLastItem = false) {
     const mappings = this.fontController.axes.mappings;
 
+    // Map to source space and filter out discrete axes
     this.fontAxesSourceSpace = mapAxesFromUserSpaceToSourceSpace(
       this.fontController.axes.axes
-    );
+    ).filter((axis) => axis.minValue !== undefined);
 
     const container = html.div({
       style: "display: grid; gap: 0.5em;",
@@ -89,6 +90,14 @@ export class CrossAxisMappingPanel extends BaseInfoPanel {
     );
     this.panelElement.appendChild(container);
     this.panelElement.focus();
+
+    if (scrollToLastItem) {
+      container.lastChild.scrollIntoView({
+        behavior: "auto",
+        block: "nearest",
+        inline: "nearest",
+      });
+    }
   }
 
   async newCrossAxisMapping() {
@@ -106,7 +115,7 @@ export class CrossAxisMappingPanel extends BaseInfoPanel {
     });
     if (changes.hasChange) {
       this.postChange(changes.change, changes.rollbackChange, undoLabel);
-      this.setupUI();
+      this.setupUI(true);
     }
   }
 
@@ -148,6 +157,13 @@ addStyleSheet(`
   grid-column-start: 5;
   grid-column-end: 7;
   align-items: center;
+}
+
+.fontra-ui-font-info-cross-axis-mapping-panel-inactive-delete-cell {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 1em;
+  width: 100%;
 }
 
 .fontra-ui-font-info-cross-axis-mapping-panel-header {
@@ -245,6 +261,7 @@ class CrossAxisMappingBox extends HTMLElement {
       inputLocationCheckboxes: { ...inputLocationCheckboxes },
       outputLocation: { ...mapping.outputLocation },
       outputLocationCheckboxes: { ...outputLocationCheckboxes },
+      inactive: { inactive: !!mapping.inactive },
     };
 
     return model;
@@ -323,6 +340,12 @@ class CrossAxisMappingBox extends HTMLElement {
       }, `edit description ${event.key}`);
     });
 
+    this.controllers.inactive.addListener((event) => {
+      this.editCrossAxisMapping((mapping) => {
+        mapping.inactive = event.newValue;
+      }, `toggle inactive`);
+    });
+
     for (const prop of ["input", "output"]) {
       const locationController = this.controllers[`${prop}Location`];
       const checkboxController = this.controllers[`${prop}LocationCheckboxes`];
@@ -390,14 +413,25 @@ class CrossAxisMappingBox extends HTMLElement {
         )
       )
     );
+
     this.append(
-      html.createDomElement("icon-button", {
-        "class": "fontra-ui-font-info-cross-axis-mapping-panel-icon",
-        "src": "/tabler-icons/trash.svg",
-        "onclick": (event) => this.deleteCrossAxisMapping(),
-        "data-tooltip": translate("cross-axis-mapping.delete"),
-        "data-tooltipposition": "left",
-      })
+      html.div(
+        { class: "fontra-ui-font-info-cross-axis-mapping-panel-inactive-delete-cell" },
+        [
+          labeledCheckbox(
+            translate("cross-axis-mapping.inactive"),
+            this.controllers.inactive,
+            "inactive"
+          ),
+          html.createDomElement("icon-button", {
+            "class": "fontra-ui-font-info-cross-axis-mapping-panel-icon",
+            "src": "/tabler-icons/trash.svg",
+            "onclick": (event) => this.deleteCrossAxisMapping(),
+            "data-tooltip": translate("cross-axis-mapping.delete"),
+            "data-tooltipposition": "left",
+          }),
+        ]
+      )
     );
 
     const inputHeaderElement = html.div(

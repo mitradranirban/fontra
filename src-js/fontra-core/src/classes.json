@@ -477,6 +477,9 @@
     "outputLocation": {
       "type": "dict",
       "subtype": "float"
+    },
+    "inactive": {
+      "type": "bool"
     }
   },
   "FontSource": {

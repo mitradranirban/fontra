@@ -66,6 +66,12 @@ import { _collectClipGlyphs, getPaintGraph } from "./colrv1-canvas-renderer.js";
 import { EditBehaviorFactory } from "./edit-behavior.js";
 import { SceneModel } from "./scene-model.js";
 
+export const ShowLocationSettings = Object.freeze({
+  DontShowEffectiveLocation: 0,
+  ShowEffectiveLocation: 1,
+  OnlyShowEffectiveLocation: 2,
+});
+
 // Minimum pixels per em and maximum pixels per unit for zooming out and in.
 //
 // Note that these are not _screen pixels_, they are css "pixels" which are
@@ -82,6 +88,8 @@ import { SceneModel } from "./scene-model.js";
 // be some merit to letting users configure this to their own taste.
 const MIN_PIX_PER_EM = 5;
 const MAX_PIX_PER_UNIT = 200;
+
+export const numQuadraticOffCurvePointsOptions = [1, 2, 3, 4, 5];
 
 export class SceneController {
   constructor(
@@ -135,6 +143,8 @@ export class SceneController {
     this.sceneSettings.myGlyphSets = getMyGlyphSets();
 
     this.fontController.ensureInitialized.then(() => {
+      this._setShowEffectiveLocationDefaults();
+
       this.sceneSettingsController.setItem(
         "projectGlyphSets",
         readProjectGlyphSets(this.fontController),
@@ -374,6 +384,29 @@ export class SceneController {
     );
   }
 
+  _setShowEffectiveLocationDefaults() {
+    // If for each of the sets of non-hidden and hidden axes there exists a
+    // cross-axis mapping that influences it, activate "ShowEffectiveLocation"
+    // by default (used in panel-designspace-navigation.js)
+    for (const [key, hidden] of [
+      ["fontAxesShowEffectiveLocation", false],
+      ["hiddenFontAxesShowEffectiveLocation", true],
+    ]) {
+      const axisNames = new Set(
+        this.fontController.fontAxes
+          .filter((axis) => !!axis.hidden == hidden)
+          .map((axis) => axis.name)
+      );
+      if (
+        this.fontController.axes.mappings.some(({ outputLocation }) =>
+          Object.keys(outputLocation).some((key) => axisNames.has(key))
+        )
+      ) {
+        this.sceneSettings[key] = ShowLocationSettings.ShowEffectiveLocation;
+      }
+    }
+  }
+
   setCanvasMagnificationLimits() {
     // The lower magnification limit is implemented relative to UPM
     // to provide a consistent em size when zoomed all the way out.
@@ -426,7 +459,7 @@ export class SceneController {
       }
 
       if (waitKeyBefore) {
-        await this.sceneSettingsController.waitForKeyChange(waitKeyBefore);
+        await this.sceneSettingsController.waitForKeyChange(waitKeyBefore, false, 20);
       }
 
       if (
@@ -450,7 +483,7 @@ export class SceneController {
       }
 
       if (waitKeyAfter) {
-        await this.sceneSettingsController.waitForKeyChange(waitKeyAfter);
+        await this.sceneSettingsController.waitForKeyChange(waitKeyAfter, false, 20);
       }
     }
   }
@@ -494,7 +527,7 @@ export class SceneController {
           viewInfo[infoKey] = { ...settingsValue };
         }
       } else {
-        assert(false, `can't get here ${[key, defaultValue, viewValue]}`);
+        assert(false, `can't get here ${[key, defaultValue, settingsValue]}`);
       }
     }
 
@@ -1116,6 +1149,15 @@ export class SceneController {
       { actionIdentifier: "action.break-contour" },
       { actionIdentifier: "action.reverse-contour" },
       { actionIdentifier: "action.set-contour-start" },
+      {
+        title: translate("action.glyph.convert-curves"),
+        getItems: () => [
+          { actionIdentifier: "action.glyph.convert-curves-to-cubic" },
+          ...numQuadraticOffCurvePointsOptions.map((i) => ({
+            actionIdentifier: `action.glyph.convert-curves-to-quadratic-${i}`,
+          })),
+        ],
+      },
       {
         title: () =>
           translatePlural(
@@ -1883,8 +1925,8 @@ function getSceneSettingsDefaults() {
     fontLocationSource: {},
     fontLocationSourceMapped: {},
     fontAxesUseSourceCoordinates: false,
-    fontAxesShowEffectiveLocation: false,
-    hiddenFontAxesShowEffectiveLocation: false,
+    fontAxesShowEffectiveLocation: ShowLocationSettings.DontShowEffectiveLocation,
+    hiddenFontAxesShowEffectiveLocation: ShowLocationSettings.DontShowEffectiveLocation,
     fontAxesShowHidden: false,
     fontAxesSkipMapping: false,
     glyphLocation: {},

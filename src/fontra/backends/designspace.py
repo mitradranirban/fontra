@@ -95,6 +95,7 @@ RF_GUIDELINE_LOCK_LIB_PREFIX = "com.typemytype.robofont.guideline.locked."
 COLOR_PALETTES_KEY = "com.github.googlei18n.ufo2ft.colorPalettes"
 COLOR_LAYERS_KEY = "com.github.googlei18n.ufo2ft.colorLayers"
 COLOR_LAYER_MAPPING_KEY = "com.github.googlei18n.ufo2ft.colorLayerMapping"
+CROSS_AXIS_MAPPING_INFO_LIB_KEY = "xyz.fontra.cross-axis-mapping-info"
 
 
 defaultUFOInfoAttrs = {
@@ -368,7 +369,7 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
     def familyName(self) -> str:
         return self._familyName if self._familyName is not None else "Untitled"
 
-    @async_property
+    @async_property[GlyphDependencies]
     async def glyphDependencies(self) -> GlyphDependencies:
         if self._glyphDependencies is not None:
             return self._glyphDependencies
@@ -410,14 +411,20 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
             defaultLocation[dsAxis.name] = dsAxis.map_forward(dsAxis.default)
         self.axes = axes
 
+        crossAxisMappingInactive = {
+            info["index"]: info.get("inactive", False)
+            for info in self.dsDoc.lib.get(CROSS_AXIS_MAPPING_INFO_LIB_KEY, [])
+        }
+
         self.axisMappings = [
             CrossAxisMapping(
                 description=mapping.description,
                 groupDescription=mapping.groupDescription,
                 inputLocation=dict(mapping.inputLocation),
                 outputLocation=dict(mapping.outputLocation),
+                inactive=crossAxisMappingInactive.get(index, False),
             )
-            for mapping in self.dsDoc.axisMappings
+            for index, mapping in enumerate(self.dsDoc.axisMappings)
         ]
 
         self.axisNames = set(defaultLocation)
@@ -1337,13 +1344,21 @@ class DesignspaceBackend(WatchableBackend, WritableBaseBackend):
 
             self.dsDoc.addAxisDescriptor(**axisParameters)
 
-        for mapping in axes.mappings:
+        crossAxisMappingInfo = []
+
+        for index, mapping in enumerate(axes.mappings):
             self.dsDoc.addAxisMappingDescriptor(
                 description=mapping.description,
                 groupDescription=mapping.groupDescription,
                 inputLocation=mapping.inputLocation,
                 outputLocation=mapping.outputLocation,
             )
+            if mapping.inactive:
+                crossAxisMappingInfo.append({"index": index, "inactive": True})
+
+        storeInDict(
+            self.dsDoc.lib, CROSS_AXIS_MAPPING_INFO_LIB_KEY, crossAxisMappingInfo
+        )
 
         self.updateAxisInfo()
         self._writeDesignSpaceDocument()

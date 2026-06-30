@@ -1111,12 +1111,15 @@ async def test_putAxes_with_mappings(tmpdir):
     outputPath = tmpdir / "TmpFont.designspace"
     outputBackend = newFileSystemBackend(outputPath)
 
+    axes = deepcopy(expectedAxesWithMappings)
+    axes.mappings[-1].inactive = True
+
     async with aclosing(outputBackend):
-        await outputBackend.putAxes(expectedAxesWithMappings)
+        await outputBackend.putAxes(axes)
 
     reopenedBackend = getFileSystemBackend(outputPath)
     roundTrippedAxes = await reopenedBackend.getAxes()
-    assert expectedAxesWithMappings == roundTrippedAxes
+    assert axes == roundTrippedAxes
 
 
 async def test_putFeatures(writableTestFont):

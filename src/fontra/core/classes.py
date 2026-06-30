@@ -46,6 +46,7 @@ class CrossAxisMapping:
     groupDescription: Optional[str] = None
     inputLocation: Location
     outputLocation: Location
+    inactive: bool = False
 
 
 @dataclass(kw_only=True)
@@ -509,6 +510,7 @@ def registerHook(cls, omitIfDefault=True, **fieldHooks):
 
 
 # The order in which the hooks are registered is significant, for unclear reasons
+registerHook(CrossAxisMapping)
 registerHook(DecomposedTransform)
 registerHook(
     Component,

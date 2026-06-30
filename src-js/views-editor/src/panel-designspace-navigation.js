@@ -55,6 +55,7 @@ import {
 
 import { NumberFormatter } from "@fontra/core/formatters.js";
 import Panel from "./panel.js";
+import { ShowLocationSettings } from "./scene-controller.js";
 
 const FONTRA_STATUS_KEY = "fontra.development.status";
 const FONTRA_STATUS_DEFINITIONS_KEY = "fontra.sourceStatusFieldDefinitions";
@@ -70,12 +71,6 @@ const LIST_HEADER_ANIMATION_STYLE = `
   transform: scale(1.2);
 }
 `;
-
-const ShowLocationSettings = {
-  DontShowEffectiveLocation: 0,
-  ShowEffectiveLocation: 1,
-  OnlyShowEffectiveLocation: 2,
-};
 
 export default class DesignspaceNavigationPanel extends Panel {
   identifier = "designspace-navigation";

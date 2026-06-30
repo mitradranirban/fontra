@@ -624,6 +624,16 @@ export function readObjectFromURLFragment() {
   return url.hash ? loadURLFragment(url.hash) : {};
 }
 
+let _writingURLFragment = false;
+/**
+ * Returns true in an event listener for `popstate` or `navigate` if the event
+ * was triggered by a call to `writeObjectToURLFragment`, and not by the user
+ * using the browser's navigation (forward and back buttons).
+ */
+export function eventIsCausedByWritingURLFragment() {
+  return _writingURLFragment;
+}
+
 export function writeObjectToURLFragment(obj: any, replace = false) {
   const newFragment = dumpURLFragment(obj);
   // @ts-ignore Typescript complains that window.location is missing some
@@ -633,10 +643,23 @@ export function writeObjectToURLFragment(obj: any, replace = false) {
     return;
   }
   url.hash = newFragment;
+
+  // See explanation on `eventIsCausedByWritingURLFragment`.
+  _writingURLFragment = true;
+  // We reset the value in a freshly queued `hashchange` listener which is
+  // guaranteed to fire after any other existing listener since it's new.
+  window.addEventListener(
+    "hashchange",
+    () => {
+      _writingURLFragment = false;
+    },
+    { once: true }
+  );
+
   if (replace) {
-    window.history.replaceState({}, "", url);
+    window.location.replace(url);
   } else {
-    window.history.pushState({}, "", url);
+    window.location.assign(url);
   }
 }
 

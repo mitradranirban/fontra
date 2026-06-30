@@ -9,7 +9,7 @@ import {
 } from "./changes.js";
 import { getClassSchema } from "./classes.js";
 import { getGlyphMapProxy, makeCharacterMapFromGlyphMap } from "./cmap.js";
-import { CrossAxisMapping } from "./cross-axis-mapping.js";
+import { CrossAxisMapper } from "./cross-axis-mapper.js";
 import { FontSourcesInstancer } from "./font-sources-instancer.js";
 import { StaticGlyphController, VariableGlyphController } from "./glyph-controller.js";
 import { KerningController } from "./kerning-controller.js";
@@ -1011,7 +1011,7 @@ export class FontController {
 
   get crossAxisMapping() {
     if (!this._crossAxisMapping) {
-      this._crossAxisMapping = new CrossAxisMapping(
+      this._crossAxisMapping = new CrossAxisMapper(
         this.fontAxesSourceSpace,
         this.axes.mappings
       );
